@@ -12,29 +12,32 @@ import java.util.prefs.Preferences;
 
 public class zPrefMan {
     Preferences mPrefs;
-    SharedPreferences mPref;
-    SharedPreferences.Editor mPrefEdit;
-    Boolean init = false;
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mPrefEdit;
+    Boolean init;
     Context context;
     zPrefMan(Context appcontext){
         context = appcontext;
         mPref = PreferenceManager.getDefaultSharedPreferences(context);
         //mPref = context.getSharedPreferences(Pref_name,Context.MODE_PRIVATE);
-        mPrefEdit = mPref.edit();
-        if (mPref.contains("initialized") == true) {
+
+        //TODO MVC화... edit 호출도 나중에 commit할 때...
+
+        if (mPref.contains("initialized")) {
             init = mPref.getBoolean("initialized", false);
         } else
             init = false;
     }
 
 
-    public void setInit(){
+    void setInit(){
+        mPrefEdit = mPref.edit();
         mPrefEdit.putBoolean("initialized", true);
         mPrefEdit.commit();
     }
 
-    public boolean getSMSEnabled () {
-        if (mPref.contains("SMS") == true) {
+    boolean getSMSEnabled() {
+        if (mPref.contains("SMS")) {
             return mPref.getBoolean("SMS", true);
 
         } else {
@@ -43,12 +46,13 @@ public class zPrefMan {
         }
     }
 
-    public void setSMSRegistered(boolean set) {
-
+    void setSMSRegistered(boolean set) {
+        mPrefEdit = mPref.edit();
         mPrefEdit.putBoolean("SMSReg", set);
         mPrefEdit.commit();
     }
     public void ClearSharedPref(){      //if(BuildConfig.isTest)
+        mPrefEdit = mPref.edit();
         mPrefEdit.clear();
         mPrefEdit.commit();
     }

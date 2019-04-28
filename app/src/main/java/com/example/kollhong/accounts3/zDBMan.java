@@ -3,25 +3,22 @@ package com.example.kollhong.accounts3;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by KollHong on 01/05/2018.
  */
 
 public class zDBMan {
-    SQLiteDatabase db;
+    private SQLiteDatabase db;
     SaveData data;
     Cursor cursor;
     //여기서 읽기 쓰기 작업 모두 진행
     //여기서 디비 객체 선언
+    //TODO 모델 영역
+
     zDBMan(Context context, boolean RW){
         if(RW) {
             if (Build.VERSION.SDK_INT >= 24) {
@@ -45,14 +42,18 @@ public class zDBMan {
 
     }
 
-    public ItemCat getItemCat(){
+    //TODO 뷰 영역
+    //TODO 컨트롤러 영역은 UI부분임
+    //TODO 커서 리턴하지 말기!
+    //TODO 쿼리 대신 ContentValues 사용하면 함수 전부 다 합칠 수 잇을 듯
+    ItemCat getItemCat(){
         return new ItemCat();
     }
-    public ItemAcc getItemAcc(){
+    ItemAcc getItemAcc(){
         return new ItemAcc();
     }
 
-    public Cursor getTransHistory(long today00, long today2359){
+    Cursor getTransHistory(long today00, long today2359){
         cursor = db.rawQuery("select c.name, t.amount, t.recipient, a.name, parent.name, c.level, t._id " +
                 "from trans as t " +
                 "left join category as c on ( t.categoryid = c._id ) " +
@@ -63,7 +64,7 @@ public class zDBMan {
         return cursor;
     }
 
-    public Cursor getTransByAcc( long thisMonth, long nextMonth){
+    Cursor getTransByAcc(long thisMonth, long nextMonth){
 
         cursor = db.rawQuery("SELECT t._id, t.categoryid, a.name as accname, t.amount, t.accountid, t.recipient, t.rewardamount, c.level " +
                 "FROM trans as t " +
@@ -74,7 +75,7 @@ public class zDBMan {
         return cursor;
     }
 
-    public Cursor getTransbyCat(long thisMonth, long nextMonth){
+    Cursor getTransbyCat(long thisMonth, long nextMonth){
         cursor = db.rawQuery("SELECT t._id, t.categoryid, c.name, t.amount " +
                 "FROM trans as t " +
                 "left join category as c on (t.categoryid = c._id) " +
@@ -84,12 +85,12 @@ public class zDBMan {
 
     }
 
-    public Cursor getTransbyID(long id){
+    Cursor getTransbyID(long id){
         cursor = db.rawQuery("SELECT _id, time, categoryid, amount, accountid, recipient, notes, rewardrecipientid, budgetexception, rewardamount, perfexception, rewardtype FROM trans WHERE _id = '" + id + "' " ,null);
         return cursor;
     }
 
-    public String getCategoryName(long id){
+    String getCategoryName(long id){
         cursor = db.rawQuery("select c.name " +
                 "from category c " +
                 "where c._id = '" + id +
@@ -101,7 +102,7 @@ public class zDBMan {
         return "";
     }
 
-    public int getCatLevel(long id){
+    int getCatLevel(long id){
         cursor = db.rawQuery("select level " +
                 "from category  " +
                 "where _id = '" + id +
@@ -114,7 +115,7 @@ public class zDBMan {
         return 0;
     }
 
-    public Cursor getCategoryList(String name){
+    Cursor getCategoryList(String name){
         cursor = db.rawQuery("select _id from category where name = '" + name +"' ", null);
         if(cursor.getCount() != 0) {
             cursor.moveToNext(); int id = cursor.getInt(0);
@@ -127,13 +128,13 @@ public class zDBMan {
     }
 
 
-    public Cursor getAccList(){
+    Cursor getAccList(){
         cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts ", null);
         return cursor;
     }
 
-    public Cursor getAccInfo(long id){
+    Cursor getAccInfo(long id){
         cursor = db.rawQuery("select _id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts " +
                 "where _id = '" + id + "' ", null);
@@ -142,26 +143,26 @@ public class zDBMan {
 
     }
 
-    public Cursor getAccBankList(){
+    Cursor getAccBankList(){
         cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts where type == '1' ", null);
         return cursor;
     }
 
-    public Cursor getCardinfo(long card_id) {
+    Cursor getCardinfo(long card_id) {
         cursor = db.rawQuery("select performanceexceptions, sections, " +
                 " rewardrecip1, rewardamount1,  rewardrecip2, rewardamount2, rewardrecip3, rewardamount3, rewardrecip4, rewardamount4, rewardrecip5, rewardamount5, rewardrecip6, rewardamount6, rewardrecip7, rewardamount7, rewardrecip8, rewardamount8 " +
                 "from card where _id = '" + card_id + "' ", null);
         return cursor;
     }
 
-    public Cursor getCardList(int type){
+    Cursor getCardList(int type){
         cursor = db.rawQuery("select _id, card_name, company " +
                 "from card where type = '" + type + "' ", null);
         return cursor;
     }
 
-    public String getRecipName(long id){
+    String getRecipName(long id){
         cursor = db.rawQuery("select name " +
                 "from reciplists " +
                 "where _id = '" + id +
@@ -174,7 +175,7 @@ public class zDBMan {
         else return "";
     }
 
-    public Cursor getLearnData(String name){        //이름과 계좌가 같을 경우
+    Cursor getLearnData(String name){        //이름과 계좌가 같을 경우
         cursor = db.rawQuery("select _id, categoryid, accid, recipientid, budgetexception, perfexception, rewardtype, rewardamount " +
                 "from learning where recipient = '" + name + "' ", null);
         return cursor;
@@ -182,9 +183,9 @@ public class zDBMan {
 
 
 
-    public void updateAccBalance(long acc_id, float amount){
+    private void updateAccBalance(long acc_id, float amount){
         Cursor tmp = getAccInfo(data.acc_id);
-        Float tmp_amount;
+        float tmp_amount;
         if(tmp.getCount() != 0 ){
             tmp.moveToNext();
             tmp_amount = tmp.getFloat(4);
@@ -193,7 +194,7 @@ public class zDBMan {
         db.execSQL("update accounts set balance = balance - '"+ amount + "' where _id = '" + acc_id + "' ");
     }
 
-    public void updateTransaction(SaveData data){
+    private void updateTransaction(SaveData data){
         ContentValues values = new ContentValues();
         values.put("time", data.timeinmillis);
         values.put("categoryid", data.category_id);
@@ -206,7 +207,7 @@ public class zDBMan {
         values.put("rewardamount", data.rew_amount_calculated);
         values.put("perfexception", data.perfexception);
         values.put("rewardtype", data.rew_type);
-        Float tmp_amount = 0f;
+        float tmp_amount = 0f;
         Cursor tmp = getTransbyID(data.trans_id);
         if(tmp.getCount() != 0){
             tmp.moveToNext();
@@ -223,7 +224,7 @@ public class zDBMan {
 
     }
 
-    public void updateCat(long id,String name){
+    void updateCat(long id, String name){
         ContentValues values = new ContentValues();
         values.put("name",name);
 
@@ -231,7 +232,7 @@ public class zDBMan {
     }
 
 
-    public void addAcc(boolean isUpdate, ItemAcc itemAcc){
+    void addAcc(boolean isUpdate, ItemAcc itemAcc){
         /*
                 long id;
         String name;
@@ -272,7 +273,7 @@ public class zDBMan {
         //타입에 따라 바꾸기
     }
 
-    public void addCat(int cat_Level, Long parent, String name){
+    void addCat(int cat_Level, Long parent, String name){
 
         ContentValues values = new ContentValues();
         values.put("level", cat_Level + 1);
@@ -283,7 +284,7 @@ public class zDBMan {
     }
 
 
-    public void addTransaction(SaveData data){
+    private void addTransaction(SaveData data){
         ContentValues values = new ContentValues();
         values.put("time", data.timeinmillis);
         values.put("categoryid", data.category_id);
@@ -301,7 +302,7 @@ public class zDBMan {
         db.insert("trans",null, values);
     }
 
-    public long addTransactionfromReciever(SaveData data) {
+    long addTransactionfromReciever(SaveData data) {
         ContentValues values = new ContentValues();
 
         values.put("time", data.timeinmillis);
@@ -325,7 +326,7 @@ public class zDBMan {
 
 
 
-    public void addTransactiononSave(SaveData data){     //잔액 조절, 카드 확인, 기록 추가
+    void addTransactiononSave(SaveData data){     //잔액 조절, 카드 확인, 기록 추가
         int tmp = getCatLevel(data.cardid);
         switch (tmp){
             case 0:
@@ -364,7 +365,7 @@ public class zDBMan {
         }
     }
 
-    public void updateLearn(SaveData data){
+    private void updateLearn(SaveData data){
         ContentValues values = new ContentValues();
         values.put("recipient", data.recipname);
         values.put("categoryid", data.category_id);
@@ -383,15 +384,15 @@ public class zDBMan {
     }
 
 
-    public void deleteTrans(long id){
+    void deleteTrans(long id){
         db.delete("Trans","_id = '" + id +"' ",null);
     }
 
-    public void deleteAcc(long id){
+    void deleteAcc(long id){
         db.delete("accounts","_id = '" + id +"' ",null);
     }
 
-    public void deleteCat(long id){
+    void deleteCat(long id){
         db.delete("category","_id = '" + id+ "' ",null);
     }
 
