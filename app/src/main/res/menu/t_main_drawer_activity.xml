@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/Trans"
+        android:checkableBehavior="single">
+        <item
+            android:checkable="false"
+            android:enabled="false"
+            android:title="@string/title_menu_transactions">
+            <menu>
+                <item
+                    android:id="@+id/Trans_history"
+                    android:icon="@drawable/ic_list_icon"
+                    android:title="@string/title_frag_trans_0_history" />
+                <item
+                    android:id="@+id/Trans_calendar"
+                    android:icon="@drawable/ic_calendar"
+                    android:title="@string/title_frag_trans_1_cal" />
+            </menu>
+        </item>
+        <item
+            android:id="@+id/Manage"
+            android:title="@string/title_menu_manage">
+            <menu>
+                <item
+                    android:id="@+id/Accounts"
+                    android:icon="@drawable/ic_accounts"
+                    android:title="@string/title_frag_accounts" />
+                <item
+                    android:id="@+id/Stats"
+                    android:icon="@drawable/ic_stats"
+                    android:title="@string/title_frag_manage_0_stat" />
+                <item
+                    android:id="@+id/Budget"
+                    android:title="@string/title_frag_manage_1_budget" />
+
+                <item
+                    android:id="@+id/Recipient"
+                    android:icon="@drawable/ic_recipient"
+                    android:title="@string/title_frag_manage_2_recipient" />
+                <item
+                    android:id="@+id/Card_rewards"
+                    android:icon="@drawable/ic_card"
+                    android:title="@string/title_frag_manage_3_reward" />
+            </menu>
+        </item>
+        <item
+            android:id="@+id/Settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/action_settings" />
+    </group>
+    <item
+        android:id="@+id/nav_send"
+        android:icon="@drawable/ic_menu_send"
+        android:title="@string/Contact_Developer_Uri" />
+
+</menu>
