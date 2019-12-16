@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -103,20 +104,29 @@ public class B_Manage1_stat extends Fragment {
             entries.add( new PieEntry(catItems.get(i).amount,catItems.get(i).acc_name));
 
         }
-
+        Context context = getContext();
         PieChart pieChart = getView().findViewById(R.id.pieChart);
         PieDataSet pieDataSet = new PieDataSet(entries, "카테고리별 지출");
         List<Integer> colorList = new ArrayList<>();
-        colorList.add(getResources().getColor( android.R.color.holo_blue_dark, null));
-        colorList.add(getResources().getColor( android.R.color.holo_green_dark, null));
-        colorList.add(getResources().getColor( android.R.color.holo_orange_dark, null));
-        colorList.add(getResources().getColor( android.R.color.holo_red_dark, null));
-        colorList.add(getResources().getColor( R.color.colorAccent, null));
+        colorList.add(getColor(context,android.R.color.holo_blue_dark ));
+        colorList.add(getColor(context,android.R.color.holo_green_dark));
+        colorList.add(getColor(context,android.R.color.holo_orange_dark));
+        colorList.add(getColor(context,android.R.color.holo_red_dark));
+        colorList.add(getColor(context, R.color.colorAccent));
 
         pieDataSet.setColors(colorList);
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.invalidate();
+    }
+
+    public static final int getColor(Context context, int id) {
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            return ContextCompat.getColor(context, id);
+        } else {
+            return context.getResources().getColor(id);
+        }
     }
 
     public void makeRecyclerView() {

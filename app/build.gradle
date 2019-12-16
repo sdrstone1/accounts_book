@@ -17,33 +17,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug{
-            ext.enableCrashlytics = false
-            ext.alwaysUpdateBuildId = false
-
+            minifyEnabled false
+            crunchPngs false
         }
     }
     flavorDimensions "stage"
     productFlavors {
-        THETA {
-            dimension "stage"
-            applicationIdSuffix ".theta"
-            versionCode 1
-            versionName "1.0.0"
-            buildConfigField 'boolean', 'isTEST', "true"
-            //Log.d, Toast에 if(BuildConfig.isTEST) 로 분기
-            minSdkVersion 22
-            aaptOptions.cruncherEnabled = false
-            resConfigs "ko", "xxxhdpi"
-            ext.enableCrashlytics = false
-        }
         beta {
             dimension "stage"
             applicationIdSuffix ".beta"
-            versionCode new Date().format('yyMMddHHmm').toInteger()
+            versionCode 100
             versionName "1.0.0"
             buildConfigField 'boolean', 'isTEST', "true"
             //Log.d, Toast에 if(BuildConfig.isTEST) 로 분기
             minSdkVersion 22
+            resConfigs "ko", "xxxhdpi"
+            ext.enableCrashlytics = false
         }
         rel {
             dimension "stage"
@@ -64,11 +53,14 @@ android {
             universalApk false
         }
     }
-}
-
-android.variantFilter { variant ->
-    def flavorName = variant.getFlavors().get(0).name
-    android.splits.abi.enable = (flavorName == 'rel' || flavorName == 'beta')
+    variantFilter{ variant ->
+        def flavorName = variant.getFlavors().get(0).name
+        def buildName = variant.buildType.name;
+        splits.abi.enable = (flavorName == 'rel')
+        if (flavorName == 'beta' && buildName == 'release' || flavorName == 'rel' && buildName == 'debug') {
+            variant.setIgnore(true);
+        }
+    }
 }
 
 

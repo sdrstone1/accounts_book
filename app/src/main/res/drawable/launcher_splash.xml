@@ -3,7 +3,13 @@
 
     <item android:drawable="@color/colorPrimary"/>
     <item
-            android:gravity="center"
-            android:drawable="@mipmap/ic_launcher_round"/>
+
+            android:width="240dp"
+            android:height="240dp">
+            <bitmap
+                    android:gravity="center"
+                    android:drawable="@mipmap/ic_launcher_round"
+                    android:src="@mipmap/ic_launcher_round"/>
+    </item>
 
 </layer-list>
