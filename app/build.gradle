@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.kollhong.accounts3"
-        minSdkVersion 24
+        minSdkVersion 22
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -31,7 +31,7 @@ android {
             versionName "1.0.0"
             buildConfigField 'boolean', 'isTEST', "true"
             //Log.d, Toast에 if(BuildConfig.isTEST) 로 분기
-            minSdkVersion 24
+            minSdkVersion 22
             aaptOptions.cruncherEnabled = false
             resConfigs "ko", "xxxhdpi"
             ext.enableCrashlytics = false
@@ -43,7 +43,7 @@ android {
             versionName "1.0.0"
             buildConfigField 'boolean', 'isTEST', "true"
             //Log.d, Toast에 if(BuildConfig.isTEST) 로 분기
-            minSdkVersion 24
+            minSdkVersion 22
         }
         rel {
             dimension "stage"
@@ -52,7 +52,7 @@ android {
             versionName "1.0.0"
             buildConfigField 'boolean', 'isTEST', "false"
             //Log.d, Toast에 if(BuildConfig.isTEST) 로 분기
-            minSdkVersion 23
+            minSdkVersion 22
         }
 
     }
