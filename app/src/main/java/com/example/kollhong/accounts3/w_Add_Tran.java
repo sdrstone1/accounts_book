@@ -1,7 +1,6 @@
 package com.example.kollhong.accounts3;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Point;
@@ -19,8 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 //import android.support.v7.widget.Toolbar;
-import android.text.Layout;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
@@ -35,7 +32,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -62,7 +58,7 @@ public class w_Add_Tran extends AppCompatActivity {
 
     VisibleControlView VCV;
     zDBMan mDB;
-    zDBMan.SaveData Datas;
+    zDBMan.ItemTransactions Datas;
 
     Calendar calendar = Calendar.getInstance();
     DateFormat df = getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
@@ -703,18 +699,6 @@ public class w_Add_Tran extends AppCompatActivity {
         public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             final LayoutInflater inflater = mDropDownInflater == null ? mInflater : mDropDownInflater;
             return createViewFromResource(inflater, position, convertView, parent, mDropDownResource);
-        }
-
-        @Override
-        public void setDropDownViewTheme(@Nullable Resources.Theme theme) {
-            if (theme == null) {
-                mDropDownInflater = null;
-            } else if (theme == mInflater.getContext().getTheme()) {
-                mDropDownInflater = mInflater;
-            } else {
-                final Context context = new ContextThemeWrapper(mContext, theme);
-                mDropDownInflater = LayoutInflater.from(context);
-            }
         }
 
         private @NonNull

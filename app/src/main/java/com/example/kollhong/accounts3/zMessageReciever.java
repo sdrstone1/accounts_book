@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
@@ -38,7 +37,7 @@ public class zMessageReciever extends BroadcastReceiver {
     zPrefMan mPrefMan;
     zDBMan mDB;
 
-    zDBMan.SaveData data;
+    zDBMan.ItemTransactions data;
 
     @Override
     public void onReceive(Context context, Intent intent) {

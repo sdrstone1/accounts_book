@@ -3,9 +3,12 @@ package com.example.kollhong.accounts3;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
+import android.util.Log;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by KollHong on 01/05/2018.
@@ -13,33 +16,30 @@ import android.os.Build;
 
 public class zDBMan {
     private SQLiteDatabase db;
-    SaveData data;
+    ItemTransactions data;
     Cursor cursor;
+    zDbIO dbIO = new zDbIO();
     //여기서 읽기 쓰기 작업 모두 진행
     //여기서 디비 객체 선언
     //TODO 모델 영역
 
+    public static final String DB_NAME = "account_book";
+    public static final String[] TABLE_NAME = {"_id","asset","cardinfo","category","learn","franchisee_code","transactions"};
+    public static final String[] ASSET_COLUMN ={"_id","asset_type","name","nickname","balance","notes","withdrawalaccount","withdrawalday","cardinfo"};    //withdrawalaccount->if
+    public static final String[] CARDINFO_COLUMN ={"_id","company","card_name","asset_type","reward_exceptions","reawrd_sections","reward_franchisee1","reward_amount1","reward_franchisee2","reward_amount2","reward_franchisee3","reward_amount3","reward_franchisee4","reward_amount4"};
+    public static final String[] CATEGORY_COLUMN ={"_id","cat_level","parent","name","reward_exception","budget"};
+    public static final String[] LEARN_COLUMN ={"_id","recipient","category_id","asset_id","franchise_id","budget_exception","reward_exception"};
+    public static final String[] FRANCHISEE_CODE_COLUMN ={"_id","name"};
+    public static final String[] TRANSACTIONS_COLUMN ={"_id","transacton_time","category_id","amount","asset_id","recipient","note","franchisee_id","budget_exception","reward_exception","reward_type","reward_caculated"};
+
+    public static final int ASSET_TYPE_CASH = 1;
+    public static final int ASSET_TYPE_DEBIT_CARD = 2;
+    public static final int ASSET_TYPE_CREDIT_CARD = 3;
+
+
     zDBMan(Context context, boolean RW){
-        if(RW) {
-            if (Build.VERSION.SDK_INT >= 24) {
-                db = SQLiteDatabase.openDatabase(context.getDataDir().getAbsolutePath() + "/database/data.db", null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            } else {
-                db = SQLiteDatabase.openDatabase(context.getFilesDir().getAbsolutePath() + "/database/data.db", null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            }
-            data = new SaveData();
-        }
-        else
-            if(Build.VERSION.SDK_INT >= 24){
-
-                db = SQLiteDatabase.openDatabase(context.getDataDir().getAbsolutePath() + "/database/data.db", null,SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            }
-            else
-            {
-
-                db = SQLiteDatabase.openDatabase(context.getFilesDir().getAbsolutePath() + "/database/data.db", null,SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            }
-
-
+        db = context.openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null); //null of cursorFactory tells to use standard SQLiteCursor
+        data = new ItemTransactions();
     }
 
     //TODO 뷰 영역
@@ -194,7 +194,7 @@ public class zDBMan {
         db.execSQL("update accounts set balance = balance - '"+ amount + "' where _id = '" + acc_id + "' ");
     }
 
-    private void updateTransaction(SaveData data){
+    private void updateTransaction(ItemTransactions data){
         ContentValues values = new ContentValues();
         values.put("time", data.timeinmillis);
         values.put("categoryid", data.category_id);
@@ -284,7 +284,7 @@ public class zDBMan {
     }
 
 
-    private void addTransaction(SaveData data){
+    private void addTransaction(ItemTransactions data){
         ContentValues values = new ContentValues();
         values.put("time", data.timeinmillis);
         values.put("categoryid", data.category_id);
@@ -302,7 +302,7 @@ public class zDBMan {
         db.insert("trans",null, values);
     }
 
-    long addTransactionfromReciever(SaveData data) {
+    long addTransactionfromReciever(ItemTransactions data) {
         ContentValues values = new ContentValues();
 
         values.put("time", data.timeinmillis);
@@ -326,7 +326,7 @@ public class zDBMan {
 
 
 
-    void addTransactiononSave(SaveData data){     //잔액 조절, 카드 확인, 기록 추가
+    void addTransactiononSave(ItemTransactions data){     //잔액 조절, 카드 확인, 기록 추가
         int tmp = getCatLevel(data.cardid);
         switch (tmp){
             case 0:
@@ -365,7 +365,7 @@ public class zDBMan {
         }
     }
 
-    private void updateLearn(SaveData data){
+    private void updateLearn(ItemTransactions data){
         ContentValues values = new ContentValues();
         values.put("recipient", data.recipname);
         values.put("categoryid", data.category_id);
@@ -396,7 +396,7 @@ public class zDBMan {
         db.delete("category","_id = '" + id+ "' ",null);
     }
 
-    class SaveData {
+    class ItemTransactions {
         boolean isUpdate = false;
         long trans_id;
         long category_id = 0;
@@ -442,5 +442,43 @@ public class zDBMan {
         String nickname;
         //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
     }
+    void rawQuery(String query){
+        db.rawQuery(query, null);
+    }
 
+    static class zDbIO {
+        static boolean creTable(SQLiteDatabase db, String table, String tablearg) {
+            try {
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + table + " ( " + tablearg + " ); ");
+            } catch (SQLException e) {
+                e.getLocalizedMessage();
+                return false;
+            }
+            return true;
+        }
+
+        static boolean putRecord(SQLiteDatabase db, String table, ContentValues values) {
+            try {
+                db.insertOrThrow(table, null, values);
+            } catch (SQLiteConstraintException e) {
+                Log.e("PUT record error", e.getMessage());
+                return false;
+            }
+            return true;
+        }
+
+
+        static Cursor getRecordCursor(SQLiteDatabase db, String table, String[] col, String where) {
+            return db.query(table, col, where, null, null, null, null);
+        }
+
+        static boolean delRecord(SQLiteDatabase db, String table, String where) {
+            db.delete(table, where, null);
+            return true;
+        }
+
+        static void rawQuery(SQLiteDatabase db, String query){
+            db.rawQuery(query, null);
+        }
+    }
 }
