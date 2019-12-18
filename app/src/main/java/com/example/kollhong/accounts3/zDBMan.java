@@ -8,6 +8,11 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
+import static com.example.kollhong.accounts3.zDBMan.DBScheme.*;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
@@ -16,30 +21,92 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class zDBMan {
     private SQLiteDatabase db;
-    ItemTransactions data;
-    Cursor cursor;
-    zDbIO dbIO = new zDbIO();
     //여기서 읽기 쓰기 작업 모두 진행
     //여기서 디비 객체 선언
     //TODO 모델 영역
 
-    public static final String DB_NAME = "account_book";
-    public static final String[] TABLE_NAME = {"_id","asset","cardinfo","category","learn","franchisee_code","transactions"};
-    public static final String[] ASSET_COLUMN ={"_id","asset_type","name","nickname","balance","notes","withdrawalaccount","withdrawalday","cardinfo"};    //withdrawalaccount->if
-    public static final String[] CARDINFO_COLUMN ={"_id","company","card_name","asset_type","reward_exceptions","reawrd_sections","reward_franchisee1","reward_amount1","reward_franchisee2","reward_amount2","reward_franchisee3","reward_amount3","reward_franchisee4","reward_amount4"};
-    public static final String[] CATEGORY_COLUMN ={"_id","cat_level","parent","name","reward_exception","budget"};
-    public static final String[] LEARN_COLUMN ={"_id","recipient","category_id","asset_id","franchise_id","budget_exception","reward_exception"};
-    public static final String[] FRANCHISEE_CODE_COLUMN ={"_id","name"};
-    public static final String[] TRANSACTIONS_COLUMN ={"_id","transacton_time","category_id","amount","asset_id","recipient","note","franchisee_id","budget_exception","reward_exception","reward_type","reward_caculated"};
+    public static final class DBScheme {
+        public static final String DB_NAME = "account_book";
+        public static final String TABLE_NAME_ASSET = "asset";
+        public static final String TABLE_NAME_CARD_INFO = "cardinfo";
+        public static final String TABLE_NAME_CATEGORY = "category";
+        public static final String TABLE_NAME_LEARN = "learn";
+        public static final String TABLE_NAME_FRANCHISEE_CODE = "franchisee_code";
+        public static final String TABLE_NAME_TRANSACTIONS = "transactions";
+        public static final String TABLE_NAME_TRANSACTIONS_VIEW = "transactions_view";
 
-    public static final int ASSET_TYPE_CASH = 1;
-    public static final int ASSET_TYPE_DEBIT_CARD = 2;
-    public static final int ASSET_TYPE_CREDIT_CARD = 3;
+        public static final String TABLE_ID = "_id";
+        public static final String ASSET_TABLE_asset_type = "asset_type";
+        public static final String ASSET_TABLE_name = "name";
+        public static final String ASSET_TABLE_nickname = "nickname";
+        public static final String ASSET_TABLE_balance = "balance";
+        public static final String ASSET_TABLE_notes = "notes";
+        public static final String ASSET_TABLE_withdrawalaccount = "withdrawalaccount";
+        public static final String ASSET_TABLE_withdrawalday = "withdrawalday";
+        public static final String ASSET_TABLE_cardinfo = "cardinfo";
+
+        public static final String CARDINFO_TABLE_company = "company";
+        public static final String CARDINFO_TABLE_card_name = "card_name";
+        public static final String CARDINFO_TABLE_asset_type = "asset_type";
+        public static final String CARDINFO_TABLE_reawrd_exceptions = "reward_exceptions";
+        public static final String CARDINFO_TABLE_reward_sections = "reawrd_sections";
+        public static final String CARDINFO_TABLE_reward_franchisee1 = "reward_franchisee1";
+        public static final String CARDINFO_TABLE_reward_amount1 = "reward_amount1";
+        public static final String CARDINFO_TABLE_reward_franchisee2 = "reward_franchisee2";
+        public static final String CARDINFO_TABLE_reward_amount2 = "reward_amount2";
+        public static final String CARDINFO_TABLE_reward_franchisee3 = "reward_franchisee3";
+        public static final String CARDINFO_TABLE_reward_amount3 = "reward_amount3";
+        public static final String CARDINFO_TABLE_reward_franchisee4 = "reward_franchisee4";
+        public static final String CARDINFO_TABLE_reward_amount4 = "reward_amount4";
+
+
+        public static final String CATEGORY_TABLE_cat_level = "cat_level";
+        public static final String CATEGORY_TABLE_parent = "parent";
+        public static final String CATEGORY_TABLE_name = "name";
+        public static final String CATEGORY_TABLE_reward_exception = "reward_exception";
+        public static final String CATEGORY_TABLE_budget = "budget";
+
+        public static final String LEARN_TABLE_recipient = "recipient";
+        public static final String LEARN_TABLE_category_id = "category_id";
+        public static final String LEARN_TABLE_asset_id = "asset_id";
+        public static final String LEARN_TABLE_franchisee_id = "franchisee_id";
+        public static final String LEARN_TABLE_budget_exception = "budget_exception";
+        public static final String LEARN_TABLE_reward_exception = "reward_exception";
+
+        public static final String FRANCHISEE_CODE_TABLE_name = "name";
+
+        public static final String TRANSACTIONS_TABLE_transacton_time = "transacton_time";
+        public static final String TRANSACTIONS_TABLE_category_id = "category_id";
+        public static final String TRANSACTIONS_TABLE_amount = "amount";
+        public static final String TRANSACTIONS_TABLE_asset_id = "asset_id";
+        public static final String TRANSACTIONS_TABLE_recipient = "recipient";
+        public static final String TRANSACTIONS_TABLE_note = "note";
+        public static final String TRANSACTIONS_TABLE_franchisee_id = "franchisee_id";
+        public static final String TRANSACTIONS_TABLE_budget_exception = "budget_exception";
+        public static final String TRANSACTIONS_TABLE_reward_exception = "reward_exception";
+        public static final String TRANSACTIONS_TABLE_reward_type = "reward_type";
+        public static final String TRANSACTIONS_TABLE_reward_caculated = "reward_caculated";
+
+        public static final String TRANSACTIONS_VIEW_transacton_time = "transacton_time";
+        public static final String TRANSACTIONS_VIEW_amount = "amount";
+        public static final String TRANSACTIONS_VIEW_category_id = "category_id";
+        public static final String TRANSACTIONS_VIEW_category_level = "category_level";
+        public static final String TRANSACTIONS_VIEW_category_name = "category_name";
+        public static final String TRANSACTIONS_VIEW_parent_category_name = "parent_category_name";
+        public static final String TRANSACTIONS_VIEW_asset_id = "asset_id";
+        public static final String TRANSACTIONS_VIEW_asset_name = "asset_name";
+        public static final String TRANSACTIONS_VIEW_recipient = "recipient";
+        public static final String TRANSACTIONS_VIEW_reward_caculated = "reward_caculated";
+
+        public static final int ASSET_TYPE_CASH = 1;
+        public static final int ASSET_TYPE_DEBIT_CARD = 2;
+        public static final int ASSET_TYPE_CREDIT_CARD = 3;
+    }
+
 
 
     zDBMan(Context context, boolean RW){
         db = context.openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null); //null of cursorFactory tells to use standard SQLiteCursor
-        data = new ItemTransactions();
     }
 
     //TODO 뷰 영역
@@ -53,20 +120,60 @@ public class zDBMan {
         return new ItemAcc();
     }
 
-    Cursor getTransHistory(long today00, long today2359){
-        cursor = db.rawQuery("select c.name, t.amount, t.recipient, a.name, parent.name, c.level, t._id " +
-                "from trans as t " +
-                "left join category as c on ( t.categoryid = c._id ) " +
-                "left join accounts as a on ( t.accountid = a._id ) " +
-                "left join category as parent on ( c.parent = parent._id) " +
-                "where t.time >= '" + today00 + "' and t.time <= '" + today2359 +
-                "' order by t.time desc", null);
-        return cursor;
+    /*
+     private double getRecord(long startdate, long enddate) {
+        Cursor cursor = mDbMan.getRecordCursor(db, recordTable, new String[]{recordTableVar[0], recordTableVar[1]}, recordTableVar[0] + " BETWEEN '" + startdate + "' AND '" + enddate + "'");
+        //SQLiteDatabase db, String table, String[] col, String where
+        double record = 0d;
+        if (cursor.getCount() != 0) {
+            while (cursor.moveToNext()) {
+
+                record = record + cursor.getDouble(1);
+            }
+
+        }
+        cursor.close();
+        return record;
+    }
+    //add record
+    boolean putRecord(Date date, Double measurement) {
+        ContentValues values = new ContentValues();
+        values.put(recordTableVar[0], date.getTime());
+        values.put(recordTableVar[1], measurement);
+        return mDbMan.putRecord(db, recordTable, values);
+    }
+     */
+
+    //TODO return list of objects
+    List<ContentValues> getTransHistory(long today00, long today2359){
+        Cursor cursor = zDbIO.getRecordCursor(db, TABLE_NAME_TRANSACTIONS_VIEW,
+                new String[]{TABLE_ID, TRANSACTIONS_VIEW_transacton_time,TRANSACTIONS_VIEW_amount,TRANSACTIONS_VIEW_recipient,TRANSACTIONS_VIEW_category_level,TRANSACTIONS_VIEW_category_name,TRANSACTIONS_VIEW_parent_category_name,TRANSACTIONS_VIEW_asset_name},
+                "? >= ? and ? <= ?",
+                new String[] { TRANSACTIONS_VIEW_transacton_time, Long.toString(today00),TRANSACTIONS_VIEW_transacton_time, Long.toString(today2359)},
+                TRANSACTIONS_VIEW_transacton_time + "desc");
+        List<ContentValues> contentValuesList = new ArrayList<>();
+        if (cursor.getCount() != 0) {
+            while (cursor.moveToNext()) {
+                ContentValues contentValues = new ContentValues();   //거래 기록 표시
+                contentValues.put(TABLE_ID, cursor.getLong(0));
+//                contentValues.put(TRANSACTIONS_VIEW_transacton_time, cursor.getLong(1));
+                contentValues.put(TRANSACTIONS_VIEW_amount, cursor.getInt(2));
+                contentValues.put(TRANSACTIONS_VIEW_recipient, cursor.getString(3));
+                contentValues.put(TRANSACTIONS_VIEW_category_level, cursor.getInt(4));
+                contentValues.put(TRANSACTIONS_VIEW_category_name, cursor.getString(5));
+                contentValues.put(TRANSACTIONS_VIEW_parent_category_name, cursor.getString(6));
+                contentValues.put(TRANSACTIONS_VIEW_asset_name, cursor.getString(7));
+                contentValuesList.add(contentValues);
+            }
+        }
+        cursor.close();
+
+        return contentValuesList;
     }
 
     Cursor getTransByAcc(long thisMonth, long nextMonth){
 
-        cursor = db.rawQuery("SELECT t._id, t.categoryid, a.name as accname, t.amount, t.accountid, t.recipient, t.rewardamount, c.level " +
+        Cursor cursor = db.rawQuery("SELECT t._id, t.categoryid, a.name as accname, t.amount, t.accountid, t.recipient, t.rewardamount, c.level " +
                 "FROM trans as t " +
                 "left join category as c on (t.categoryid = c._id) " +
                 "left join accounts as a on ( t.accountid = a._id ) " +
@@ -76,7 +183,7 @@ public class zDBMan {
     }
 
     Cursor getTransbyCat(long thisMonth, long nextMonth){
-        cursor = db.rawQuery("SELECT t._id, t.categoryid, c.name, t.amount " +
+        Cursor cursor = db.rawQuery("SELECT t._id, t.categoryid, c.name, t.amount " +
                 "FROM trans as t " +
                 "left join category as c on (t.categoryid = c._id) " +
                 "WHERE t.time >= '" + thisMonth + "' and t.time <= '" + nextMonth +"' " +
@@ -86,12 +193,12 @@ public class zDBMan {
     }
 
     Cursor getTransbyID(long id){
-        cursor = db.rawQuery("SELECT _id, time, categoryid, amount, accountid, recipient, notes, rewardrecipientid, budgetexception, rewardamount, perfexception, rewardtype FROM trans WHERE _id = '" + id + "' " ,null);
+        Cursor cursor = db.rawQuery("SELECT _id, time, categoryid, amount, accountid, recipient, notes, rewardrecipientid, budgetexception, rewardamount, perfexception, rewardtype FROM trans WHERE _id = '" + id + "' " ,null);
         return cursor;
     }
 
     String getCategoryName(long id){
-        cursor = db.rawQuery("select c.name " +
+        Cursor cursor = db.rawQuery("select c.name " +
                 "from category c " +
                 "where c._id = '" + id +
                 "'", null);
@@ -103,7 +210,7 @@ public class zDBMan {
     }
 
     int getCatLevel(long id){
-        cursor = db.rawQuery("select level " +
+        Cursor cursor = db.rawQuery("select level " +
                 "from category  " +
                 "where _id = '" + id +
                 "'", null);
@@ -116,7 +223,7 @@ public class zDBMan {
     }
 
     Cursor getCategoryList(String name){
-        cursor = db.rawQuery("select _id from category where name = '" + name +"' ", null);
+        Cursor cursor = db.rawQuery("select _id from category where name = '" + name +"' ", null);
         if(cursor.getCount() != 0) {
             cursor.moveToNext(); int id = cursor.getInt(0);
             cursor = db.rawQuery("select _id, name " +
@@ -129,13 +236,13 @@ public class zDBMan {
 
 
     Cursor getAccList(){
-        cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
+        Cursor cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts ", null);
         return cursor;
     }
 
     Cursor getAccInfo(long id){
-        cursor = db.rawQuery("select _id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid " +
+        Cursor cursor = db.rawQuery("select _id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts " +
                 "where _id = '" + id + "' ", null);
 
@@ -144,26 +251,26 @@ public class zDBMan {
     }
 
     Cursor getAccBankList(){
-        cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
+        Cursor cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
                 "from accounts where type == '1' ", null);
         return cursor;
     }
 
     Cursor getCardinfo(long card_id) {
-        cursor = db.rawQuery("select performanceexceptions, sections, " +
+        Cursor cursor = db.rawQuery("select performanceexceptions, sections, " +
                 " rewardrecip1, rewardamount1,  rewardrecip2, rewardamount2, rewardrecip3, rewardamount3, rewardrecip4, rewardamount4, rewardrecip5, rewardamount5, rewardrecip6, rewardamount6, rewardrecip7, rewardamount7, rewardrecip8, rewardamount8 " +
                 "from card where _id = '" + card_id + "' ", null);
         return cursor;
     }
 
     Cursor getCardList(int type){
-        cursor = db.rawQuery("select _id, card_name, company " +
+        Cursor cursor = db.rawQuery("select _id, card_name, company " +
                 "from card where type = '" + type + "' ", null);
         return cursor;
     }
 
     String getRecipName(long id){
-        cursor = db.rawQuery("select name " +
+        Cursor cursor = db.rawQuery("select name " +
                 "from reciplists " +
                 "where _id = '" + id +
                 "'", null);
@@ -176,7 +283,7 @@ public class zDBMan {
     }
 
     Cursor getLearnData(String name){        //이름과 계좌가 같을 경우
-        cursor = db.rawQuery("select _id, categoryid, accid, recipientid, budgetexception, perfexception, rewardtype, rewardamount " +
+        Cursor cursor = db.rawQuery("select _id, categoryid, accid, recipientid, budgetexception, perfexception, rewardtype, rewardamount " +
                 "from learning where recipient = '" + name + "' ", null);
         return cursor;
     }
@@ -207,6 +314,7 @@ public class zDBMan {
         values.put("rewardamount", data.rew_amount_calculated);
         values.put("perfexception", data.perfexception);
         values.put("rewardtype", data.rew_type);
+
         float tmp_amount = 0f;
         Cursor tmp = getTransbyID(data.trans_id);
         if(tmp.getCount() != 0){
@@ -442,8 +550,9 @@ public class zDBMan {
         String nickname;
         //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
     }
+
     void rawQuery(String query){
-        db.rawQuery(query, null);
+        zDbIO.rawQuery(db, query);
     }
 
     static class zDbIO {
@@ -468,8 +577,8 @@ public class zDBMan {
         }
 
 
-        static Cursor getRecordCursor(SQLiteDatabase db, String table, String[] col, String where) {
-            return db.query(table, col, where, null, null, null, null);
+        static Cursor getRecordCursor(SQLiteDatabase db, String table, String[] col, String where, String[] whereArgs,String orderBy) {
+            return db.query(table, col, where, whereArgs, null, null, orderBy);
         }
 
         static boolean delRecord(SQLiteDatabase db, String table, String where) {

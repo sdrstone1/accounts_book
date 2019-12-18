@@ -12,7 +12,7 @@ package com.example.kollhong.accounts3;
         import java.io.IOException;
         import java.io.InputStream;
 
-        import static com.example.kollhong.accounts3.zDBMan.DB_NAME;
+        import static com.example.kollhong.accounts3.zDBMan.DBScheme.DB_NAME;
 
 public class S_Splash extends AppCompatActivity {
 
@@ -165,7 +165,12 @@ public class S_Splash extends AppCompatActivity {
                 "\tCHECK (budget_exception < 2)\n" +
                 ");\n" +
                 "\n" +
-                "CREATE INDEX `transactions_index` ON transactions (transacton_time DESC);\n";
+                "CREATE INDEX `transactions_index` ON transactions (transacton_time DESC);\n" +
+                "CREATE VIEW transactions_view AS SELECT t._id as _id,  t.transacton_time as transacton_time, t.amount as amount, t.category_id as category_id, c.cat_level as category_level, c.name as category_name, parent.name as parent_category_name, t.asset_id as asset_id, a.name as asset_name,  t.recipient as recipient, t.reward_caculated as reward_calculated\n" +
+                "                FROM transactions as t \n" +
+                "                left join category as c on (t.category_id = c._id) \n" +
+                "                left join asset as a on ( t.asset_id = a._id ) \n" +
+                "                left join category as parent on ( c.parent = parent._id);\n";
 
         zDBMan dbMan = new zDBMan(this,true);
         dbMan.rawQuery(query);

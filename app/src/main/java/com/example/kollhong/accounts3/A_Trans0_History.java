@@ -1,12 +1,13 @@
 package com.example.kollhong.accounts3;
 
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,19 +22,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
+import static com.example.kollhong.accounts3.zDBMan.DBScheme.*;
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
 
@@ -173,29 +169,28 @@ public class A_Trans0_History extends Fragment {
             calendar2.setTimeInMillis(today2359);
 
 
-            Cursor cursor = mDB.getTransHistory(today00, today2359);
+            ListIterator<ContentValues> iterator = mDB.getTransHistory(today00, today2359).listIterator();
+            ContentValues contentValues;
 
-            if (cursor.getCount() != 0) {
-//                ContentItem item = new ContentItem();   //거래 기록 표시
+            if(iterator.hasNext()) {
                 HeaderItem headerItem = new HeaderItem();
                 headerItem.timeinmillis = today00;
                 list.add(headerItem);       //거래 날짜 표시
-                while (cursor.moveToNext()) {
-                    ContentItem item = new ContentItem();   //거래 기록 표시
 
-                    item.category = cursor.getString(0);
-                    item.amount = cursor.getInt(1);
-                    item.recipient = cursor.getString(2);
-                    item.account = cursor.getString(3);
-                    item.category_parent = cursor.getString(4);
-                    item.level = cursor.getInt(5);
-                    item.trans_id = cursor.getLong(6);
+                while (iterator.hasNext()) {
+                    ContentItem item = new ContentItem();
+                    contentValues = iterator.next();
+                    item.trans_id = contentValues.getAsLong(TABLE_ID);
+                    item.amount = contentValues.getAsInteger(TRANSACTIONS_VIEW_amount);
+                    item.recipient = contentValues.getAsString(TRANSACTIONS_VIEW_recipient);
+                    item.category_level =  contentValues.getAsInteger(TRANSACTIONS_VIEW_category_level);
+                    item.category_name = contentValues.getAsString(TRANSACTIONS_VIEW_category_name);
+                    item.parent_category_name = contentValues.getAsString(TRANSACTIONS_VIEW_parent_category_name);
+                    item.asset_name = contentValues.getAsString(TRANSACTIONS_VIEW_asset_name);
+
                     list.add(item);
                 }
-                cursor.close();
-
             }
-
 
         }
 
@@ -230,11 +225,11 @@ public class A_Trans0_History extends Fragment {
     class ContentItem extends ItemVO {
         long trans_id;
         String recipient;
-        String account;
-        String category;
-        String category_parent;
+        String asset_name;
+        String category_name;
+        String parent_category_name;
         int amount;
-        int level;
+        int category_level;
 
         //amount, recipient, account, category
         @Override
@@ -271,9 +266,16 @@ public class A_Trans0_History extends Fragment {
             list_reci = v.findViewById(R.id.list_reci);
             list_accounts = v.findViewById(R.id.list_accounts);
             list_amount = v.findViewById(R.id.list_amount);
-            color_blue = v.getResources().getColor(android.R.color.holo_blue_light, null);
-            color_red = v.getResources().getColor(android.R.color.holo_red_light, null);
-            color_gray = v.getResources().getColor(android.R.color.darker_gray, null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                color_blue = ContextCompat.getColor(getContext(),android.R.color.holo_blue_light);
+                color_red = ContextCompat.getColor(getContext(),android.R.color.holo_red_light);
+                color_gray = ContextCompat.getColor(getContext(),android.R.color.darker_gray);
+            }
+            else{
+                color_blue = v.getResources().getColor(android.R.color.holo_blue_light);
+                color_red = v.getResources().getColor(android.R.color.holo_red_light);
+                color_gray = v.getResources().getColor(android.R.color.darker_gray);
+            }
 
         }
     }
@@ -347,40 +349,40 @@ public class A_Trans0_History extends Fragment {
                     }
                 });
 
-                switch (contentItem.level) { //0,1,2        3,4,5           6,7,8
+                switch (contentItem.category_level) { //0,1,2        3,4,5           6,7,8
                     case 0:
                     case 1: {
-                        contentViewHolder.list_cat.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
                         break;
                     }
                     case 2: {//수입
-                        contentViewHolder.list_cat.setText(contentItem.category_parent);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
                         break;
                     }
                     case 3:
                     case 4: {
-                        contentViewHolder.list_cat.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
                         break;
                     }
                     case 5: {//지출
-                        contentViewHolder.list_cat.setText(contentItem.category_parent);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
                         break;
                     }
                     case 6:
                     case 7: {
-                        contentViewHolder.list_cat.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
                         break;
                     }
                     case 8: {        //이체
-                        contentViewHolder.list_cat.setText(contentItem.category_parent);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category);
+                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
                         contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
                         break;
                     }
@@ -389,7 +391,7 @@ public class A_Trans0_History extends Fragment {
                 }
 
                 contentViewHolder.list_amount.setText(contentItem.amount + "");
-                contentViewHolder.list_accounts.setText(contentItem.account);
+                contentViewHolder.list_accounts.setText(contentItem.asset_name);
                 contentViewHolder.list_reci.setText(contentItem.recipient);
 
             }
