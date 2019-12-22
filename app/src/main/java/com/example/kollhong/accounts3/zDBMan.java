@@ -3,17 +3,15 @@ package com.example.kollhong.accounts3;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
-import static com.example.kollhong.accounts3.zDBMan.DBScheme.*;
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.kollhong.accounts3.zDBScheme.*;
 
 /**
  * Created by KollHong on 01/05/2018.
@@ -25,83 +23,7 @@ public class zDBMan {
     //여기서 디비 객체 선언
     //TODO 모델 영역
 
-    public static final class DBScheme {
-        public static final String DB_NAME = "account_book";
-        public static final String TABLE_NAME_ASSET = "asset";
-        public static final String TABLE_NAME_CARD_INFO = "cardinfo";
-        public static final String TABLE_NAME_CATEGORY = "category";
-        public static final String TABLE_NAME_LEARN = "learn";
-        public static final String TABLE_NAME_FRANCHISEE_CODE = "franchisee_code";
-        public static final String TABLE_NAME_TRANSACTIONS = "transactions";
-        public static final String TABLE_NAME_TRANSACTIONS_VIEW = "transactions_view";
 
-        public static final String TABLE_ID = "_id";
-        public static final String ASSET_TABLE_asset_type = "asset_type";
-        public static final String ASSET_TABLE_name = "name";
-        public static final String ASSET_TABLE_nickname = "nickname";
-        public static final String ASSET_TABLE_balance = "balance";
-        public static final String ASSET_TABLE_notes = "notes";
-        public static final String ASSET_TABLE_withdrawalaccount = "withdrawalaccount";
-        public static final String ASSET_TABLE_withdrawalday = "withdrawalday";
-        public static final String ASSET_TABLE_cardinfo = "cardinfo";
-
-        public static final String CARDINFO_TABLE_company = "company";
-        public static final String CARDINFO_TABLE_card_name = "card_name";
-        public static final String CARDINFO_TABLE_asset_type = "asset_type";
-        public static final String CARDINFO_TABLE_reawrd_exceptions = "reward_exceptions";
-        public static final String CARDINFO_TABLE_reward_sections = "reawrd_sections";
-        public static final String CARDINFO_TABLE_reward_franchisee1 = "reward_franchisee1";
-        public static final String CARDINFO_TABLE_reward_amount1 = "reward_amount1";
-        public static final String CARDINFO_TABLE_reward_franchisee2 = "reward_franchisee2";
-        public static final String CARDINFO_TABLE_reward_amount2 = "reward_amount2";
-        public static final String CARDINFO_TABLE_reward_franchisee3 = "reward_franchisee3";
-        public static final String CARDINFO_TABLE_reward_amount3 = "reward_amount3";
-        public static final String CARDINFO_TABLE_reward_franchisee4 = "reward_franchisee4";
-        public static final String CARDINFO_TABLE_reward_amount4 = "reward_amount4";
-
-
-        public static final String CATEGORY_TABLE_cat_level = "cat_level";
-        public static final String CATEGORY_TABLE_parent = "parent";
-        public static final String CATEGORY_TABLE_name = "name";
-        public static final String CATEGORY_TABLE_reward_exception = "reward_exception";
-        public static final String CATEGORY_TABLE_budget = "budget";
-
-        public static final String LEARN_TABLE_recipient = "recipient";
-        public static final String LEARN_TABLE_category_id = "category_id";
-        public static final String LEARN_TABLE_asset_id = "asset_id";
-        public static final String LEARN_TABLE_franchisee_id = "franchisee_id";
-        public static final String LEARN_TABLE_budget_exception = "budget_exception";
-        public static final String LEARN_TABLE_reward_exception = "reward_exception";
-
-        public static final String FRANCHISEE_CODE_TABLE_name = "name";
-
-        public static final String TRANSACTIONS_TABLE_transacton_time = "transacton_time";
-        public static final String TRANSACTIONS_TABLE_category_id = "category_id";
-        public static final String TRANSACTIONS_TABLE_amount = "amount";
-        public static final String TRANSACTIONS_TABLE_asset_id = "asset_id";
-        public static final String TRANSACTIONS_TABLE_recipient = "recipient";
-        public static final String TRANSACTIONS_TABLE_note = "note";
-        public static final String TRANSACTIONS_TABLE_franchisee_id = "franchisee_id";
-        public static final String TRANSACTIONS_TABLE_budget_exception = "budget_exception";
-        public static final String TRANSACTIONS_TABLE_reward_exception = "reward_exception";
-        public static final String TRANSACTIONS_TABLE_reward_type = "reward_type";
-        public static final String TRANSACTIONS_TABLE_reward_caculated = "reward_caculated";
-
-        public static final String TRANSACTIONS_VIEW_transacton_time = "transacton_time";
-        public static final String TRANSACTIONS_VIEW_amount = "amount";
-        public static final String TRANSACTIONS_VIEW_category_id = "category_id";
-        public static final String TRANSACTIONS_VIEW_category_level = "category_level";
-        public static final String TRANSACTIONS_VIEW_category_name = "category_name";
-        public static final String TRANSACTIONS_VIEW_parent_category_name = "parent_category_name";
-        public static final String TRANSACTIONS_VIEW_asset_id = "asset_id";
-        public static final String TRANSACTIONS_VIEW_asset_name = "asset_name";
-        public static final String TRANSACTIONS_VIEW_recipient = "recipient";
-        public static final String TRANSACTIONS_VIEW_reward_caculated = "reward_caculated";
-
-        public static final int ASSET_TYPE_CASH = 1;
-        public static final int ASSET_TYPE_DEBIT_CARD = 2;
-        public static final int ASSET_TYPE_CREDIT_CARD = 3;
-    }
 
 
 
@@ -146,140 +68,110 @@ public class zDBMan {
 
     //TODO return list of objects
     List<ContentValues> getTransHistory(long today00, long today2359){
-        Cursor cursor = zDbIO.getRecordCursor(db, TABLE_NAME_TRANSACTIONS_VIEW,
-                new String[]{TABLE_ID, TRANSACTIONS_VIEW_transacton_time,TRANSACTIONS_VIEW_amount,TRANSACTIONS_VIEW_recipient,TRANSACTIONS_VIEW_category_level,TRANSACTIONS_VIEW_category_name,TRANSACTIONS_VIEW_parent_category_name,TRANSACTIONS_VIEW_asset_name},
+        String[] columns = {TABLE_ID, TRANSACTIONS_VIEW.TRANSACTON_TIME,TRANSACTIONS_VIEW.AMOUNT,TRANSACTIONS_VIEW.RECIPIENT,TRANSACTIONS_VIEW.CATEGORY_LEVEL,TRANSACTIONS_VIEW.CATEGORY_NAME,TRANSACTIONS_VIEW.PARENT_CATEGORY_NAME,TRANSACTIONS_VIEW.ASSET_NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
                 "? >= ? and ? <= ?",
-                new String[] { TRANSACTIONS_VIEW_transacton_time, Long.toString(today00),TRANSACTIONS_VIEW_transacton_time, Long.toString(today2359)},
-                TRANSACTIONS_VIEW_transacton_time + "desc");
-        List<ContentValues> contentValuesList = new ArrayList<>();
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                ContentValues contentValues = new ContentValues();   //거래 기록 표시
-                contentValues.put(TABLE_ID, cursor.getLong(0));
-//                contentValues.put(TRANSACTIONS_VIEW_transacton_time, cursor.getLong(1));
-                contentValues.put(TRANSACTIONS_VIEW_amount, cursor.getInt(2));
-                contentValues.put(TRANSACTIONS_VIEW_recipient, cursor.getString(3));
-                contentValues.put(TRANSACTIONS_VIEW_category_level, cursor.getInt(4));
-                contentValues.put(TRANSACTIONS_VIEW_category_name, cursor.getString(5));
-                contentValues.put(TRANSACTIONS_VIEW_parent_category_name, cursor.getString(6));
-                contentValues.put(TRANSACTIONS_VIEW_asset_name, cursor.getString(7));
-                contentValuesList.add(contentValues);
-            }
-        }
-        cursor.close();
-
+                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today00),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today2359)},
+                TRANSACTIONS_VIEW.TRANSACTON_TIME + "desc");
         return contentValuesList;
     }
 
-    Cursor getTransByAcc(long thisMonth, long nextMonth){
-
-        Cursor cursor = db.rawQuery("SELECT t._id, t.categoryid, a.name as accname, t.amount, t.accountid, t.recipient, t.rewardamount, c.level " +
-                "FROM trans as t " +
-                "left join category as c on (t.categoryid = c._id) " +
-                "left join accounts as a on ( t.accountid = a._id ) " +
-                "WHERE t.time >= '" + thisMonth + "' and t.time <= '" + nextMonth +"' " +
-                "order by t.accountid ",null);
-        return cursor;
+    List<ContentValues> getTransByAcc(long thisMonth, long nextMonth){
+        String[] columns ={TABLE_ID, TRANSACTIONS_VIEW.TRANSACTON_TIME, TRANSACTIONS_VIEW.AMOUNT, TRANSACTIONS_VIEW.RECIPIENT, TRANSACTIONS_VIEW.CATEGORY_LEVEL, TRANSACTIONS_VIEW.CATEGORY_ID,TRANSACTIONS_VIEW.ASSET_ID,TRANSACTIONS_VIEW.ASSET_NAME,TRANSACTIONS_VIEW.REWARD_CACULATED};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
+                "? >= ? and ? <= ?",
+                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(thisMonth),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(nextMonth)},
+                TRANSACTIONS_VIEW.ASSET_ID);
+        return contentValuesList;
     }
 
-    Cursor getTransbyCat(long thisMonth, long nextMonth){
-        Cursor cursor = db.rawQuery("SELECT t._id, t.categoryid, c.name, t.amount " +
-                "FROM trans as t " +
-                "left join category as c on (t.categoryid = c._id) " +
-                "WHERE t.time >= '" + thisMonth + "' and t.time <= '" + nextMonth +"' " +
-                "order by c._id ",null);
-        return cursor;
-
+    List<ContentValues> getTransbyCat(long thisMonth, long nextMonth){
+        String[] columns ={TABLE_ID, TRANSACTIONS_VIEW.AMOUNT,TRANSACTIONS_VIEW.CATEGORY_ID, TRANSACTIONS_VIEW.CATEGORY_NAME };
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
+                "? >= ? and ? <= ?",
+                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(thisMonth),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(nextMonth)},
+                TRANSACTIONS_VIEW.CATEGORY_ID);
+        return contentValuesList;
     }
 
-    Cursor getTransbyID(long id){
-        Cursor cursor = db.rawQuery("SELECT _id, time, categoryid, amount, accountid, recipient, notes, rewardrecipientid, budgetexception, rewardamount, perfexception, rewardtype FROM trans WHERE _id = '" + id + "' " ,null);
-        return cursor;
+    ContentValues getTransbyID(long id){
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, null, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        if (contentValuesList.isEmpty()) return null;
+        return contentValuesList.get(0);
+
     }
 
     String getCategoryName(long id){
-        Cursor cursor = db.rawQuery("select c.name " +
-                "from category c " +
-                "where c._id = '" + id +
-                "'", null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToNext();
-            return cursor.getString(0);
+        String[] columns ={CATEGORY_TABLE.NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        if(contentValuesList.isEmpty()) {
+            Log.e("Get Category Name ","By CATEGORY ID Failed : No Matching Category ID");
+            return null;
         }
-        return "";
+
+        return contentValuesList.get(0).getAsString(CATEGORY_TABLE.NAME);
     }
 
     int getCatLevel(long id){
-        Cursor cursor = db.rawQuery("select level " +
-                "from category  " +
-                "where _id = '" + id +
-                "'", null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToNext();
-            return cursor.getInt(0);
+        String[] columns ={CATEGORY_TABLE.CAT_LEVEL};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        if(contentValuesList.isEmpty()) {
+            Log.e("Get Category Level ","By CATEGORY ID Failed : No Matching Category ID");
+            return -1;
         }
 
-        return 0;
+        return contentValuesList.get(0).getAsInteger(CATEGORY_TABLE.CAT_LEVEL);
     }
 
-    Cursor getCategoryList(String name){
-        Cursor cursor = db.rawQuery("select _id from category where name = '" + name +"' ", null);
-        if(cursor.getCount() != 0) {
-            cursor.moveToNext(); int id = cursor.getInt(0);
-            cursor = db.rawQuery("select _id, name " +
-                    "from category " +
-                    "where parent == '" + id +
-                    "' ", null);
-            return cursor;
-        }else return  null;
+    List<ContentValues> getChildCategoryList(long id){
+        String[] columns ={TABLE_ID, CATEGORY_TABLE.NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+                "? = '?' ", new String[] { CATEGORY_TABLE.PARENT_ID, Long.toString(id)}, null);
+        return contentValuesList;
     }
 
 
-    Cursor getAccList(){
-        Cursor cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
-                "from accounts ", null);
-        return cursor;
+    List<ContentValues> getAssetList(){
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
+                null,null, null);
+        return contentValuesList;
     }
 
-    Cursor getAccInfo(long id){
-        Cursor cursor = db.rawQuery("select _id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid " +
-                "from accounts " +
-                "where _id = '" + id + "' ", null);
-
-            return cursor;
-
+    ContentValues getAssetInfo(long id){
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        return contentValuesList.get(0);
     }
 
-    Cursor getAccBankList(){
-        Cursor cursor = db.rawQuery("select _id, type, name, balance, withdrawalaccount, withdrawalday, cardid " +
-                "from accounts where type == '1' ", null);
-        return cursor;
+    List<ContentValues> getBankAssetList_forCard(){
+        String[] columns ={TABLE_ID, ASSET_TABLE.NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, columns, //select all columns
+                "? = '?' ", new String[] { ASSET_TABLE.ASSET_TYPE, Integer.toString(ASSET_TYPE_BANK_BOOK)}, null);
+        return contentValuesList;
     }
 
-    Cursor getCardinfo(long card_id) {
-        Cursor cursor = db.rawQuery("select performanceexceptions, sections, " +
-                " rewardrecip1, rewardamount1,  rewardrecip2, rewardamount2, rewardrecip3, rewardamount3, rewardrecip4, rewardamount4, rewardrecip5, rewardamount5, rewardrecip6, rewardamount6, rewardrecip7, rewardamount7, rewardrecip8, rewardamount8 " +
-                "from card where _id = '" + card_id + "' ", null);
-        return cursor;
+    List<ContentValues> getCardinfo(long card_id) {
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CARD_INFO, null, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(card_id)}, null);
+        return contentValuesList;
     }
 
-    Cursor getCardList(int type){
-        Cursor cursor = db.rawQuery("select _id, card_name, company " +
-                "from card where type = '" + type + "' ", null);
-        return cursor;
+    List<ContentValues> getCardListByType(int type){
+        String[] columns ={TABLE_ID, CARD_INFO_TABLE.CARD_NAME, CARD_INFO_TABLE.COMPANY};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, columns, //select all columns
+                "? = '?' ", new String[] { CARD_INFO_TABLE.ASSET_TYPE, Integer.toString(type)}, null);
+        return contentValuesList;
     }
 
-    String getRecipName(long id){
-        Cursor cursor = db.rawQuery("select name " +
-                "from reciplists " +
-                "where _id = '" + id +
-                "'", null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToNext();
-            return cursor.getString(0);
-        }
-
-        else return "";
+    String getFranchiseeName(long id){
+        String[] columns ={TABLE_ID, FRANCHISEE_CODE_TABLE.NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db,TABLE_FRANCHISEE_CODE, columns, //select all columns
+                "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        if(contentValuesList.isEmpty()) return null;
+        return contentValuesList.get(0).getAsString(FRANCHISEE_CODE_TABLE.NAME);
     }
 
     Cursor getLearnData(String name){        //이름과 계좌가 같을 경우
@@ -291,7 +183,7 @@ public class zDBMan {
 
 
     private void updateAccBalance(long acc_id, float amount){
-        Cursor tmp = getAccInfo(data.acc_id);
+        Cursor tmp = getAssetInfo(data.acc_id);
         float tmp_amount;
         if(tmp.getCount() != 0 ){
             tmp.moveToNext();
@@ -512,21 +404,21 @@ public class zDBMan {
         long timeinmillis = 0L;
         float amount;
         long acc_id = 0;
-        int acc_type;
+        long acc_type;
         String acc_name = null;
-        int withdrawlday = 0;
-        int withdrawlaccount = 0;
+        long withdrawlday = 0;
+        long withdrawlaccount = 0;
         long cardid = 0;
         float balance;
         long recipid = 0;
         String recipname = " ";
         float rew_amount;
         float rew_amount_calculated;
-        int rew_type;
+        long rew_type;
         String note = " ";
-        int budgetexception = 0;
-        int perfexception;
-        int perftype;
+        long budgetexception = 0;
+        long perfexception;
+        long perftype;
         float perfamount;
         boolean learn;
 
@@ -542,11 +434,11 @@ public class zDBMan {
     class ItemAcc {
         long id;
         String name;
-        int type = 1;
+        long type = 1;
         long cardid;
         float balance;
-        int withdrawalaccount;
-        int withdrawalday;
+        long withdrawalaccount;
+        long withdrawalday;
         String nickname;
         //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
     }
@@ -555,39 +447,5 @@ public class zDBMan {
         zDbIO.rawQuery(db, query);
     }
 
-    static class zDbIO {
-        static boolean creTable(SQLiteDatabase db, String table, String tablearg) {
-            try {
-                db.execSQL("CREATE TABLE IF NOT EXISTS " + table + " ( " + tablearg + " ); ");
-            } catch (SQLException e) {
-                e.getLocalizedMessage();
-                return false;
-            }
-            return true;
-        }
 
-        static boolean putRecord(SQLiteDatabase db, String table, ContentValues values) {
-            try {
-                db.insertOrThrow(table, null, values);
-            } catch (SQLiteConstraintException e) {
-                Log.e("PUT record error", e.getMessage());
-                return false;
-            }
-            return true;
-        }
-
-
-        static Cursor getRecordCursor(SQLiteDatabase db, String table, String[] col, String where, String[] whereArgs,String orderBy) {
-            return db.query(table, col, where, whereArgs, null, null, orderBy);
-        }
-
-        static boolean delRecord(SQLiteDatabase db, String table, String where) {
-            db.delete(table, where, null);
-            return true;
-        }
-
-        static void rawQuery(SQLiteDatabase db, String query){
-            db.rawQuery(query, null);
-        }
-    }
 }

@@ -79,7 +79,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             update(id);
         }
 
-        int TAB_INDEX = itemAcc.type - 1;
+        long TAB_INDEX = itemAcc.type - 1;
 
         TabLayout tabLayout = findViewById(R.id.add_acc_tablayout);
         tabLayout.addOnTabSelectedListener(new tabListener());
@@ -233,7 +233,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
     private void update(long id){
 
-        Cursor cursor = mDB.getAccInfo(id);
+        Cursor cursor = mDB.getAssetInfo(id);
         if(cursor.getCount() != 0){
             cursor.moveToNext();
             //_id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid
@@ -261,7 +261,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     }
 
     private void set_with_acc_spinner(){
-        Cursor cursor = mDB.getAccBankList();
+        Cursor cursor = mDB.getBankAssetList_forCard();
 
         final List<ItemSpinner> itemBanks = makeadapter(cursor);
 
@@ -286,7 +286,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     }
 
     private void set_card_spinner(int type){
-        Cursor cursor = mDB.getCardList(type-1);
+        Cursor cursor = mDB.getCardListByType(type-1);
         final List<ItemSpinner> itemCards = makeadapter(cursor);
 
         spinadapter spinadapters = new spinadapter(this,android.R.layout.simple_spinner_item,itemCards);

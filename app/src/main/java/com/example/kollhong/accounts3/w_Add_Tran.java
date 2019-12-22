@@ -1,7 +1,6 @@
 package com.example.kollhong.accounts3;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.support.v7.widget.RecyclerView;
 //import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -288,12 +286,12 @@ public class w_Add_Tran extends AppCompatActivity {
     }
 
     public void onCategoryClick(View v) {
-        Cursor cursor = mDB.getCategoryList(String.valueOf(cat_view.getText()));
+        Cursor cursor = mDB.getChildCategoryList(String.valueOf(cat_view.getText()));
         make_bottomSheet(cursor,BOTTOMSHEET_CATEGORY);
     }
 
     public void onAccountClick(View v) {
-        Cursor cursor = mDB.getAccList();//계좌 목록 가져오기
+        Cursor cursor = mDB.getAssetList();//계좌 목록 가져오기
         make_bottomSheet(cursor, BOTTOMSHEET_ACCOUNT);
     }
 
@@ -402,7 +400,7 @@ public class w_Add_Tran extends AppCompatActivity {
             ItemRecipient itemRecipient = new ItemRecipient();
 
             itemRecipient.recipid = Long.parseLong(perfsplit[l]);
-            itemRecipient.recipient = mDB.getRecipName(itemRecipient.recipid);
+            itemRecipient.recipient = mDB.getFranchiseeName(itemRecipient.recipid);
             itemRecipient.conditionexception = 1;
             recipList.add(itemRecipient);
         }
@@ -461,7 +459,7 @@ public class w_Add_Tran extends AppCompatActivity {
                 if (!duplicate) {
                     ItemRecipient itemRecipient = new ItemRecipient();
                     itemRecipient.recipid = recipid;
-                    itemRecipient.recipient = mDB.getRecipName(recipid);
+                    itemRecipient.recipient = mDB.getFranchiseeName(recipid);
                     itemRecipient.conditiontype = conditiontype;
                     itemRecipient.conditionperformance = conperf;
                     itemRecipient.rewamount = rewamount;
@@ -564,7 +562,7 @@ public class w_Add_Tran extends AppCompatActivity {
     }   //TODO 데이터 무결성 확인
 
     private void setAccountOnUpdate(){
-        Cursor cursor = mDB.getAccInfo(Datas.acc_id);
+        Cursor cursor = mDB.getAssetInfo(Datas.acc_id);
         if(cursor.getCount() > 0){
             cursor.moveToNext();
 
@@ -845,7 +843,7 @@ public class w_Add_Tran extends AppCompatActivity {
                     //zDBMan mDB = new zDBMan(getApplicationContext(), false);
                     TextView view = (TextView) v;
 
-                    Cursor cursor = mDB.getCategoryList(String.valueOf(view.getText()));
+                    Cursor cursor = mDB.getChildCategoryList(String.valueOf(view.getText()));
 
                     if (cursor.getCount() != 0) {        //자녀 카테고리 표시
 

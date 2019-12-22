@@ -181,9 +181,9 @@ public class A_Trans0_History extends Fragment {
                     ContentItem item = new ContentItem();
                     contentValues = iterator.next();
                     item.trans_id = contentValues.getAsLong(TABLE_ID);
-                    item.amount = contentValues.getAsInteger(TRANSACTIONS_VIEW_amount);
+                    item.amount = contentValues.getAsLong(TRANSACTIONS_VIEW_amount);
                     item.recipient = contentValues.getAsString(TRANSACTIONS_VIEW_recipient);
-                    item.category_level =  contentValues.getAsInteger(TRANSACTIONS_VIEW_category_level);
+                    item.category_level =  contentValues.getAsLong(TRANSACTIONS_VIEW_category_level);
                     item.category_name = contentValues.getAsString(TRANSACTIONS_VIEW_category_name);
                     item.parent_category_name = contentValues.getAsString(TRANSACTIONS_VIEW_parent_category_name);
                     item.asset_name = contentValues.getAsString(TRANSACTIONS_VIEW_asset_name);
@@ -228,8 +228,8 @@ public class A_Trans0_History extends Fragment {
         String asset_name;
         String category_name;
         String parent_category_name;
-        int amount;
-        int category_level;
+        long amount;
+        long category_level;
 
         //amount, recipient, account, category
         @Override
@@ -349,45 +349,33 @@ public class A_Trans0_History extends Fragment {
                     }
                 });
 
-                switch (contentItem.category_level) { //0,1,2        3,4,5           6,7,8
-                    case 0:
-                    case 1: {
-                        contentViewHolder.list_cat.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                        break;
-                    }
-                    case 2: {//수입
-                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                        break;
-                    }
-                    case 3:
-                    case 4: {
-                        contentViewHolder.list_cat.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                        break;
-                    }
-                    case 5: {//지출
-                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                        break;
-                    }
-                    case 6:
-                    case 7: {
-                        contentViewHolder.list_cat.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
-                        break;
-                    }
-                    case 8: {        //이체
-                        contentViewHolder.list_cat.setText(contentItem.parent_category_name);
-                        contentViewHolder.list_cat2nd.setText(contentItem.category_name);
-                        contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
-                        break;
-                    }
-                    default:
-                        break;
+                if (contentItem.category_level == 0l || contentItem.category_level == 1l) { //0,1,2        3,4,5           6,7,8
+                    contentViewHolder.list_cat.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
+                }
+                else if (contentItem.category_level == 2l) {
+                    contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                    contentViewHolder.list_cat2nd.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
+                }
+                else if (contentItem.category_level == 3l || contentItem.category_level == 4l) {
+                    contentViewHolder.list_cat.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
+                }
+                else if (contentItem.category_level == 5l) {
+                    contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                    contentViewHolder.list_cat2nd.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
+                }
+                else if (contentItem.category_level == 6l || contentItem.category_level == 7l) {
+                    contentViewHolder.list_cat.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
+                }
+                else if (contentItem.category_level == 8l) {
+
+                    contentViewHolder.list_cat.setText(contentItem.parent_category_name);
+                    contentViewHolder.list_cat2nd.setText(contentItem.category_name);
+                    contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
                 }
 
                 contentViewHolder.list_amount.setText(contentItem.amount + "");

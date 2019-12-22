@@ -227,7 +227,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 }
 
 
-                Cursor cursor = mDB.getAccInfo(data.acc_id);
+                Cursor cursor = mDB.getAssetInfo(data.acc_id);
                 if( cursor.getCount() != 0){
                     cursor.moveToNext();
                     charSequence = charSequence + "\n" + acc + " : " + cursor.getString(2);       //accname
@@ -235,7 +235,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 cursor.close();
 
                 charSequence = charSequence + "\n" + recip + " : "+ data.recipname ;//recipient
-                String recip_name = mDB.getRecipName(data.recipid);
+                String recip_name = mDB.getFranchiseeName(data.recipid);
                 if(!recip_name.equals("")){
                     charSequence = charSequence + "\n" + re + " : " + recip_name;
                 }

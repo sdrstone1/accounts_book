@@ -17,7 +17,6 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Category_Recycler(mDB.getCategoryList(name));
+        Category_Recycler(mDB.getChildCategoryList(name));
 
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.cat_fab);
@@ -80,7 +79,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
                                 String name = String.valueOf(editText.getText());
                                 mDB.addCat(cat_level, cat_id, name);       //부모 카테고리의 id
                                 String name2 = mDB.getCategoryName(cat_id);
-                                Category_Recycler(mDB.getCategoryList(name2));
+                                Category_Recycler(mDB.getChildCategoryList(name2));
                             }
                         });
 
@@ -242,7 +241,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
                                     name = String.valueOf(editText.getText());
                                     mDB.updateCat(idL,name);
                                     String name = mDB.getCategoryName(cat_id);
-                                    Category_Recycler(mDB.getCategoryList(name));
+                                    Category_Recycler(mDB.getChildCategoryList(name));
 
                                 }
                             });

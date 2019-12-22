@@ -71,7 +71,7 @@ public class v_Settings2_acc extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Account_recycler(mDB.getAccList());
+        Account_recycler(mDB.getAssetList());
     }
 
     private void Account_recycler(Cursor cursor) {

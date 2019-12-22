@@ -40,7 +40,8 @@ public class v_Settings0_cat extends AppCompatActivity {
     Long cat_id;
     int cat_level;
 
-    String tab_num;
+    String tab_name;
+    long tab_num;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class v_Settings0_cat extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Category_Recycler(mDB.getCategoryList(tab_num));
+        Category_Recycler(mDB.getChildCategoryList(tab_num));
     }
 
     @Override
@@ -88,25 +89,26 @@ public class v_Settings0_cat extends AppCompatActivity {
 
             switch (tab.getPosition()) {
                 case 0: {
-                    Category_Recycler(mDB.getCategoryList("수입"));
+                    tab_num = 1l;
+                    Category_Recycler(mDB.getChildCategoryList(tab_num));
                     cat_id = 1l;
                     cat_level = 0;
-                    tab_num = "수입";
                     break;
                 }
                 case 1: {
-                    Category_Recycler(mDB.getCategoryList("지출"));
+                    tab_num = 2l;
+                    Category_Recycler(mDB.getChildCategoryList(tab_num));
                     cat_id = 2l;
                     cat_level = 3;
-                    tab_num = "지출";
+
                     break;
 
                 }
                 case 2: {
-                    Category_Recycler(mDB.getCategoryList("이체"));
+                    tab_num = 3l;
+                    Category_Recycler(mDB.getChildCategoryList(tab_num));
                     cat_id = 3l;
                     cat_level = 6;
-                    tab_num = "이체";
 
                     break;
                 }
@@ -168,8 +170,7 @@ public class v_Settings0_cat extends AppCompatActivity {
                         public void SaveinDialog() {
                             String name = String.valueOf(editText.getText());
                             mDB.addCat(cat_level, cat_id, name);
-                            String name2 = mDB.getCategoryName(cat_id);
-                            Category_Recycler(mDB.getCategoryList(name2));
+                            Category_Recycler(mDB.getChildCategoryList(cat_id));
 
                         }
                     });

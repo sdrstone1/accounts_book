@@ -11,8 +11,7 @@ package com.example.kollhong.accounts3;
         import java.io.FileOutputStream;
         import java.io.IOException;
         import java.io.InputStream;
-
-        import static com.example.kollhong.accounts3.zDBMan.DBScheme.DB_NAME;
+        import static com.example.kollhong.accounts3.zDBScheme.DB_NAME;
 
 public class S_Splash extends AppCompatActivity {
 
