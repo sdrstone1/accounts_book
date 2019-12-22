@@ -71,7 +71,7 @@ public class zMessageReciever extends BroadcastReceiver {
         }
         else return;
         mDB = new zDBMan(context,true);
-        data = mDB.data;
+        data = zDBMan.ItemTransactions;
         Bundle bundle = intent.getExtras();//인텐트의 부가 데이터 수신
 
         //PDU : Protocol Description Unit : SMS메시지 포맷

@@ -1,8 +1,8 @@
 package com.example.kollhong.accounts3;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,12 +21,10 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.PieChart;
 
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static android.view.View.GONE;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -114,54 +112,45 @@ public class B_Manage0_acc extends Fragment {
         calendar2.add(Calendar.MONTH, 1);
         long nextMonth = calendar2.getTimeInMillis() - 1l;
 
-        Cursor cursor = mDB.getTransByAcc(thisMonth, nextMonth);
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                TransItem transItem = new TransItem();
 
-                transItem.trans_id = cursor.getLong(0);
-                transItem.acc_name = cursor.getString(2);
-                transItem.amount = cursor.getFloat(3);
-                transItem.acc_id = cursor.getLong(4);
-                if(!cursor.isNull(6)) {
-                    transItem.reward = cursor.getFloat(6);
-                    Log.e("데이터 가져오기","실적 : " +transItem.reward);
-                }
-                transItem.level = cursor.getInt(7);
-                transItems.add(transItem);
+        ListIterator<ContentValues> transByAcc = mDB.getTransByAcc(thisMonth, nextMonth).listIterator();
+        ContentValues contentValues;
+        while (transByAcc.hasNext()) {
+            TransItem transItem = new TransItem();
+
+            contentValues = transByAcc.next();
+            transItem.trans_id = contentValues.getAsLong(TABLE_ID);
+            transItem.acc_name = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.ASSET_NAME);
+            transItem.amount = contentValues.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.AMOUNT);
+            transItem.asset_id = contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.ASSET_ID);
+            if(contentValues.containsKey(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED)) {
+                transItem.reward = contentValues.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED);
+                Log.i("데이터 가져오기","실적 : " +transItem.reward);
             }
-            cursor.close();
-            long name = -1;
+            transItem.level = contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.CATEGORY_LEVEL);
+            transItems.add(transItem);
+        }
+        long name = -1;
 
-            //ItemPerAcc itemPerAcc = new ItemPerAcc();
-            for (int i = 0; i < transItems.size(); i++) {
-                if (transItems.get(i).acc_id != name) {
-                    ItemPerAcc itemPerAcc = new ItemPerAcc();
-                    name = transItems.get(i).acc_id;
-                    itemPerAcc.acc_name = transItems.get(i).acc_name;
-                    accItems.add(itemPerAcc);
+        //ItemPerAcc itemPerAcc = new ItemPerAcc();
+        for (int i = 0; i < transItems.size(); i++) {
+            if (transItems.get(i).asset_id != name) {
+                ItemPerAcc itemPerAcc = new ItemPerAcc();
+                name = transItems.get(i).asset_id;
+                itemPerAcc.asset_name = transItems.get(i).acc_name;
+                accItems.add(itemPerAcc);
 
-                }
-                //사용금액 합산
-                switch (transItems.get(i).level) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        accItems.get(accItems.size() - 1).amount_in += transItems.get(i).amount;
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                        accItems.get(accItems.size() - 1).amount_out += transItems.get(i).amount;
-                        break;
-                    case 6:
-                    case 7:
-                    case 8:
-                        accItems.get(accItems.size() - 1).amount_rem += transItems.get(i).amount;
-                        break;
-                }
-                accItems.get(accItems.size() - 1).reward += transItems.get(i).reward;
             }
+            //사용금액 합산
+            if (transItems.get(i).level == 0L || transItems.get(i).level == 1L || transItems.get(i).level == 2L)
+                accItems.get(accItems.size() - 1).amount_in += transItems.get(i).amount;
+            else if(transItems.get(i).level == 3L || transItems.get(i).level == 4L || transItems.get(i).level == 5L)
+                accItems.get(accItems.size() - 1).amount_out += transItems.get(i).amount;
+            else if(transItems.get(i).level == 6L || transItems.get(i).level == 7L || transItems.get(i).level == 8L)
+                accItems.get(accItems.size() - 1).amount_rem += transItems.get(i).amount;
+
+            accItems.get(accItems.size() - 1).reward += transItems.get(i).reward;
+
 
         }
 
@@ -182,12 +171,12 @@ public class B_Manage0_acc extends Fragment {
         String acc_name;
         float amount;
         float reward = 0f;
-        long acc_id;
-        int level;
+        long asset_id;
+        long level;
     }
 
     public class ItemPerAcc{
-        String acc_name;
+        String asset_name;
         float amount_in;
         float amount_out;
         float amount_rem;
@@ -221,7 +210,7 @@ public class B_Manage0_acc extends Fragment {
 
             accHolder accHolder =  (accHolder) holder;
 
-            accHolder.name.setText(itemVO.acc_name);
+            accHolder.name.setText(itemVO.asset_name);
             accHolder.income.setText(String.valueOf(itemVO.amount_in));
             accHolder.expense.setText(String.valueOf(itemVO.amount_out));
             accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
