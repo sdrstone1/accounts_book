@@ -380,17 +380,16 @@ public class zDBMan {
 
 
     void deleteTrans(long id){
-        db.delete("Trans","_id = '" + id +"' ",null);
+        zDbIO.delRecord(db,TABLE_TRANSACTIONS,id);
     }
 
     void deleteAcc(long id){
-        db.delete("accounts","_id = '" + id +"' ",null);
+        zDbIO.delRecord(db,TABLE_ASSET, id);
     }
 
     void deleteCat(long id){
-        db.delete("category","_id = '" + id+ "' ",null);
+        zDbIO.delRecord(db,TABLE_CATEGORY, id);
     }
-
 
     class ItemTransactions {
         boolean isUpdate = false;

@@ -177,9 +177,9 @@ public final class zDBScheme {
             return contentValuesList;
         }
 
-        static boolean delRecord(SQLiteDatabase db, String table, String where) {
-            db.delete(table, where, null);
-            return true;
+        static void delRecord(SQLiteDatabase db, String table, long id) {
+            db.delete(table, "? = '?'", new String[]{TABLE_ID, Long.toString(id)});
+           // return true;
         }
 
         static void rawQuery(SQLiteDatabase db, String query){
