@@ -173,7 +173,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             itemAcc.name = name_txt.getText()+"";
             itemAcc.nickname = nick_txt.getText()+"";
             itemAcc.balance = Float.valueOf(bal_text.getText()+"") ;
-            mDB.addAcc(isUpdate,itemAcc);
+            mDB.addAsset(isUpdate,itemAcc);
             finish();
             return true;
         }

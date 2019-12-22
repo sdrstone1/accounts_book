@@ -122,6 +122,8 @@ public class S_Splash extends AppCompatActivity {
                 "\t `franchisee_id` INTEGER,\n" +
                 "\t `budget_exception` INTEGER DEFAULT 0,\n" +
                 "\t `reward_exception` INTEGER DEFAULT 0,\n" +
+                "\t `reward_type` INTEGER DEFAULT 0,\n" +
+                "\t `reward_amount` INTEGER DEFAULT 0,\n" +
                 "\tPRIMARY KEY(`_id`),\n" +
                 "\tFOREIGN KEY (`franchisee_id`) REFERENCES `franchisee_code` (`_id`) ON DELETE SET NULL ON UPDATE CASCADE,\n" +
                 "\t\tFOREIGN KEY (`asset_id`) REFERENCES `asset` (`_id`) ON DELETE SET NULL ON UPDATE CASCADE,\n" +

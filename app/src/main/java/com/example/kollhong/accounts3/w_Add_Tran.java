@@ -96,13 +96,13 @@ public class w_Add_Tran extends AppCompatActivity {
                     if(cursor.getCount() != 0){
                         cursor.moveToNext();
                         Datas.category_id = cursor.getLong(1);
-                        Datas.acc_id = cursor.getLong(2);
-                        Datas.recipid = cursor.getLong(3);
+                        Datas.asset_id = cursor.getLong(2);
+                        Datas.franchisee_id = cursor.getLong(3);
 
                         setCategoryOnTab(Datas.category_id);
                         setAccountOnUpdate();
 
-                        if(Datas.acc_type == 2 || Datas.acc_type == 3)
+                        if(Datas.asset_type == 2 || Datas.asset_type == 3)
                             setRecispinnerOnUpdate();
                     }
                 }
@@ -146,7 +146,7 @@ public class w_Add_Tran extends AppCompatActivity {
         }
         else if(id == R.id.itemDelete){
             if (Datas.isUpdate){
-                mDB.deleteTrans(Datas.trans_id);
+                mDB.deleteTrans(Datas.transaction_id);
             }
             else{
                 this.finish();
@@ -190,7 +190,7 @@ public class w_Add_Tran extends AppCompatActivity {
         if (cursor.getCount() != 0) {
             cursor.moveToNext();
             Datas.isUpdate = true;
-            Datas.trans_id = cursor.getLong(0);
+            Datas.transaction_id = cursor.getLong(0);
             Datas.timeinmillis = cursor.getLong(1);
             setTimeText();
 
@@ -200,7 +200,7 @@ public class w_Add_Tran extends AppCompatActivity {
             Datas.amount = cursor.getFloat(3);
             amount_view.setText(String.valueOf(Datas.amount));
 
-            Datas.acc_id = cursor.getLong(4);
+            Datas.asset_id = cursor.getLong(4);
             setAccountOnUpdate();
 
             Datas.recipname = cursor.getString(5);
@@ -209,14 +209,14 @@ public class w_Add_Tran extends AppCompatActivity {
             Datas.note = cursor.getString(6);
             note_view.setText(Datas.note);
 
-            Datas.recipid = cursor.getLong(7);
+            Datas.franchisee_id = cursor.getLong(7);
 
-            if(Datas.acc_type == 2 || Datas.acc_type == 3)
+            if(Datas.asset_type == 2 || Datas.asset_type == 3)
                 setRecispinnerOnUpdate();
 
-            Datas.budgetexception = cursor.getInt(8);
+            Datas.budget_exception = cursor.getInt(8);
             Datas.rew_amount_calculated = cursor.getFloat(9);
-            Datas.perfexception =cursor.getInt(10);
+            Datas.reward_exception =cursor.getInt(10);
             Datas.rew_type = cursor.getInt(11);
 
 
@@ -241,12 +241,12 @@ public class w_Add_Tran extends AppCompatActivity {
         }
 
 
-        if (Datas.acc_id == 0) {
+        if (Datas.asset_id == 0) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
 
-        if (Datas.acc_type == 2 || Datas.acc_type == 3) {
+        if (Datas.asset_type == 2 || Datas.asset_type == 3) {
             if (Datas.cardid == 0) {
                 Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
                 return;
@@ -543,18 +543,18 @@ public class w_Add_Tran extends AppCompatActivity {
         zDBMan.ItemAcc itemAcc = (zDBMan.ItemAcc) v.getTag();
 
         Datas.cardid = itemAcc.cardid;
-        Datas.acc_id = itemAcc.id;
-        Datas.acc_name = itemAcc.name;
-        Datas.acc_type = itemAcc.type;
+        Datas.asset_id = itemAcc.id;
+        Datas.asset_name = itemAcc.name;
+        Datas.asset_type = itemAcc.type;
         Datas.withdrawlday = itemAcc.withdrawalday;
         Datas.withdrawlaccount = itemAcc.withdrawalaccount;
         Datas.balance = itemAcc.balance;
 
-        acc_view.setText(Datas.acc_name);
+        acc_view.setText(Datas.asset_name);
 
-        if (Datas.acc_type == 2) {
+        if (Datas.asset_type == 2) {
             Check_Card();
-        } else if (Datas.acc_type == 3) {
+        } else if (Datas.asset_type == 3) {
             Credit_Card();
         } else {
             setTransInvisible();
@@ -562,24 +562,24 @@ public class w_Add_Tran extends AppCompatActivity {
     }   //TODO 데이터 무결성 확인
 
     private void setAccountOnUpdate(){
-        Cursor cursor = mDB.getAssetInfo(Datas.acc_id);
+        Cursor cursor = mDB.getAssetInfo(Datas.asset_id);
         if(cursor.getCount() > 0){
             cursor.moveToNext();
 
-            Datas.acc_id = cursor.getLong(0);
-            Datas.acc_type = cursor.getInt(1);
-            Datas.acc_name = cursor.getString(2);
+            Datas.asset_id = cursor.getLong(0);
+            Datas.asset_type = cursor.getInt(1);
+            Datas.asset_name = cursor.getString(2);
 
             Datas.balance = cursor.getFloat(4);
             Datas.withdrawlaccount = cursor.getInt(5);
             Datas.withdrawlday = cursor.getInt(6);
             Datas.cardid = cursor.getLong(7);
 
-            acc_view.setText(Datas.acc_name);
+            acc_view.setText(Datas.asset_name);
 
-            if (Datas.acc_type == 2) {
+            if (Datas.asset_type == 2) {
                 Check_Card();
-            } else if (Datas.acc_type == 3) {
+            } else if (Datas.asset_type == 3) {
                 Credit_Card();
             } else {
                 setTransInvisible();
@@ -590,9 +590,9 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setRecipient(ItemRecipient itemRecipient){
 
-        Datas.recipid = itemRecipient.recipid;
+        Datas.franchisee_id = itemRecipient.recipid;
         Datas.recipname = itemRecipient.recipient;
-        Datas.perfexception = itemRecipient.conditionexception;
+        Datas.reward_exception = itemRecipient.conditionexception;
         Datas.perftype = itemRecipient.conditiontype;
         Datas.perfamount = itemRecipient.conditionperformance;
         Datas.rew_type = itemRecipient.rewtype;
@@ -607,7 +607,7 @@ public class w_Add_Tran extends AppCompatActivity {
         ItemRecipient itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemRecipient) VCV.rew_spin.getItemAtPosition(i);
-            if( itemRecipient.recipid == Datas.recipid) {
+            if( itemRecipient.recipid == Datas.franchisee_id) {
                 //i -= 1;
                 break;
             }

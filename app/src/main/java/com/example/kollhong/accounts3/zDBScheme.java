@@ -68,6 +68,8 @@ public final class zDBScheme {
         public static final String FRANCHISEE_ID = "franchisee_id";
         public static final String BUDGET_EXCEPTION = "budget_exception";
         public static final String REWARD_EXCEPTION = "reward_exception";
+        public static final String REWARD_TYPE = "reward_type";
+        public static final String REWARD = "reward_amount";
     }
 
     public static final class FRANCHISEE_CODE_TABLE {
@@ -114,16 +116,24 @@ public final class zDBScheme {
             return true;
         }
 
-        static boolean putRecord(SQLiteDatabase db, String table, ContentValues values) {
+        static long putRecord(SQLiteDatabase db, String table, ContentValues values) {
             try {
-                db.insertOrThrow(table, null, values);
+                return db.insertOrThrow(table, null, values);
             } catch (SQLiteConstraintException e) {
                 Log.e("PUT record error", e.getMessage());
+                return -1L;
+            }
+        }
+
+        static boolean updateRecord(SQLiteDatabase db, String table, ContentValues values,  String where, String[] whereArgs) {
+            try {
+                db.update(table, values, where, whereArgs);
+            } catch (SQLiteConstraintException e) {
+                Log.e("Update record error", e.getMessage());
                 return false;
             }
             return true;
         }
-
 
         static List<ContentValues> getRecordList(SQLiteDatabase db, String table, String[] columns, String where, String[] whereArgs, String orderBy) {
             Cursor cursor = db.query(table, columns, where, whereArgs, null, null, orderBy);

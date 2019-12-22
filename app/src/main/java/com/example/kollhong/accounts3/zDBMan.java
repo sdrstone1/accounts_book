@@ -2,7 +2,6 @@ package com.example.kollhong.accounts3;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -143,6 +142,7 @@ public class zDBMan {
     ContentValues getAssetInfo(long id){
         List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
+        if(contentValuesList.isEmpty()) return null;
         return contentValuesList.get(0);
     }
 
@@ -174,101 +174,96 @@ public class zDBMan {
         return contentValuesList.get(0).getAsString(FRANCHISEE_CODE_TABLE.NAME);
     }
 
-    Cursor getLearnData(String name){        //이름과 계좌가 같을 경우
-        Cursor cursor = db.rawQuery("select _id, categoryid, accid, recipientid, budgetexception, perfexception, rewardtype, rewardamount " +
-                "from learning where recipient = '" + name + "' ", null);
-        return cursor;
+    //TODO perfexception 칼럼 없어짐
+    ContentValues getLearnData(String name){        //이름과 계좌가 같을 경우
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db,TABLE_LEARN, null, //select all columns
+                "? = '?' ", new String[] { LEARN_TABLE.RECIPIENT, name}, null);
+        if(contentValuesList.isEmpty()) return null;
+        return contentValuesList.get(0);
     }
 
 
 
-    private void updateAccBalance(long acc_id, float amount){
-        Cursor tmp = getAssetInfo(data.acc_id);
-        float tmp_amount;
-        if(tmp.getCount() != 0 ){
-            tmp.moveToNext();
-            tmp_amount = tmp.getFloat(4);
-            amount = tmp_amount + amount;
-        }
-        db.execSQL("update accounts set balance = balance - '"+ amount + "' where _id = '" + acc_id + "' ");
-    }
 
-    private void updateTransaction(ItemTransactions data){
+//TODO ItemTransaction를 모두 ContentValues로 바꾸기
+    private void updateTransaction(ItemTransactions inputData){
         ContentValues values = new ContentValues();
-        values.put("time", data.timeinmillis);
-        values.put("categoryid", data.category_id);
-        values.put("amount", data.amount);
-        values.put("accountid", data.acc_id);
-        values.put("recipient", data.recipname);
-        values.put("notes", data.note);
-        values.put("rewardrecipientid", data.recipid );
-        values.put("budgetexception", data.budgetexception);
-        values.put("rewardamount", data.rew_amount_calculated);
-        values.put("perfexception", data.perfexception);
-        values.put("rewardtype", data.rew_type);
+        values.put(TRANSACTIONS_TABLE.TRANSACTON_TIME, inputData.timeinmillis);
+        values.put(TRANSACTIONS_TABLE.CATEGORY_ID, inputData.category_id);
+        values.put(TRANSACTIONS_TABLE.AMOUNT, inputData.amount);
+        values.put(TRANSACTIONS_TABLE.ASSET_ID, inputData.asset_id);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, inputData.recipname);
+        values.put(TRANSACTIONS_TABLE.NOTE, inputData.note);
+        values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, inputData.franchisee_id);
+        values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, inputData.budget_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_CACULATED, inputData.rew_amount_calculated);
+        values.put(TRANSACTIONS_TABLE.REWARD_EXCEPTION, inputData.reward_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_TYPE, inputData.rew_type);
 
-        float tmp_amount = 0f;
-        Cursor tmp = getTransbyID(data.trans_id);
-        if(tmp.getCount() != 0){
-            tmp.moveToNext();
-            tmp_amount = tmp.getFloat(3);
-            tmp_amount = tmp_amount - data.amount;
+
+        // 잔액 변동 체크
+        ContentValues transbyID = getTransbyID(inputData.transaction_id);
+        if(transbyID== null){
+            return;
         }
-        if( data.acc_type == 1 ){       //체크카드 출금계좌에서 잔액 보정.
-            updateAccBalance(data.withdrawlaccount, tmp_amount);
-        }else {
-            updateAccBalance(data.acc_id, tmp_amount);
+        float tmp_amount = transbyID.getAsFloat(TRANSACTIONS_TABLE.AMOUNT);
+        tmp_amount = tmp_amount - inputData.amount;
+        if( inputData.asset_type == 1L ){       //체크카드 출금계좌에서 잔액 보정.
+            updateAssetBalance(inputData.withdrawlaccount, tmp_amount);
         }
+        /*else {
+            updateAssetBalance(inputData.acc_id, tmp_amount);
+        }
+*/
+        //db.update("trans", values, "_id = " + inputData.transaction_id, null );
+        zDbIO.updateRecord(db, TABLE_TRANSACTIONS, values, "? = '?' ", new String[] {TABLE_ID, Long.toString(inputData.transaction_id) });
+    }
 
-        db.update("trans", values, "_id = " + data.trans_id, null );
-
+    private void updateAssetBalance( long acc_id, float amount){
+        ContentValues assetInfo = getAssetInfo(acc_id);
+        if(assetInfo == null ){ //Balance
+            Log.e("getAssetInfo : ","error");
+            return;
+        }
+        float balance = assetInfo.getAsFloat(ASSET_TABLE.BALANCE);
+        balance = balance + amount;
+        ContentValues updateValues = new ContentValues();
+        updateValues.put(ASSET_TABLE.BALANCE, Float.toString(balance));
+        zDbIO.updateRecord(db, TABLE_ASSET, assetInfo, "? = '?' ", new String[] {TABLE_ID, Long.toString(acc_id) });
     }
 
     void updateCat(long id, String name){
         ContentValues values = new ContentValues();
         values.put("name",name);
-
-        db.update("category",values,"_id = " + id,null);
+        zDbIO.updateRecord(db, TABLE_CATEGORY, values, "? = '?' ", new String[] {TABLE_ID, Long.toString(id) });
     }
 
 
-    void addAcc(boolean isUpdate, ItemAcc itemAcc){
-        /*
-                long id;
-        String name;
-        int type = 1;
-        long cardid;
-        float balance;
-        int withdrawalaccount;
-        int withdrawalday;
-        String nickname;
-         */
-
+    void addAsset(boolean isUpdate, ItemAcc itemAcc){
         ContentValues values = new ContentValues();
-        values.put("name", itemAcc.name);
+        values.put(ASSET_TABLE.NAME, itemAcc.name);
 
-        values.put("cardid", itemAcc.cardid);
-        values.put("nickname",itemAcc.nickname);
+        values.put(ASSET_TABLE.CARD_ID, itemAcc.cardid);
+        values.put(ASSET_TABLE.NICKNAME,itemAcc.nickname);
 
-        if(itemAcc.type == 1 ){     //현금
-            values.put("balance", itemAcc.balance);
+        if(itemAcc.type == 1L ){     //현금
+            values.put(ASSET_TABLE.BALANCE, itemAcc.balance);
         }
-        else if (itemAcc.type == 2){       //체크카드
-            values.put("withdrawalaccount", itemAcc.withdrawalaccount);
+        else if (itemAcc.type == 2L){       //체크카드
+            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAcc.withdrawalaccount);
         }
-        else if (itemAcc.type == 3){       //신용카드
-            values.put("balance", itemAcc.balance);
-            values.put("withdrawalaccount", itemAcc.withdrawalaccount);
-            values.put("withdrawalday", itemAcc.withdrawalday);
+        else if (itemAcc.type == 3L){       //신용카드
+            values.put(ASSET_TABLE.BALANCE, itemAcc.balance);
+            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAcc.withdrawalaccount);
+            values.put(ASSET_TABLE.WITHDRAWALDAY, itemAcc.withdrawalday);
         }
 
         if(isUpdate) {      //id확인
-
-
-            db.update("accounts", values, " _id = '" + itemAcc.id + "' ",null);
+            zDbIO.updateRecord(db, TABLE_ASSET, values, "? = '?' ", new String[] {TABLE_ID, Long.toString(itemAcc.id) });
         }
         else{
-            db.insert("accounts", null, values);
+            //db.insert("accounts", null, values);
+            zDbIO.putRecord(db,TABLE_ASSET,values);
         }
         //타입에 따라 바꾸기
     }
@@ -276,52 +271,51 @@ public class zDBMan {
     void addCat(int cat_Level, Long parent, String name){
 
         ContentValues values = new ContentValues();
-        values.put("level", cat_Level + 1);
-        values.put("parent", parent);
-        values.put("name",name);
-
-        db.insert("category",null, values);
+        values.put(CATEGORY_TABLE.CAT_LEVEL, cat_Level + 1);
+        values.put(CATEGORY_TABLE.PARENT_ID, parent);
+        values.put(CATEGORY_TABLE.NAME,name);
+        zDbIO.putRecord(db,TABLE_CATEGORY,values);
     }
 
 
     private void addTransaction(ItemTransactions data){
         ContentValues values = new ContentValues();
-        values.put("time", data.timeinmillis);
-        values.put("categoryid", data.category_id);
-        values.put("amount", data.amount);
-        values.put("accountid", data.acc_id);
-        values.put("recipient", data.recipname);
-        values.put("notes", data.note);
-        values.put("rewardrecipientid", data.recipid );
-        values.put("budgetexception", data.budgetexception);
-        values.put("rewardamount", data.rew_amount_calculated);
-        values.put("perfexception", data.perfexception);
-        values.put("rewardtype", data.rew_type);
+        values.put(TRANSACTIONS_TABLE.TRANSACTON_TIME, data.timeinmillis);
+        values.put(TRANSACTIONS_TABLE.CATEGORY_ID, data.category_id);
+        values.put(TRANSACTIONS_TABLE.AMOUNT, data.amount);
+        values.put(TRANSACTIONS_TABLE.ASSET_ID, data.asset_id);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipname);
+        values.put(TRANSACTIONS_TABLE.NOTE, data.note);
+        values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, data.franchisee_id);
+        values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, data.budget_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_CACULATED, data.rew_amount_calculated);
+        values.put(TRANSACTIONS_TABLE.REWARD_EXCEPTION, data.reward_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_TYPE, data.rew_type);
 
 
-        db.insert("trans",null, values);
+        zDbIO.putRecord(db,TABLE_TRANSACTIONS,values);
     }
 
     long addTransactionfromReciever(ItemTransactions data) {
         ContentValues values = new ContentValues();
 
-        values.put("time", data.timeinmillis);
-        values.put("categoryid", data.category_id);
-        values.put("amount", data.amount);
+        values.put(TRANSACTIONS_TABLE.TRANSACTON_TIME, data.timeinmillis);
+        values.put(TRANSACTIONS_TABLE.CATEGORY_ID, data.category_id);
+        values.put(TRANSACTIONS_TABLE.AMOUNT, data.amount);
 
-        values.put("recipient", data.recipname);
-        values.put("rewardrecipientid", data.recipid );
-        values.put("budgetexception", data.budgetexception);
-        values.put("perfexception", data.perfexception);
-        values.put("rewardtype", data.rew_type);
-        values.put("rewardamount", data.rew_amount_calculated);
-        if (data.acc_id != 0 ) {
-            values.put("accountid", data.acc_id);
-            updateAccBalance(data.acc_id, data.amount);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipname);
+        values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, data.franchisee_id);
+        values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, data.budget_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_CACULATED, data.rew_amount_calculated);
+        values.put(TRANSACTIONS_TABLE.REWARD_EXCEPTION, data.reward_exception);
+        values.put(TRANSACTIONS_TABLE.REWARD_TYPE, data.rew_type);
+        if (data.asset_id != 0L ) {
+            values.put(TRANSACTIONS_TABLE.ASSET_ID, data.asset_id);
+            updateAssetBalance(data.asset_id, data.amount);
         }
 
 
-        return db.insert("trans",null, values);
+        return zDbIO.putRecord(db,TABLE_TRANSACTIONS,values);
     }
 
 
@@ -333,10 +327,10 @@ public class zDBMan {
             case 1:
             case 2: {       //수입 -> data.amount만큼 잔액 더함.
 
-                if (data.acc_type == 1) {       //체크카드 출금계좌에서 잔액 보정.
-                    updateAccBalance(data.withdrawlaccount, data.amount);
+                if (data.asset_type == 1L) {       //체크카드 출금계좌에서 잔액 보정.
+                    updateAssetBalance( data.withdrawlaccount, data.amount);
                 } else {
-                    updateAccBalance(data.acc_id, data.amount);
+                    updateAssetBalance( data.asset_id, data.amount);
                 }
                 break;
             }
@@ -346,10 +340,10 @@ public class zDBMan {
             case 6:
             case 7:
             case 8:{
-                if (data.acc_type == 1) {       //체크카드 출금계좌에서 잔액 보정.
-                    updateAccBalance(data.withdrawlaccount, -data.amount);
+                if (data.asset_type == 1L) {       //체크카드 출금계좌에서 잔액 보정.
+                    updateAssetBalance(data.withdrawlaccount, -data.amount);
                 } else {
-                    updateAccBalance(data.acc_id, -data.amount);
+                    updateAssetBalance(data.asset_id, -data.amount);
                 }
                 break;
             }
@@ -367,19 +361,20 @@ public class zDBMan {
 
     private void updateLearn(ItemTransactions data){
         ContentValues values = new ContentValues();
-        values.put("recipient", data.recipname);
-        values.put("categoryid", data.category_id);
-        values.put("accid", data.acc_id);
-        values.put("recipientid", data.recipid);
-        values.put("budgetexception", data.budgetexception);
-        values.put("perfexception", data.perfexception);
-        values.put("rewardtype", data.rew_type);
-        values.put("rewardamount", data.rew_amount);
+        values.put(LEARN_TABLE.RECIPIENT, data.recipname);
+        values.put(LEARN_TABLE.CATEGORY_ID, data.category_id);
+        values.put(LEARN_TABLE.ASSET_ID, data.asset_id);
+        values.put(LEARN_TABLE.FRANCHISEE_ID, data.franchisee_id);
+        values.put(LEARN_TABLE.BUDGET_EXCEPTION, data.budget_exception);
+        values.put(LEARN_TABLE.REWARD_EXCEPTION, data.reward_exception);
+        values.put(LEARN_TABLE.REWARD_TYPE, data.rew_type);
+        values.put(LEARN_TABLE.REWARD, data.rew_amount);
 
 
-        try{db.insertOrThrow("learning",null, values);}
+
+        try{db.insertOrThrow(TABLE_LEARN,null, values);}
         catch (SQLiteConstraintException e){
-            db.update("learning", values, "recipient = '"+ data.recipname+ "' ",null);
+            db.update(TABLE_LEARN, values, "? = '?'",new String[]{LEARN_TABLE.RECIPIENT, data.recipname});
         }
     }
 
@@ -396,30 +391,31 @@ public class zDBMan {
         db.delete("category","_id = '" + id+ "' ",null);
     }
 
+
     class ItemTransactions {
         boolean isUpdate = false;
-        long trans_id;
-        long category_id = 0;
+        long transaction_id;
+        long category_id = 0L;
         String category_name = null;
         long timeinmillis = 0L;
         float amount;
-        long acc_id = 0;
-        long acc_type;
-        String acc_name = null;
-        long withdrawlday = 0;
-        long withdrawlaccount = 0;
-        long cardid = 0;
+        long asset_id = 0L;
+        long asset_type;
+        String asset_name = null;
+        long withdrawlday = 0L;
+        long withdrawlaccount = 0L;
+        long cardid = 0L;
         float balance;
-        long recipid = 0;
+        long franchisee_id = 0L;
         String recipname = " ";
         float rew_amount;
         float rew_amount_calculated;
         long rew_type;
         String note = " ";
-        long budgetexception = 0;
-        long perfexception;
+        long budget_exception = 0L;
+        long reward_exception;
         long perftype;
-        float perfamount;
+        //float perfamount; //==rew_amount_calculated
         boolean learn;
 
 
@@ -443,9 +439,6 @@ public class zDBMan {
         //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
     }
 
-    void rawQuery(String query){
-        zDbIO.rawQuery(db, query);
-    }
 
 
 }

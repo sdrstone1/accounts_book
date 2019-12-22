@@ -113,7 +113,7 @@ public class zMessageReciever extends BroadcastReceiver {
         }
 
 
-        data.trans_id = addTrans();
+        data.transaction_id = addTrans();
         //Log.w("SMS수신됨", "수신됨");
         sendNoti(context);
 
@@ -121,7 +121,7 @@ public class zMessageReciever extends BroadcastReceiver {
 
     public long addTrans(){
         //학습에서 기록 확인
-        data.trans_id = 0;
+        data.transaction_id = 0;
         Cursor cursor = mDB.getLearnData(data.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
         if(cursor.getCount() != 0){
             cursor.moveToNext();
@@ -129,14 +129,14 @@ public class zMessageReciever extends BroadcastReceiver {
             if(!cursor.isNull(1))
                 data.category_id =  cursor.getLong(1);
             if(!cursor.isNull(2))
-                data.acc_id = cursor.getLong(2);
+                data.asset_id = cursor.getLong(2);
 
             if(!cursor.isNull(3))
-                data.recipid = cursor.getLong(3);
+                data.franchisee_id = cursor.getLong(3);
             if(!cursor.isNull(4))
-                data.budgetexception = cursor.getInt(4);
+                data.budget_exception = cursor.getInt(4);
             if(!cursor.isNull(5))
-                data.perfexception = cursor.getInt(5);
+                data.reward_exception = cursor.getInt(5);
             if(!cursor.isNull(6))
                 data.rew_type = cursor.getInt(6);
             if(!cursor.isNull(7))
@@ -144,10 +144,10 @@ public class zMessageReciever extends BroadcastReceiver {
                 data.rew_amount_calculated = data.rew_amount * data.amount;
         }else {
             data.category_id = 3;       //이체 항목으로 지정
-            data.acc_id = 0;
-            data.recipid = 0;
-            data.budgetexception = 0;
-            data.perfexception = 0;
+            data.asset_id = 0;
+            data.franchisee_id = 0;
+            data.budget_exception = 0;
+            data.reward_exception = 0;
             data.rew_type = 0;
             data.rew_amount = 0;
             data.rew_amount_calculated = 0;
@@ -173,9 +173,9 @@ public class zMessageReciever extends BroadcastReceiver {
             Intent intent = new Intent(context, w_Add_Tran.class);
             //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-            intent.putExtra("Notification", data.trans_id);
+            intent.putExtra("Notification", data.transaction_id);
 
-            Log.e("SMS Rec, ", " Trans_id : "+String.valueOf(data.trans_id) );
+            Log.e("SMS Rec, ", " Trans_id : "+String.valueOf(data.transaction_id) );
 
             //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
@@ -199,7 +199,7 @@ public class zMessageReciever extends BroadcastReceiver {
 
             //            CharSequence string = getContext().getResources().getText(R.string.reward);
             CharSequence charSequence;
-            if(data.acc_id == 0) {
+            if(data.asset_id == 0) {
                 String learn_data = (String) context.getResources().getText(R.string.notification_learn_not_avail);
                 String time = (String) context.getResources().getText(R.string.time_text);
                 String recip = (String) context.getResources().getText(R.string.recipient);
@@ -227,7 +227,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 }
 
 
-                Cursor cursor = mDB.getAssetInfo(data.acc_id);
+                Cursor cursor = mDB.getAssetInfo(data.asset_id);
                 if( cursor.getCount() != 0){
                     cursor.moveToNext();
                     charSequence = charSequence + "\n" + acc + " : " + cursor.getString(2);       //accname
@@ -235,7 +235,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 cursor.close();
 
                 charSequence = charSequence + "\n" + recip + " : "+ data.recipname ;//recipient
-                String recip_name = mDB.getFranchiseeName(data.recipid);
+                String recip_name = mDB.getFranchiseeName(data.franchisee_id);
                 if(!recip_name.equals("")){
                     charSequence = charSequence + "\n" + re + " : " + recip_name;
                 }
