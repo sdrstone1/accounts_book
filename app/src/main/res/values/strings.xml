@@ -1,0 +1,191 @@
+<resources>
+    <string name="app_name">Money Manager</string>
+    <string name="Developer">호준</string>
+    <string name="Contact_Developer">sdrstone3@gmail.com</string>
+    <string name="Contact_Developer_Uri">문의 메일 보내기</string>
+    <string name="tmp_text">업데이트 예정</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">설정</string>
+
+    <string name="title_activity_splash_main">Money Manager</string>
+    <string name="title_activity_settings">설정</string>
+    <string name="title_activity_stats">통계 보기</string>
+    <string name="title_activity_add_transactions">거래 기록 추가</string>
+    <string name="title_activity_permission_get">권한이 필요합니다.</string>
+    <string name="title_activity_first_launch">가계부를 사용해주셔서 감사합니다</string>
+
+    <string name="title_content_accounts">Accounts</string>
+    <string name="title_content_stats">Stats</string>
+    <string name="title_content_trans">Transactions</string>
+
+    <string name="title_add_trans_datepicker_dialog">시간</string>
+
+    <string name="title_menu_transactions">거래</string>
+    <string name="title_frag_trans_0_history">거래 기록 보기</string>
+    <string name="title_frag_trans_1_cal">달력 보기</string>
+    <string name="title_frag_accounts">자산</string>
+    <string name="title_menu_manage">관리</string>
+    <string name="title_frag_manage_0_stat">통계</string>
+    <string name="title_frag_manage_1_budget">예산</string>
+    <string name="title_frag_manage_2_recipient">거래처</string>
+    <string name="title_frag_manage_3_reward">카드 실적</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">가계부 알림</string>
+
+    <string name="category">카테고리</string>
+    <string name="category_sub">세부 카테고리</string>
+    <string name="income">수입</string>
+    <string name="expense">지출</string>
+    <string name="remittance">이체</string>
+
+    <string name="time_text">시간</string>
+    <string name="date_text">날짜</string>
+
+    <string name="withdrawal_acc">출금 계좌</string>
+    <string name="withdrawal_date">출금일</string>
+    <string name="select_card">카드 선택</string>
+    <string name="balance">잔액</string>
+    <string name="maxed_out">한도</string>
+    <string name="nickname">별명</string>
+    <string name="amount_usage">금액</string>
+    <string name="account">자산</string>
+    <string name="recipient">거래처</string>
+    <string name="note">메모</string>
+    <string name="reward">혜택</string>
+    <string name="name">이름</string>
+
+    <string name="save">저장</string>
+    <string name="forward">앞으로</string>
+    <string name="backward">뒤로</string>
+    <string name="add">추가</string>
+    <string name="delete">삭제</string>
+    <string name="deleteask">삭제하시겠습니까?</string>
+    <string name="deleteaskmsg">하위의 모든 카테고리도 삭제됩니다.</string>
+
+    <string name="acc_bank">은행 계좌</string>
+    <string name="acc_debit">체크 카드</string>
+    <string name="acc_credit">신용 카드</string>
+
+
+    <!-- main activity-->
+    <string name="imageDescription_bannerImg">콜홍 배너</string>
+
+    <!-- first launch-->
+    <string name="snackbar_fl_choose_options">옵션을 선택하세요.</string>
+    <string name="snackbar_fl_back_lock">먼저 설정을 진행 해주세요.</string>
+    <string name="snackbar_fl_req_sms_perm">설정 적용을 위해 SMS권한을 허용해야 합니다.</string>
+    <string name="toast_fl_sms_granted">SMS권한이 확인되었습니다.</string>
+    <string name="toast_fl_sms_not_granted">SMS권한이 거부되었습니다. \n설정에서 활성화 해주세요</string>
+    <string name="imageDescription_welcomeimg">Welcome Image</string>
+    <string name="radiobtn_SMS_allowed">SMS 읽기 허용</string>
+    <string name="radiobtn_SMS_disallowed">SMS 읽기 허용 안 함</string>
+    <string name="launchbtn">실행</string>
+    <string name="Welcome_Message">가계부를 이용해 주셔서 감사합니다!</string>
+    <string name="SMS_Message">거래 기록 자동 추가를 위한 권한이 필요합니다.\n 언제든지 설정에서 변경할 수 있습니다.</string>
+
+    <!--거래 기록 추가-->
+    <string name="snackbar_trans_amount_missing">거래액을 입력해주세요.</string>
+    <string name="snackbar_trans_time_missing">거래 시간을 선택해주세요.</string>
+    <string name="snackbar_trans_acc_missing">거래 계좌 선택에 오류가 발생했습니다.</string>
+    <string name="snackbar_trans_cat_missing">카테고리 선택에 오류가 발생했습니다.</string>
+
+    <!--settings-->
+    <string name="title_frag_settings_name_add">카테고리 추가</string>
+    <string name="title_frag_settings_name_add_hint">이름 입력</string>
+    <string name="title_alertdialog_cancel_button">취소</string>
+    <string name="title_frag_settings_name_update">카테고리 수정</string>
+    <string name="title_alertdialog_update_button">수정</string>
+    <string name="text_set_category">카테고리 설정</string>
+    <string name="text_set_account">자산 설정</string>
+
+    <!--add_transaction-->
+    <string name="text_learn_checker">같은 거래처의 내용 자동 완성</string>
+    <string name="title_time_picker">시간</string>
+
+    <string name="notification_learn_avail">학습 데이터에서 자동완성하여 추가되었습니다.\n</string>
+    <string name="notification_learn_not_avail">학습 데이터에 없습니다.
+        \n메시지 내용에 따라 자동으로 추가되었습니다.\n</string>
+
+    <string name="title_activity_tmp__settings">설정</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">일반 설정</string>
+
+    <string name="pref_title_SMSreg">거래 자동 등록 사용</string>
+    <string name="pref_description_SMSreg">메시지를 수신하면 거래를 자동으로 등록합니다. \nSMS 권한이 필요합니다.    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">자산 설정</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">카테고리 설정</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+
+</resources>
