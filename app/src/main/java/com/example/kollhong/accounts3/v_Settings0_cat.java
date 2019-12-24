@@ -123,15 +123,29 @@ public class v_Settings0_cat extends AppCompatActivity {
 
     }
 
+    class categoryClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {       //자녀 카테고리가 있으면 다시 다이얼로그 띄우고 자녀가 없으면 완료.
+
+            TextView view = (TextView) v;
+
+            long id = (long)view.getTag();
+            //TODO 아이디로 설정 편집 이동.
+            Intent intent = new Intent(context, v_Settings0_subcat.class);
+            intent.putExtra("id", id);
+
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(v_Settings0_cat.this).toBundle());
+        }
+    }
     private void Category_Recycler(Cursor cursor) {
-        List<zDBMan.ItemCat> itemCats;
+        List<zRecyclerView_AdapterGenerator.recyclerItem> itemCats;
 
         RecyclerView recyclerView = findViewById(R.id.pref_categories_recycler);
 
         itemCats = new ArrayList<>();
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
-                zDBMan.ItemCat item = mDB.getItemCat();
+                zRecyclerView_AdapterGenerator.recyclerItem item = new zRecyclerView_AdapterGenerator.recyclerItem();
                 item.id = cursor.getLong(0);
                 item.name = cursor.getString(1);
                 itemCats.add(item);
@@ -140,7 +154,9 @@ public class v_Settings0_cat extends AppCompatActivity {
         cursor.close();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        Category_adapter categoryadapter = new Category_adapter(itemCats);
+        zRecyclerView_AdapterGenerator.Category_adapter categoryadapter
+                = new zRecyclerView_AdapterGenerator.Category_adapter(this,this,itemCats, new categoryClickListener());
+
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();
 
@@ -185,84 +201,6 @@ public class v_Settings0_cat extends AppCompatActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
-    }
-
-    private class Category_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        List<zDBMan.ItemCat> items;
-
-        Category_adapter(List<zDBMan.ItemCat> item2) {
-            items = item2;
-        }
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
-            return new Category_adapter.categoryNameHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            final zDBMan.ItemCat itemcat = items.get(position);
-
-            Category_adapter.categoryNameHolder newholder = (Category_adapter.categoryNameHolder) holder;
-            newholder.textView.setText(itemcat.name);
-            View v = newholder.textView;
-            v.setTag(itemcat.id);
-            newholder.textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {       //자녀 카테고리가 있으면 다시 다이얼로그 띄우고 자녀가 없으면 완료.
-
-                    TextView view = (TextView) v;
-
-                    long id = (long)view.getTag();
-                    //TODO 아이디로 설정 편집 이동.
-                    Intent intent = new Intent(context, v_Settings0_subcat.class);
-                    intent.putExtra("id", id);
-
-                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(v_Settings0_cat.this).toBundle());
-
-
-
-                }
-
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-//                return 4;
-            return items.size();
-        }
-
-        public class categoryNameHolder extends RecyclerView.ViewHolder {
-            TextView textView;
-
-            public categoryNameHolder(View v) {
-                super(v);
-                textView = (TextView) v.findViewById(R.id.add_tran_category_name);
-
-                Point point = new Point();
-                Display display = getWindowManager().getDefaultDisplay();
-                int rotation = display.getRotation();
-                display.getSize(point );
-
-                /*
-                디스플레이 정보 가져오기- 사용하지는 않았지만 좋은 정보여서 남겨 둠
-                float density  = getResources().getDisplayMetrics().density;
-                float dpHeight = outMetrics.heightPixels / density;
-                float dpWidth  = outMetrics.widthPixels / density;
-*/
-                ViewGroup.LayoutParams params = v.getLayoutParams();
-
-
-                if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-                    params.width = point.x ;
-
-                else params.width = point.y ;
-                v.setLayoutParams(params);
-            }
-        }
-
     }
 
 }

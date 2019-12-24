@@ -1,5 +1,6 @@
 package com.example.kollhong.accounts3;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Point;
@@ -35,11 +36,10 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import static com.example.kollhong.accounts3.zDBScheme.*;
+import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
 import static java.text.DateFormat.getTimeInstance;
@@ -53,20 +53,21 @@ public class w_Add_Tran extends AppCompatActivity {
     EditText amount_view;
     EditText recip_view;
     EditText note_view;
+    long tab_num;
 
     VisibleControlView VCV;
     zDBMan mDB;
-    zDBMan.ItemTransactions Datas;
+    zDBScheme.ItemTransactions itemTransactions;
 
     Calendar calendar = Calendar.getInstance();
     DateFormat df = getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 
 
     DialogFragment dialogFragment;
-    w_Add_Tran_Datepicker ATCF;
+    w_Add_Tran_Datepicker transactionsDatePicker;
 
-    List<zDBMan.ItemCat> itemCats;
-    List<zDBMan.ItemAcc> itemAccs;
+    List<zDBScheme.ItemCat> itemCats;
+    List<zDBScheme.ItemAcc> itemAccs;
     BottomSheetDialog mBottomSheetDialog;
 
     //Cursor cursor;
@@ -91,18 +92,18 @@ public class w_Add_Tran extends AppCompatActivity {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
                     EditText view = (EditText)v;
-                    Datas.recipname = view.getText().toString();
-                    Cursor cursor = mDB.getLearnData(Datas.recipname);
-                    if(cursor.getCount() != 0){
-                        cursor.moveToNext();
-                        Datas.category_id = cursor.getLong(1);
-                        Datas.asset_id = cursor.getLong(2);
-                        Datas.franchisee_id = cursor.getLong(3);
+                    itemTransactions.recipname = view.getText().toString();
+                    ContentValues learnValues = mDB.getLearnData(itemTransactions.recipname);
+                    if(learnValues != null){
+                        //learnValues();
+                        itemTransactions.category_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.CATEGORY_ID);
+                        itemTransactions.asset_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.ASSET_ID);
+                        itemTransactions.franchisee_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.FRANCHISEE_ID);
 
-                        setCategoryOnTab(Datas.category_id);
+                        setCategoryOnTab(itemTransactions.category_id);
                         setAccountOnUpdate();
 
-                        if(Datas.asset_type == 2 || Datas.asset_type == 3)
+                        if(itemTransactions.asset_type == ASSET_TYPE_DEBIT_CARD || itemTransactions.asset_type == ASSET_TYPE_CREDIT_CARD)
                             setRecispinnerOnUpdate();
                     }
                 }
@@ -113,9 +114,9 @@ public class w_Add_Tran extends AppCompatActivity {
         VCV = new VisibleControlView();
 
         mDB = new zDBMan(this, true);
-        Datas = mDB.data;
+        itemTransactions = new zDBScheme.ItemTransactions();
 
-        Datas.timeinmillis = calendar.getTimeInMillis();
+        itemTransactions.timeinmillis = calendar.getTimeInMillis();
 
         int tab_num = 1;
         setTab(tab_num);
@@ -145,8 +146,8 @@ public class w_Add_Tran extends AppCompatActivity {
             return true;
         }
         else if(id == R.id.itemDelete){
-            if (Datas.isUpdate){
-                mDB.deleteTrans(Datas.transaction_id);
+            if (itemTransactions.isUpdate){
+                mDB.deleteTrans(itemTransactions.transaction_id);
             }
             else{
                 this.finish();
@@ -167,9 +168,9 @@ public class w_Add_Tran extends AppCompatActivity {
 
         if (intent.hasExtra("Notification")){
             if(intent.getLongExtra("Notification", 0L) != 0l) {   //마지막 레코드 가져와서 띄우기
-                Cursor cursor = mDB.getTransbyID(intent.getLongExtra("Notification", 0l));
-                Log.e("Recieved SMS Intent, id : ", String.valueOf(intent.getLongExtra("Notification", 0l)));
-                UpdateTrans(cursor);
+                ContentValues transactionsValues = mDB.getTransbyID(intent.getLongExtra("Notification", 0L));
+                Log.e("Recieved SMS Intent", String.valueOf(intent.getLongExtra("Notification", 0l)));
+                UpdateDisplay(transactionsValues);
 
                 //Bundle bundle = intent.getBundleExtra("bundle");
                 //bundle.getLong("Notification");
@@ -178,54 +179,51 @@ public class w_Add_Tran extends AppCompatActivity {
         }
         else if (intent.hasExtra("UpdateTrans")){
             if(intent.getLongExtra("UpdateTrans", 0l) != 0) {
-                Cursor cursor = mDB.getTransbyID(intent.getLongExtra("UpdateTrans", 0));
-                UpdateTrans(cursor);        //trans 레코드 가져와서 띄우기
+                ContentValues transactionsValues = mDB.getTransbyID(intent.getLongExtra("UpdateTrans", 0));
+                UpdateDisplay(transactionsValues);        //trans 레코드 가져와서 띄우기
             } else {
-                Datas.timeinmillis = calendar.getTimeInMillis();
+                itemTransactions.timeinmillis = calendar.getTimeInMillis();
             }
         }
     }
 
-    private void UpdateTrans(Cursor cursor) {
-        if (cursor.getCount() != 0) {
-            cursor.moveToNext();
-            Datas.isUpdate = true;
-            Datas.transaction_id = cursor.getLong(0);
-            Datas.timeinmillis = cursor.getLong(1);
+    private void UpdateDisplay(ContentValues values) {
+        if (values != null) {
+
+            itemTransactions.isUpdate = true;
+            itemTransactions.transaction_id = values.getAsLong(zDBScheme.TABLE_ID);
+            itemTransactions.timeinmillis = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.TRANSACTON_TIME);
             setTimeText();
 
-            Datas.category_id = cursor.getLong(2);
+            itemTransactions.category_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.CATEGORY_ID);
             setCategoryOnUpdate();
 
-            Datas.amount = cursor.getFloat(3);
-            amount_view.setText(String.valueOf(Datas.amount));
+            itemTransactions.amount = values.getAsFloat(zDBScheme.TRANSACTIONS_TABLE.AMOUNT);
+            amount_view.setText(String.valueOf(itemTransactions.amount));
 
-            Datas.asset_id = cursor.getLong(4);
+            itemTransactions.asset_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.ASSET_ID);
             setAccountOnUpdate();
 
-            Datas.recipname = cursor.getString(5);
-            recip_view.setText(Datas.recipname);
+            itemTransactions.recipname = values.getAsString(zDBScheme.TRANSACTIONS_TABLE.RECIPIENT);
+            recip_view.setText(itemTransactions.recipname);
 
-            Datas.note = cursor.getString(6);
-            note_view.setText(Datas.note);
+            itemTransactions.note = values.getAsString(zDBScheme.TRANSACTIONS_TABLE.NOTE);
+            note_view.setText(itemTransactions.note);
 
-            Datas.franchisee_id = cursor.getLong(7);
+            itemTransactions.franchisee_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
 
-            if(Datas.asset_type == 2 || Datas.asset_type == 3)
+            if (itemTransactions.asset_type == ASSET_TYPE_DEBIT_CARD || itemTransactions.asset_type == ASSET_TYPE_CREDIT_CARD)
                 setRecispinnerOnUpdate();
 
-            Datas.budget_exception = cursor.getInt(8);
-            Datas.rew_amount_calculated = cursor.getFloat(9);
-            Datas.reward_exception =cursor.getInt(10);
-            Datas.rew_type = cursor.getInt(11);
-
-
+            itemTransactions.budget_exception = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
+            itemTransactions.rew_amount_calculated = values.getAsFloat(zDBScheme.TRANSACTIONS_TABLE.REWARD_CACULATED);
+            itemTransactions.reward_exception = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_EXCEPTION);
+            itemTransactions.rew_type = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_TYPE);
         }
-        cursor.close();
     }
 
     public void onSetDate (View v) throws ParseException {
-        Datas.timeinmillis = ATCF.getTimeinmillis();      //timeinmillis는 전역변수이므로 변경 필요
+        itemTransactions.timeinmillis = transactionsDatePicker.getTimeinmillis();      //timeinmillis는 전역변수이므로 변경 필요
         setTimeText();
     }
 
@@ -237,47 +235,47 @@ public class w_Add_Tran extends AppCompatActivity {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_amount_missing, Snackbar.LENGTH_LONG).show();
             return;
         } else {
-            Datas.amount = Float.parseFloat(String.valueOf(amount.getText()));
+            itemTransactions.amount = Float.parseFloat(String.valueOf(amount.getText()));
         }
 
 
-        if (Datas.asset_id == 0) {
+        if (itemTransactions.asset_id == 0) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
 
-        if (Datas.asset_type == 2 || Datas.asset_type == 3) {
-            if (Datas.cardid == 0) {
+        if (itemTransactions.asset_type == 2 || itemTransactions.asset_type == 3) {
+            if (itemTransactions.cardid == 0) {
                 Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
                 return;
             }
         }
-        if (Datas.category_id == 0) {
+        if (itemTransactions.category_id == 0) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_cat_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
-        if (Datas.timeinmillis == 0L) {
+        if (itemTransactions.timeinmillis == 0L) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_time_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
         CheckBox checkedTextView = findViewById(R.id.Learn_Checker);
-        Datas.learn = checkedTextView.isChecked();
+        itemTransactions.learn = checkedTextView.isChecked();
 
-        Datas.recipname = recip_view.getText().toString();
-        Datas.note = note_view.getText().toString();
-        mDB.addTransactiononSave(Datas);
+        itemTransactions.recipname = recip_view.getText().toString();
+        itemTransactions.note = note_view.getText().toString();
+        mDB.addTransactiononSave(itemTransactions);
 
         finish();
     }
 
     public void onDatePick(View v) {
 
-        ATCF = new w_Add_Tran_Datepicker();
-        dialogFragment = ATCF;
+        transactionsDatePicker = new w_Add_Tran_Datepicker();
+        dialogFragment = transactionsDatePicker;
 
         Bundle args = new Bundle();
 
-        args.putLong("timeinmillis", Datas.timeinmillis);
+        args.putLong("timeinmillis", itemTransactions.timeinmillis);
         //TODO 년월일시분 전달
 
         dialogFragment.setArguments(args);
@@ -286,38 +284,40 @@ public class w_Add_Tran extends AppCompatActivity {
     }
 
     public void onCategoryClick(View v) {
-        Cursor cursor = mDB.getChildCategoryList(String.valueOf(cat_view.getText()));
-        make_bottomSheet(cursor,BOTTOMSHEET_CATEGORY);
+
+        List<ContentValues> categoryList = mDB.getChildCategoryList(tab_num);
+        make_bottomSheet(categoryList,BOTTOMSHEET_CATEGORY);
     }
 
     public void onAccountClick(View v) {
-        Cursor cursor = mDB.getAssetList();//계좌 목록 가져오기
-        make_bottomSheet(cursor, BOTTOMSHEET_ACCOUNT);
+        List<ContentValues> assetList = mDB.getAssetList();//계좌 목록 가져오기
+        make_bottomSheet(assetList, BOTTOMSHEET_ACCOUNT);
     }
 
 
-    private void make_bottomSheet(Cursor cursor, int type){
+    private void make_bottomSheet(List<ContentValues> contentValuesList, int type){
         mBottomSheetDialog = new BottomSheetDialog(this);
         View sheetView = getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker, null);
 
         RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
+        ListIterator<ContentValues> contentValuesListIterator = contentValuesList.listIterator();
         if(type == BOTTOMSHEET_ACCOUNT){
 
             itemAccs = new ArrayList<>();
 
-            if (cursor.getCount() != 0) {
-                while (cursor.moveToNext()) {
-                    zDBMan.ItemAcc item =  mDB.getItemAcc();
-                    item.id = cursor.getLong(0);
-                    item.type = cursor.getInt(1);
-                    item.name = cursor.getString(2);
-                    item.balance = cursor.getFloat(3);
-                    item.withdrawalaccount = cursor.getInt(4);
-                    item.withdrawalday = cursor.getInt(5);
-                    item.cardid = cursor.getLong(6);
-                    itemAccs.add(item);
-                }
+            while (contentValuesListIterator.hasNext()) {
+                ContentValues contentitem = contentValuesListIterator.next();
+                zDBScheme.ItemAcc item = new zDBScheme.ItemAcc();
+                item.id = contentitem.getAsLong(TABLE_ID);
+                item.type = contentitem.getAsLong(ASSET_TYPE);
+                item.name = contentitem.getAsString(NAME);
+                item.balance = contentitem.getAsFloat(BALANCE);
+                item.withdrawalaccount = contentitem.getAsLong(WITHDRAWALACCOUNT);
+                item.withdrawalday = contentitem.getAsLong(WITHDRAWALDAY);
+                item.cardid = contentitem.getAsLong(CARD_ID);
+                itemAccs.add(item);
+
             }
 
 
@@ -327,11 +327,11 @@ public class w_Add_Tran extends AppCompatActivity {
         else{
             itemCats = new ArrayList<>();
 
-            if (cursor.getCount() != 0) {
-                while (cursor.moveToNext()) {
+            if (contentValuesList.getCount() != 0) {
+                while (contentValuesList.moveToNext()) {
                     zDBMan.ItemCat item = mDB.getItemCat();
-                    item.id = cursor.getLong(0);
-                    item.name = cursor.getString(1);
+                    item.id = contentValuesList.getLong(0);
+                    item.name = contentValuesList.getString(1);
                     itemCats.add(item);
                 }
             }
@@ -345,7 +345,6 @@ public class w_Add_Tran extends AppCompatActivity {
             });
         }
 
-        cursor.close();
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         mBottomSheetDialog.setContentView(sheetView);
@@ -354,7 +353,7 @@ public class w_Add_Tran extends AppCompatActivity {
     }
 
     private void Check_Card() {
-        Cursor cursor = mDB.getCardinfo(Datas.cardid);
+        Cursor cursor = mDB.getCardinfo(itemTransactions.cardid);
 
         List<ItemRecipient> recipList = new ArrayList<>();
 
@@ -479,19 +478,19 @@ public class w_Add_Tran extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         data.getLongExtra("timeinmillis", 0);
         if (BuildConfig.isTEST)
-            Log.w("timeinmillis returned", Datas.timeinmillis + "");
+            Log.w("timeinmillis returned", itemTransactions.timeinmillis + "");
     }
 
     private void setTimeText() {
 
         TextView date_text = findViewById(R.id.add_tran_time);
 
-        calendar.setTimeInMillis(Datas.timeinmillis);     //나중에 사용하기 위한 변수 저장.
+        calendar.setTimeInMillis(itemTransactions.timeinmillis);     //나중에 사용하기 위한 변수 저장.
 
         df.setCalendar(calendar);
 
         Date date = new Date();
-        date.setTime(Datas.timeinmillis);
+        date.setTime(itemTransactions.timeinmillis);
 
         String dff = df.format(date);
 
@@ -517,13 +516,14 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setCategory(String name, long id) {
 
-        Datas.category_name = name;
+        itemTransactions.category_name = name;
         cat_view.setText(name);
-        Datas.category_id = id;
+        itemTransactions.category_id = id;
     }
 
     private void setCategoryOnTab(long cat_id) {
         setCategory( mDB.getCategoryName(cat_id + 1), cat_id +1);
+        tab_num = cat_id+1l;
         if (BuildConfig.isTEST) {
             Log.w("Cat_View Update", "" + cat_id);
         }
@@ -531,30 +531,30 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setCategoryOnUpdate(){
 
-        int temp_level = mDB.getCatLevel(Datas.category_id);
+        int temp_level = mDB.getCatLevel(itemTransactions.category_id);
         if(temp_level == 0 || temp_level ==1 || temp_level == 2){        setTab(0);}
         else if(temp_level == 3 || temp_level ==4 || temp_level == 5){        setTab(1);}
         else if(temp_level == 6 || temp_level ==7 || temp_level == 8){        setTab(2);}
 
-        setCategory(  mDB.getCategoryName( Datas.category_id), Datas.category_id);
+        setCategory(  mDB.getCategoryName( itemTransactions.category_id), itemTransactions.category_id);
     }
 
     public void setAccount(View v){
         zDBMan.ItemAcc itemAcc = (zDBMan.ItemAcc) v.getTag();
 
-        Datas.cardid = itemAcc.cardid;
-        Datas.asset_id = itemAcc.id;
-        Datas.asset_name = itemAcc.name;
-        Datas.asset_type = itemAcc.type;
-        Datas.withdrawlday = itemAcc.withdrawalday;
-        Datas.withdrawlaccount = itemAcc.withdrawalaccount;
-        Datas.balance = itemAcc.balance;
+        itemTransactions.cardid = itemAcc.cardid;
+        itemTransactions.asset_id = itemAcc.id;
+        itemTransactions.asset_name = itemAcc.name;
+        itemTransactions.asset_type = itemAcc.type;
+        itemTransactions.withdrawlday = itemAcc.withdrawalday;
+        itemTransactions.withdrawlaccount = itemAcc.withdrawalaccount;
+        itemTransactions.balance = itemAcc.balance;
 
-        acc_view.setText(Datas.asset_name);
+        acc_view.setText(itemTransactions.asset_name);
 
-        if (Datas.asset_type == 2) {
+        if (itemTransactions.asset_type == 2) {
             Check_Card();
-        } else if (Datas.asset_type == 3) {
+        } else if (itemTransactions.asset_type == 3) {
             Credit_Card();
         } else {
             setTransInvisible();
@@ -562,24 +562,24 @@ public class w_Add_Tran extends AppCompatActivity {
     }   //TODO 데이터 무결성 확인
 
     private void setAccountOnUpdate(){
-        Cursor cursor = mDB.getAssetInfo(Datas.asset_id);
+        Cursor cursor = mDB.getAssetInfo(itemTransactions.asset_id);
         if(cursor.getCount() > 0){
             cursor.moveToNext();
 
-            Datas.asset_id = cursor.getLong(0);
-            Datas.asset_type = cursor.getInt(1);
-            Datas.asset_name = cursor.getString(2);
+            itemTransactions.asset_id = cursor.getLong(0);
+            itemTransactions.asset_type = cursor.getInt(1);
+            itemTransactions.asset_name = cursor.getString(2);
 
-            Datas.balance = cursor.getFloat(4);
-            Datas.withdrawlaccount = cursor.getInt(5);
-            Datas.withdrawlday = cursor.getInt(6);
-            Datas.cardid = cursor.getLong(7);
+            itemTransactions.balance = cursor.getFloat(4);
+            itemTransactions.withdrawlaccount = cursor.getInt(5);
+            itemTransactions.withdrawlday = cursor.getInt(6);
+            itemTransactions.cardid = cursor.getLong(7);
 
-            acc_view.setText(Datas.asset_name);
+            acc_view.setText(itemTransactions.asset_name);
 
-            if (Datas.asset_type == 2) {
+            if (itemTransactions.asset_type == 2) {
                 Check_Card();
-            } else if (Datas.asset_type == 3) {
+            } else if (itemTransactions.asset_type == 3) {
                 Credit_Card();
             } else {
                 setTransInvisible();
@@ -590,15 +590,15 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setRecipient(ItemRecipient itemRecipient){
 
-        Datas.franchisee_id = itemRecipient.recipid;
-        Datas.recipname = itemRecipient.recipient;
-        Datas.reward_exception = itemRecipient.conditionexception;
-        Datas.perftype = itemRecipient.conditiontype;
-        Datas.perfamount = itemRecipient.conditionperformance;
-        Datas.rew_type = itemRecipient.rewtype;
-        Datas.rew_amount = itemRecipient.rewamount;
-        Datas.rew_amount_calculated = (float) (Datas.rew_amount * 0.01 * Datas.amount);
-        Log.e("rew inf","금액 " +Datas.amount +"rew_amount"+Datas.rew_amount+ "calculated" + Datas.rew_amount_calculated);
+        itemTransactions.franchisee_id = itemRecipient.recipid;
+        itemTransactions.recipname = itemRecipient.recipient;
+        itemTransactions.reward_exception = itemRecipient.conditionexception;
+        itemTransactions.perftype = itemRecipient.conditiontype;
+        itemTransactions.perfamount = itemRecipient.conditionperformance;
+        itemTransactions.rew_type = itemRecipient.rewtype;
+        itemTransactions.rew_amount = itemRecipient.rewamount;
+        itemTransactions.rew_amount_calculated = (float) (itemTransactions.rew_amount * 0.01 * itemTransactions.amount);
+        Log.e("rew inf","금액 " + itemTransactions.amount +"rew_amount"+ itemTransactions.rew_amount+ "calculated" + itemTransactions.rew_amount_calculated);
     }
 
     private void setRecispinnerOnUpdate(){
@@ -607,7 +607,7 @@ public class w_Add_Tran extends AppCompatActivity {
         ItemRecipient itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemRecipient) VCV.rew_spin.getItemAtPosition(i);
-            if( itemRecipient.recipid == Datas.franchisee_id) {
+            if( itemRecipient.recipid == itemTransactions.franchisee_id) {
                 //i -= 1;
                 break;
             }
@@ -639,17 +639,7 @@ public class w_Add_Tran extends AppCompatActivity {
         }
     }
 
-    class ItemRecipient {
-        long recipid;
-        String recipient;
-        int conditionexception;
-        int conditiontype =0;   //전월실적(b), 당월 실적(c)
-        int conditionperformance= 0;
-        int rewtype = 0 ;       //p(oint), d(iscount)
-        float rewamount = 0;    //0.7
 
-
-    }
 
     private class tabListener implements TabLayout.OnTabSelectedListener {
         @Override
@@ -668,6 +658,39 @@ public class w_Add_Tran extends AppCompatActivity {
         }
     }
 
+
+    class categoryClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {       //자녀 카테고리가 있으면 다시 다이얼로그 띄우고 자녀가 없으면 완료.
+            //onItemClick();
+            mBottomSheetDialog.dismiss();
+            //zDBMan mDB = new zDBMan(getApplicationContext(), false);
+            TextView view = (TextView) v;
+
+            Cursor cursor = mDB.getChildCategoryList(String.valueOf(view.getText()));
+
+            if (cursor.getCount() != 0) {        //자녀 카테고리 표시
+
+                make_bottomSheet(cursor, BOTTOMSHEET_CATEGORY);
+
+            } else {
+                TextView vt = (TextView) v;
+                setCategory(vt.getText().toString(), Integer.parseInt(v.getTag().toString()));
+
+
+            }
+
+
+        }
+    }
+    class activityClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+            mBottomSheetDialog.dismiss();
+            setAccount(v);
+        }
+    }
     private class spinadapter extends ArrayAdapter {
         LayoutInflater mInflater;
         private final int mResource;
@@ -744,7 +767,7 @@ public class w_Add_Tran extends AppCompatActivity {
     
     }
 
-    private  class Account_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+   /* private  class Account_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Account_adapter() {
 
         }
@@ -758,12 +781,13 @@ public class w_Add_Tran extends AppCompatActivity {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-            final zDBMan.ItemAcc itemacc = itemAccs.get(position);
+            final ItemAcc itemacc = itemAccs.get(position);
 
             categoryNameHolder newholder = (categoryNameHolder) holder;
             newholder.textView.setText(itemacc.name);
             View v = newholder.textView;
             v.setTag(itemacc);
+
             newholder.textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -780,42 +804,13 @@ public class w_Add_Tran extends AppCompatActivity {
             return itemAccs.size();
         }
 
-        public class categoryNameHolder extends RecyclerView.ViewHolder {
-            TextView textView;
-
-            public categoryNameHolder(View v) {
-                super(v);
-                textView = v.findViewById(R.id.add_tran_category_name);
-
-
-                Point point = new Point();
-                Display display = getWindowManager().getDefaultDisplay();
-                int rotation = display.getRotation();
-                display.getSize(point );
-
-                /*
-                float density  = getResources().getDisplayMetrics().density;
-                float dpHeight = outMetrics.heightPixels / density;
-                float dpWidth  = outMetrics.widthPixels / density;
-*/
-                ViewGroup.LayoutParams params = v.getLayoutParams();
-
-
-                if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-                    params.width = point.x / 2;
-
-                else params.width = point.y / 2;
-                v.setLayoutParams(params);
-
-            }
-        }
     }
 
 
     private  class Category_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        List<zDBMan.ItemCat> items;
+        List<ItemCat> items;
 
-        Category_adapter(List<zDBMan.ItemCat> item2) {
+        Category_adapter(List<ItemCat> item2) {
             items = item2;
         }
 
@@ -829,36 +824,13 @@ public class w_Add_Tran extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            final zDBMan.ItemCat itemcat = items.get(position);
+            final ItemCat itemcat = items.get(position);
 
             categoryNameHolder newholder = (categoryNameHolder) holder;
             newholder.textView.setText(itemcat.name);
             View v = newholder.textView;
             v.setTag(itemcat.id);
-            newholder.textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {       //자녀 카테고리가 있으면 다시 다이얼로그 띄우고 자녀가 없으면 완료.
-                    //onItemClick();
-                    mBottomSheetDialog.dismiss();
-                    //zDBMan mDB = new zDBMan(getApplicationContext(), false);
-                    TextView view = (TextView) v;
-
-                    Cursor cursor = mDB.getChildCategoryList(String.valueOf(view.getText()));
-
-                    if (cursor.getCount() != 0) {        //자녀 카테고리 표시
-
-                        make_bottomSheet(cursor,BOTTOMSHEET_CATEGORY);
-
-                    } else {
-                        TextView vt = (TextView) v;
-                        setCategory(vt.getText().toString(), Integer.parseInt(v.getTag().toString()) );
-
-
-                    }
-
-                }
-
-            });
+            newholder.textView.setOnClickListener(
         }
 
         @Override
@@ -878,11 +850,7 @@ public class w_Add_Tran extends AppCompatActivity {
                 int rotation = display.getRotation();
                 display.getSize(point );
 
-                /*
-                float density  = getResources().getDisplayMetrics().density;
-                float dpHeight = outMetrics.heightPixels / density;
-                float dpWidth  = outMetrics.widthPixels / density;
-*/
+
                 ViewGroup.LayoutParams params = v.getLayoutParams();
 
 
@@ -899,5 +867,5 @@ public class w_Add_Tran extends AppCompatActivity {
         }
 
     }
-
+*/
 }

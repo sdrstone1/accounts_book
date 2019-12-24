@@ -37,7 +37,7 @@ public class zMessageReciever extends BroadcastReceiver {
     zPrefMan mPrefMan;
     zDBMan mDB;
 
-    zDBMan.ItemTransactions data;
+    zDBScheme.ItemTransactions itemTransactions;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -71,7 +71,7 @@ public class zMessageReciever extends BroadcastReceiver {
         }
         else return;
         mDB = new zDBMan(context,true);
-        data = zDBMan.ItemTransactions;
+        itemTransactions = new zDBScheme.ItemTransactions();
         Bundle bundle = intent.getExtras();//인텐트의 부가 데이터 수신
 
         //PDU : Protocol Description Unit : SMS메시지 포맷
@@ -113,7 +113,7 @@ public class zMessageReciever extends BroadcastReceiver {
         }
 
 
-        data.transaction_id = addTrans();
+        itemTransactions.transaction_id = addTrans();
         //Log.w("SMS수신됨", "수신됨");
         sendNoti(context);
 
@@ -121,36 +121,36 @@ public class zMessageReciever extends BroadcastReceiver {
 
     public long addTrans(){
         //학습에서 기록 확인
-        data.transaction_id = 0;
-        Cursor cursor = mDB.getLearnData(data.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
+        itemTransactions.transaction_id = 0;
+        Cursor cursor = mDB.getLearnData(itemTransactions.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
         if(cursor.getCount() != 0){
             cursor.moveToNext();
             //data.trans_id = cursor.getLong(0);
             if(!cursor.isNull(1))
-                data.category_id =  cursor.getLong(1);
+                itemTransactions.category_id =  cursor.getLong(1);
             if(!cursor.isNull(2))
-                data.asset_id = cursor.getLong(2);
+                itemTransactions.asset_id = cursor.getLong(2);
 
             if(!cursor.isNull(3))
-                data.franchisee_id = cursor.getLong(3);
+                itemTransactions.franchisee_id = cursor.getLong(3);
             if(!cursor.isNull(4))
-                data.budget_exception = cursor.getInt(4);
+                itemTransactions.budget_exception = cursor.getInt(4);
             if(!cursor.isNull(5))
-                data.reward_exception = cursor.getInt(5);
+                itemTransactions.reward_exception = cursor.getInt(5);
             if(!cursor.isNull(6))
-                data.rew_type = cursor.getInt(6);
+                itemTransactions.rew_type = cursor.getInt(6);
             if(!cursor.isNull(7))
-                data.rew_amount = cursor.getFloat(7);
-                data.rew_amount_calculated = data.rew_amount * data.amount;
+                itemTransactions.rew_amount = cursor.getFloat(7);
+                itemTransactions.rew_amount_calculated = itemTransactions.rew_amount * itemTransactions.amount;
         }else {
-            data.category_id = 3;       //이체 항목으로 지정
-            data.asset_id = 0;
-            data.franchisee_id = 0;
-            data.budget_exception = 0;
-            data.reward_exception = 0;
-            data.rew_type = 0;
-            data.rew_amount = 0;
-            data.rew_amount_calculated = 0;
+            itemTransactions.category_id = 3;       //이체 항목으로 지정
+            itemTransactions.asset_id = 0;
+            itemTransactions.franchisee_id = 0;
+            itemTransactions.budget_exception = 0;
+            itemTransactions.reward_exception = 0;
+            itemTransactions.rew_type = 0;
+            itemTransactions.rew_amount = 0;
+            itemTransactions.rew_amount_calculated = 0;
         }
         cursor.close();
 
@@ -161,9 +161,9 @@ public class zMessageReciever extends BroadcastReceiver {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(Calendar.HOUR_OF_DAY,hour );
         calendar.set(Calendar.MINUTE,minute );
-        data.timeinmillis = calendar.getTimeInMillis();
+        itemTransactions.timeinmillis = calendar.getTimeInMillis();
 
-        return mDB.addTransactionfromReciever(data);
+        return mDB.addTransactionfromReciever(itemTransactions);
 
     }
 
@@ -173,9 +173,9 @@ public class zMessageReciever extends BroadcastReceiver {
             Intent intent = new Intent(context, w_Add_Tran.class);
             //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-            intent.putExtra("Notification", data.transaction_id);
+            intent.putExtra("Notification", itemTransactions.transaction_id);
 
-            Log.e("SMS Rec, ", " Trans_id : "+String.valueOf(data.transaction_id) );
+            Log.e("SMS Rec, ", " Trans_id : "+String.valueOf(itemTransactions.transaction_id) );
 
             //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
@@ -191,7 +191,7 @@ public class zMessageReciever extends BroadcastReceiver {
             createNotificationChannel(context);
 
             Date date= new Date();
-            date.setTime(data.timeinmillis);
+            date.setTime(itemTransactions.timeinmillis);
             DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
             String dateSTR = dateFormat.format(date);
@@ -199,13 +199,13 @@ public class zMessageReciever extends BroadcastReceiver {
 
             //            CharSequence string = getContext().getResources().getText(R.string.reward);
             CharSequence charSequence;
-            if(data.asset_id == 0) {
+            if(itemTransactions.asset_id == 0) {
                 String learn_data = (String) context.getResources().getText(R.string.notification_learn_not_avail);
                 String time = (String) context.getResources().getText(R.string.time_text);
                 String recip = (String) context.getResources().getText(R.string.recipient);
                 charSequence = learn_data +
                         time + " : " + dateSTR + "\n" +
-                        recip + " : " + data.recipname;
+                        recip + " : " + itemTransactions.recipname;
             }else
             {
 
@@ -221,21 +221,21 @@ public class zMessageReciever extends BroadcastReceiver {
 
 
 
-                String catSTR = mDB.getCategoryName(data.category_id);
+                String catSTR = mDB.getCategoryName(itemTransactions.category_id);
                 if(!catSTR.equals("")){
                     charSequence = charSequence + "\n" + cat + " : " + catSTR;
                 }
 
 
-                Cursor cursor = mDB.getAssetInfo(data.asset_id);
+                Cursor cursor = mDB.getAssetInfo(itemTransactions.asset_id);
                 if( cursor.getCount() != 0){
                     cursor.moveToNext();
                     charSequence = charSequence + "\n" + acc + " : " + cursor.getString(2);       //accname
                 }
                 cursor.close();
 
-                charSequence = charSequence + "\n" + recip + " : "+ data.recipname ;//recipient
-                String recip_name = mDB.getFranchiseeName(data.franchisee_id);
+                charSequence = charSequence + "\n" + recip + " : "+ itemTransactions.recipname ;//recipient
+                String recip_name = mDB.getFranchiseeName(itemTransactions.franchisee_id);
                 if(!recip_name.equals("")){
                     charSequence = charSequence + "\n" + re + " : " + recip_name;
                 }
@@ -307,13 +307,13 @@ public class zMessageReciever extends BroadcastReceiver {
             hour = Integer.parseInt(time[0]);
             minute=Integer.parseInt(time[1]);
 
-            data.amount = Float.parseFloat(split[6].replace(",",""));
+            itemTransactions.amount = Float.parseFloat(split[6].replace(",",""));
             currency = split[7];
             for (int i = 8; i < len; i++ )
-                data.recipname= data.recipname + split[i];
+                itemTransactions.recipname= itemTransactions.recipname + split[i];
 
             if(BuildConfig.isTEST)
-                Log.e("Payed Message",  ""+data.recipname);
+                Log.e("Payed Message",  ""+ itemTransactions.recipname);
 
             is_CardSMS = true;
             return;
@@ -334,13 +334,13 @@ public class zMessageReciever extends BroadcastReceiver {
             hour = Integer.parseInt(time[0]);
             minute=Integer.parseInt(time[1]);
 
-            data.amount = Float.parseFloat(split[5].replace(",","").replace("(금액)",""));
+            itemTransactions.amount = Float.parseFloat(split[5].replace(",","").replace("(금액)",""));
             currency = split[6];
             for (int i = 7; i < len; i++ )
-                data.recipname= data.recipname + split[i];
+                itemTransactions.recipname= itemTransactions.recipname + split[i];
 
             if(BuildConfig.isTEST)
-                Log.e("Payed Message",  ""+data.recipname);
+                Log.e("Payed Message",  ""+ itemTransactions.recipname);
             is_CardSMS = true;
             return ;
         }
@@ -377,11 +377,11 @@ public class zMessageReciever extends BroadcastReceiver {
         else if (split[9].equals("입금"))
             is_Income = true;
 
-        data.amount = Integer.parseInt(split[10].replace(",",""));
+        itemTransactions.amount = Integer.parseInt(split[10].replace(",",""));
         currency = split[11];
 
         if(BuildConfig.isTEST)
-            Log.e("Payed Message",  ""+data.recipname);
+            Log.e("Payed Message",  ""+ itemTransactions.recipname);
         is_BankSMS = true;
         return;
 

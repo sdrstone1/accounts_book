@@ -104,6 +104,64 @@ public final class zDBScheme {
         public static final String REWARD_CACULATED = "reward_caculated";
     }
 
+    public static class ItemRecipient {
+        long recipid;
+        String recipient;
+        int conditionexception;
+        int conditiontype =0;   //전월실적(b), 당월 실적(c)
+        int conditionperformance= 0;
+        int rewtype = 0 ;       //p(oint), d(iscount)
+        float rewamount = 0;    //0.7
+
+
+    }
+
+    public static class ItemTransactions {
+        boolean isUpdate = false;
+        long transaction_id;
+        long category_id = 0L;
+        String category_name = null;
+        long timeinmillis = 0L;
+        float amount;
+        long asset_id = 0L;
+        long asset_type;
+        String asset_name = null;
+        long withdrawlday = 0L;
+        long withdrawlaccount = 0L;
+        long cardid = 0L;
+        float balance;
+        long franchisee_id = 0L;
+        String recipname = " ";
+        float rew_amount;
+        float rew_amount_calculated;
+        long rew_type;
+        String note = " ";
+        long budget_exception = 0L;
+        long reward_exception;
+        long perftype;
+        //float perfamount; //==rew_amount_calculated
+        boolean learn;
+
+
+        //_id, type, balance, withdrawalday, cardid
+    }
+
+    static class ItemCat {
+        long id;
+        String name;
+    }
+
+    static class ItemAcc {
+        long id;
+        String name;
+        long type = 1;
+        long cardid;
+        float balance;
+        long withdrawalaccount;
+        long withdrawalday;
+        String nickname;
+        //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
+    }
 
     static class zDbIO {
         static boolean creTable(SQLiteDatabase db, String table, String tablearg) {

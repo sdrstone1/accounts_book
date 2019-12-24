@@ -34,13 +34,15 @@ public class zDBMan {
     //TODO 컨트롤러 영역은 UI부분임
     //TODO 커서 리턴하지 말기!
     //TODO 쿼리 대신 ContentValues 사용하면 함수 전부 다 합칠 수 잇을 듯
-    ItemCat getItemCat(){
-        return new ItemCat();
-    }
-    ItemAcc getItemAcc(){
-        return new ItemAcc();
-    }
+    /*
+    zDBScheme.ItemCat getItemCat(){
 
+        return new zDBScheme.ItemCat();
+    }
+    zDBScheme.ItemAcc getItemAcc(){
+        return new zDBScheme.ItemAcc();
+    }
+*/
     /*
      private double getRecord(long startdate, long enddate) {
         Cursor cursor = mDbMan.getRecordCursor(db, recordTable, new String[]{recordTableVar[0], recordTableVar[1]}, recordTableVar[0] + " BETWEEN '" + startdate + "' AND '" + enddate + "'");
@@ -131,6 +133,14 @@ public class zDBMan {
                 "? = '?' ", new String[] { CATEGORY_TABLE.PARENT_ID, Long.toString(id)}, null);
         return contentValuesList;
     }
+
+    List<ContentValues> getChildCategoryList(String name){
+        String[] columns ={TABLE_ID, CATEGORY_TABLE.NAME};
+        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+                "? = '?' ", new String[] { CATEGORY_TABLE.PARENT_ID, name}, null);
+        return contentValuesList;
+    }
+
 
 
     List<ContentValues> getAssetList(){
@@ -391,52 +401,6 @@ public class zDBMan {
         zDbIO.delRecord(db,TABLE_CATEGORY, id);
     }
 
-    class ItemTransactions {
-        boolean isUpdate = false;
-        long transaction_id;
-        long category_id = 0L;
-        String category_name = null;
-        long timeinmillis = 0L;
-        float amount;
-        long asset_id = 0L;
-        long asset_type;
-        String asset_name = null;
-        long withdrawlday = 0L;
-        long withdrawlaccount = 0L;
-        long cardid = 0L;
-        float balance;
-        long franchisee_id = 0L;
-        String recipname = " ";
-        float rew_amount;
-        float rew_amount_calculated;
-        long rew_type;
-        String note = " ";
-        long budget_exception = 0L;
-        long reward_exception;
-        long perftype;
-        //float perfamount; //==rew_amount_calculated
-        boolean learn;
-
-
-        //_id, type, balance, withdrawalday, cardid
-    }
-
-    class ItemCat {
-        long id;
-        String name;
-    }
-
-    class ItemAcc {
-        long id;
-        String name;
-        long type = 1;
-        long cardid;
-        float balance;
-        long withdrawalaccount;
-        long withdrawalday;
-        String nickname;
-        //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
-    }
 
 
 
