@@ -403,6 +403,7 @@ public class zDBMan {
     }
 
 
-
-
+    public void rawQuery(String query) {
+        zDbIO.rawQuery(db,query);
+    }
 }

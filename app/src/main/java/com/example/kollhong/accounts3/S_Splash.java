@@ -104,7 +104,7 @@ public class S_Splash extends AppCompatActivity {
                 "\t `parent` INTEGER,\n" +
                 "\t `name` TEXT NOT NULL,\n" +
                 "\t `reward_exception` INTEGER NOT NULL DEFAULT 0,\n" +
-                "\t `budget` integer NOT NULL ON CONFLICT REPLACE DEFAULT 0,\n" +
+                "\t `budget` real NOT NULL ON CONFLICT REPLACE DEFAULT 0,\n" +
                 "\tPRIMARY KEY(`_id`),\n" +
                 "\tCONSTRAINT `parent` FOREIGN KEY (`_id`) REFERENCES `category` (`parent`) ON DELETE CASCADE ON UPDATE CASCADE,\n" +
                 "\tUNIQUE (_id ASC),\n" +
@@ -175,5 +175,6 @@ public class S_Splash extends AppCompatActivity {
 
         zDBMan dbMan = new zDBMan(this,true);
         dbMan.rawQuery(query);
+
     }
 }
