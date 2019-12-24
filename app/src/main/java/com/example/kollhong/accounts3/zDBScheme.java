@@ -52,6 +52,9 @@ public final class zDBScheme {
         public static final String REWARD_AMOUNT_3 = "reward_amount3";
         public static final String REWARD_FRANCHISEE_4 = "reward_franchisee4";
         public static final String REWARD_AMOUNT_4 = "reward_amount4";
+
+        public static final String REWARD_FRANCHISEE_STRING = "reward_franchisee";
+        public static final String REWARD_AMOUNT_STRING = "reward_amount";
     }
 
     public static final class CATEGORY_TABLE {
@@ -109,7 +112,7 @@ public final class zDBScheme {
         String recipient;
         int conditionexception;
         int conditiontype =0;   //전월실적(b), 당월 실적(c)
-        int conditionperformance= 0;
+        int conditionAmount = 0;
         int rewtype = 0 ;       //p(oint), d(iscount)
         float rewamount = 0;    //0.7
 
@@ -139,16 +142,11 @@ public final class zDBScheme {
         long budget_exception = 0L;
         long reward_exception;
         long perftype;
-        //float perfamount; //==rew_amount_calculated
+        float conditionAmount; //==rew_amount_calculated
         boolean learn;
 
 
         //_id, type, balance, withdrawalday, cardid
-    }
-
-    static class ItemCat {
-        long id;
-        String name;
     }
 
     static class ItemAcc {

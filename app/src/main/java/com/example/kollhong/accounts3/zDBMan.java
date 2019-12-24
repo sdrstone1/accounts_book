@@ -163,10 +163,11 @@ public class zDBMan {
         return contentValuesList;
     }
 
-    List<ContentValues> getCardinfo(long card_id) {
+    ContentValues getCardinfo(long card_id) {
         List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CARD_INFO, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(card_id)}, null);
-        return contentValuesList;
+        if (contentValuesList.isEmpty())return null;
+        return contentValuesList.get(0);
     }
 
     List<ContentValues> getCardListByType(int type){

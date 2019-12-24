@@ -1,8 +1,6 @@
 package com.example.kollhong.accounts3;
 
-import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -14,38 +12,77 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class zRecyclerView_AdapterGenerator {
+public class zRecyclerAdapt_Gen {
+    static final int RECYCLERITEM_TYPE_ASSET = 0;
+    static final int RECYCLERITEM_TYPE_CATEGORY = 1;
+    static final int RECYCLERITEM_TYPE_SETTINGS = 2;
 
-    zRecyclerView_AdapterGenerator(){
+    zRecyclerAdapt_Gen(){
     }
 
-    static class recyclerItem{
-        int class_type; //type 0 == asset, type 1 == category selector, type 2 == cagetory settings
+    abstract static class recyclerItem{
+        //int class_type; //type 0 == asset, type 1 == category selector, type 2 == cagetory settings
+        abstract int getType();
+        abstract String getName();
+    }
+
+    //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
+    static class assetItem extends recyclerItem{
         long id;
         String name;
-        long type = 1;
+        long asset_type = 1;
         long cardid;
         float balance;
         long withdrawalaccount;
         long withdrawalday;
         String nickname;
-        //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
 
+        @Override
+        int getType() {
+            return RECYCLERITEM_TYPE_ASSET;
+        }
+        @Override
+        String getName() {
+            return name;
+        }
     }
-    Category_adapter getCategoryAdapter(Context cxt,AppCompatActivity ac, List<recyclerItem> items, View.OnClickListener clickListener){
+    static class categoryItem extends recyclerItem {
+        long id;
+        String name;
 
-        return new Category_adapter(cxt, ac, items,clickListener);
+        @Override
+        int getType() {
+            return RECYCLERITEM_TYPE_CATEGORY;
+        }
+        @Override
+        String getName() {
+            return name;
+        }
+    }
+    static class settingsItem extends recyclerItem{
+        long id;
+        String name;
+
+        @Override
+        int getType() {
+            return RECYCLERITEM_TYPE_SETTINGS;
+        }
+        @Override
+        String getName() {
+            return name;
+        }
     }
 
-    public static class Category_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        Context context;
+
+    public static class CatAssetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        //Context context;
         AppCompatActivity activity;
         List<recyclerItem> items;
         View.OnClickListener listener;
 
 
-        Category_adapter(Context cxt,AppCompatActivity ac, List<recyclerItem> item, View.OnClickListener clickListener) {
-            context = cxt;
+        CatAssetAdapter(Context cxt, AppCompatActivity ac, List<recyclerItem> item, View.OnClickListener clickListener) {
+            //context = cxt;
             activity = ac;
             items = item;
             listener = clickListener;
@@ -62,7 +99,7 @@ public class zRecyclerView_AdapterGenerator {
             recyclerItem item = items.get(position);
 
             viewHolder newholder = (viewHolder) holder;
-            newholder.textView.setText(item.name);
+            newholder.textView.setText(item.getName());
             View v = newholder.textView;
             v.setTag(item);
             newholder.textView.setOnClickListener(listener);

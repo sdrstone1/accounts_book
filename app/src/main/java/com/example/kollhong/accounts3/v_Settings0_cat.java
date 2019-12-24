@@ -2,11 +2,10 @@ package com.example.kollhong.accounts3;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,18 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 31/05/2018.
@@ -137,25 +136,26 @@ public class v_Settings0_cat extends AppCompatActivity {
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(v_Settings0_cat.this).toBundle());
         }
     }
-    private void Category_Recycler(Cursor cursor) {
-        List<zRecyclerView_AdapterGenerator.recyclerItem> itemCats;
+    private void Category_Recycler(List<ContentValues> contentList) {
+        List<zRecyclerAdapt_Gen.recyclerItem> recyclerItems;
+        ListIterator<ContentValues> contentListIterator = contentList.listIterator();
+        ContentValues content;
 
         RecyclerView recyclerView = findViewById(R.id.pref_categories_recycler);
 
-        itemCats = new ArrayList<>();
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                zRecyclerView_AdapterGenerator.recyclerItem item = new zRecyclerView_AdapterGenerator.recyclerItem();
-                item.id = cursor.getLong(0);
-                item.name = cursor.getString(1);
-                itemCats.add(item);
-            }
+        recyclerItems = new ArrayList<>();
+
+        while (contentListIterator.hasNext()) {
+            content = contentListIterator.next();
+            zRecyclerAdapt_Gen.settingsItem item = new zRecyclerAdapt_Gen.settingsItem();
+            item.id = content.getAsLong(TABLE_ID);
+            item.name = content.getAsString( zDBScheme.CATEGORY_TABLE.NAME);
+            recyclerItems.add(item);
         }
-        cursor.close();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        zRecyclerView_AdapterGenerator.Category_adapter categoryadapter
-                = new zRecyclerView_AdapterGenerator.Category_adapter(this,this,itemCats, new categoryClickListener());
+        zRecyclerAdapt_Gen.CatAssetAdapter categoryadapter
+                = new zRecyclerAdapt_Gen.CatAssetAdapter(this,this,recyclerItems, new categoryClickListener());
 
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();

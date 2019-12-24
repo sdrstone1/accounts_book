@@ -29,7 +29,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.util.*;
 
-import static com.example.kollhong.accounts3.zDBMan.DBScheme.*;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
 
@@ -181,12 +181,12 @@ public class A_Trans0_History extends Fragment {
                     ContentItem item = new ContentItem();
                     contentValues = iterator.next();
                     item.trans_id = contentValues.getAsLong(TABLE_ID);
-                    item.amount = contentValues.getAsLong(TRANSACTIONS_VIEW_amount);
-                    item.recipient = contentValues.getAsString(TRANSACTIONS_VIEW_recipient);
-                    item.category_level =  contentValues.getAsLong(TRANSACTIONS_VIEW_category_level);
-                    item.category_name = contentValues.getAsString(TRANSACTIONS_VIEW_category_name);
-                    item.parent_category_name = contentValues.getAsString(TRANSACTIONS_VIEW_parent_category_name);
-                    item.asset_name = contentValues.getAsString(TRANSACTIONS_VIEW_asset_name);
+                    item.amount = contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.AMOUNT);
+                    item.recipient = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.RECIPIENT);
+                    item.category_level =  contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.CATEGORY_LEVEL);
+                    item.category_name = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.CATEGORY_NAME);
+                    item.parent_category_name = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.PARENT_CATEGORY_NAME);
+                    item.asset_name = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.ASSET_NAME);
 
                     list.add(item);
                 }
