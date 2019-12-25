@@ -1,18 +1,15 @@
 package com.example.kollhong.accounts3;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +21,6 @@ import com.github.mikephil.charting.charts.PieChart;
 import java.util.*;
 
 import static android.view.View.GONE;
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -61,7 +57,6 @@ public class B_Manage0_acc extends Fragment {
         left.setOnClickListener(new leftListener());
         right.setOnClickListener(new rightListener());
 
-
         PieChart pieChart = view.findViewById(R.id.pieChart);
         pieChart.setVisibility(GONE);
 
@@ -90,8 +85,8 @@ public class B_Manage0_acc extends Fragment {
     }
 
     private void makeRecyclerView() {
-        List<TransItem> transItems = new ArrayList<>();
-        List<ItemPerAcc> accItems = new ArrayList<>();
+        //List<TransItem> transByAcc = new ArrayList<>();
+        List<zRecyclerAdapt_Gen.recyclerItem> accItems = new ArrayList<>();
 
         Calendar calendar2 = Calendar.getInstance();
 
@@ -113,76 +108,61 @@ public class B_Manage0_acc extends Fragment {
         long nextMonth = calendar2.getTimeInMillis() - 1l;
 
 
-        ListIterator<ContentValues> transByAcc = mDB.getTransByAcc(thisMonth, nextMonth).listIterator();
-        ContentValues contentValues;
+        List<zDBScheme.TransactionsViewItem> transByAcc = mDB.getTransByAcc(thisMonth, nextMonth);
+        /*
+        zDBScheme.TransactionsViewItem transactionITem;
         while (transByAcc.hasNext()) {
-            TransItem transItem = new TransItem();
+            transItem = new ();
 
-            contentValues = transByAcc.next();
-            transItem.trans_id = contentValues.getAsLong(TABLE_ID);
-            transItem.acc_name = contentValues.getAsString(zDBScheme.TRANSACTIONS_VIEW.ASSET_NAME);
-            transItem.amount = contentValues.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.AMOUNT);
-            transItem.asset_id = contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.ASSET_ID);
-            if(contentValues.containsKey(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED)) {
-                transItem.reward = contentValues.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED);
+            transactionITem = transByAcc.next();
+            transItem.trans_id = transactionITem.tableId;
+            transItem.acc_name = transactionITem.getAsString(zDBScheme.TRANSACTIONS_VIEW.ASSET_NAME);
+            transItem.amount = transactionITem.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.AMOUNT);
+            transItem.asset_id = transactionITem.getAsLong(zDBScheme.TRANSACTIONS_VIEW.ASSET_ID);
+            if(transactionITem.containsKey(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED)) {
+                transItem.reward = transactionITem.getAsFloat(zDBScheme.TRANSACTIONS_VIEW.REWARD_CACULATED);
                 Log.i("데이터 가져오기","실적 : " +transItem.reward);
             }
-            transItem.level = contentValues.getAsLong(zDBScheme.TRANSACTIONS_VIEW.CATEGORY_LEVEL);
-            transItems.add(transItem);
+            transItem.level = transactionITem.getAsLong(zDBScheme.TRANSACTIONS_VIEW.CATEGORY_LEVEL);
+                transItems.add(transItem);
         }
+        */
+
         long name = -1;
 
         //ItemPerAcc itemPerAcc = new ItemPerAcc();
-        for (int i = 0; i < transItems.size(); i++) {
-            if (transItems.get(i).asset_id != name) {
-                ItemPerAcc itemPerAcc = new ItemPerAcc();
-                name = transItems.get(i).asset_id;
-                itemPerAcc.asset_name = transItems.get(i).acc_name;
+        for (int i = 0; i < transByAcc.size(); i++) {
+            if (transByAcc.get(i).assetId != name) {
+                zRecyclerAdapt_Gen.ItemPerAcc itemPerAcc = new zRecyclerAdapt_Gen.ItemPerAcc();
+                name = transByAcc.get(i).assetId;
+                itemPerAcc.assetName = transByAcc.get(i).assetName;
+
+                //사용금액 합산
+                if (transByAcc.get(i).categoryLevel == 0 || transByAcc.get(i).categoryLevel == 1 || transByAcc.get(i).categoryLevel == 2) {
+                    itemPerAcc.amountIn += transByAcc.get(i).amount;
+                }
+                else if(transByAcc.get(i).categoryLevel == 3 || transByAcc.get(i).categoryLevel == 4 || transByAcc.get(i).categoryLevel == 5){
+                    itemPerAcc.amountOut += transByAcc.get(i).amount;
+                }
+                else if(transByAcc.get(i).categoryLevel == 6 || transByAcc.get(i).categoryLevel == 7 || transByAcc.get(i).categoryLevel == 8) {
+                    itemPerAcc.amountRemain += transByAcc.get(i).amount;
+                }
+                itemPerAcc.reward += transByAcc.get(i).rewardCalculated;
                 accItems.add(itemPerAcc);
-
             }
-            //사용금액 합산
-            if (transItems.get(i).level == 0L || transItems.get(i).level == 1L || transItems.get(i).level == 2L)
-                accItems.get(accItems.size() - 1).amount_in += transItems.get(i).amount;
-            else if(transItems.get(i).level == 3L || transItems.get(i).level == 4L || transItems.get(i).level == 5L)
-                accItems.get(accItems.size() - 1).amount_out += transItems.get(i).amount;
-            else if(transItems.get(i).level == 6L || transItems.get(i).level == 7L || transItems.get(i).level == 8L)
-                accItems.get(accItems.size() - 1).amount_rem += transItems.get(i).amount;
-
-            accItems.get(accItems.size() - 1).reward += transItems.get(i).reward;
-
-
         }
 
-
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        accAdapter accAdapter = new accAdapter(accItems);
+        zRecyclerAdapt_Gen.recyclerAdapter accAdapter = new zRecyclerAdapt_Gen.recyclerAdapter(getActivity(),accItems,null);
         recyclerView.setAdapter(accAdapter);
         DividerItemDecoration divider = new DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
         accAdapter.notifyDataSetChanged();
 
-    }
-
-    public class TransItem{
-        //t._id, t.categoryid, a.name as accname, t.amount, t.accountid, t.recipient, t.rewardamount, c.level
-        long trans_id;
-        //long cat_id;
-        String acc_name;
-        float amount;
-        float reward = 0f;
-        long asset_id;
-        long level;
-    }
-
-    public class ItemPerAcc{
-        String asset_name;
-        float amount_in;
-        float amount_out;
-        float amount_rem;
-        float reward = 0;
 
     }
+
+/*
     private class accAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         private final List<ItemPerAcc> list;
 
@@ -237,7 +217,7 @@ public class B_Manage0_acc extends Fragment {
             }
         }
     }
-
+*/
     private class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
         private  final int[] ATTRS = new int[]{android.R.attr.listDivider};

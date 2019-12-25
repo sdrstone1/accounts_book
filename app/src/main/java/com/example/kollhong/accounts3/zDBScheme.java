@@ -112,7 +112,7 @@ public final class zDBScheme {
         int tableId;
         abstract String getType();
     }
-    static class AssetTableItem extends DBItem{
+    static class AssetItem extends DBItem{
         int assetType;
         String name;
         String nickname;
@@ -128,16 +128,16 @@ public final class zDBScheme {
         }
     }
 
-    static class CardInfoTableItem extends DBItem{
+    static class CardInfoItem extends DBItem{
         String company;
         String cardName;
         int assetType;
-        String rewardExceptions;
-        String rewardSections;
-        String franchisee_1;
-        String amount_1;
+        String rewardExceptions;//10003:10050
+        String rewardSections;//b10:c90
+        String franchisee_1;//10050:50000
+        String amount_1;//0.8p
         String franchisee_2;
-        String amount_2;
+        String amount_2;//1.2d
         String franchisee_3;
         String amount_3;
         String franchisee_4;
@@ -149,7 +149,7 @@ public final class zDBScheme {
         }
     }
 
-    static class CategoryTableItem extends DBItem{
+    static class CategoryItem extends DBItem{
         int catLevel;
         int parentId;
         String name;
@@ -161,7 +161,7 @@ public final class zDBScheme {
             return TABLE_ASSET;
         }
     }
-    static class LearnTableItem extends DBItem{
+    static class LearnItem extends DBItem{
         String recipientName;
         int categoryId;
         int assetId;
@@ -176,14 +176,14 @@ public final class zDBScheme {
             return TABLE_ASSET;
         }
     }
-    static class FranchiseeTableItem extends DBItem{
+    static class FranchiseeItem extends DBItem{
         String name;
         @Override
         String getType() {
             return TABLE_ASSET;
         }
     }
-    static class TransactionsTableItem extends DBItem{
+    static class TransactionsItem extends DBItem{
         long transactionTime;
         int categoryId;
         float amount;
@@ -201,7 +201,7 @@ public final class zDBScheme {
             return TABLE_ASSET;
         }
     }
-    static class TransactionsViewTableItem extends DBItem{
+    static class TransactionsViewItem extends DBItem{
         long transactionTime;
         float amount;
         int categoryId;
@@ -220,58 +220,43 @@ public final class zDBScheme {
     }
 
     public static class ItemRecipient {
-        long recipid;
-        String recipient;
-        int conditionexception;
+        int recipientId;
+        String recipientName;
+        int rewardExceptions;
         int conditiontype =0;   //전월실적(b), 당월 실적(c)
-        int conditionAmount = 0;
-        int rewtype = 0 ;       //p(oint), d(iscount)
-        float rewamount = 0;    //0.7
-
-
+        float conditionAmount = 0;
+        int rewardType = 0 ;       //p(oint), d(iscount)
+        float rewardPercent = 0;    //0.7
     }
 
     public static class ItemTransactions {
         boolean isUpdate = false;
-        long transaction_id;
-        long category_id = 0L;
-        String category_name = null;
-        long timeinmillis = 0L;
+
+        int transactionId;
+        int categoryId = 0;
+        String categoryName = null;
+        long transactionTime = 0L;
         float amount;
-        long asset_id = 0L;
-        long asset_type;
-        String asset_name = null;
-        long withdrawlday = 0L;
-        long withdrawlaccount = 0L;
-        long cardid = 0L;
+        int assetId = 0;
+        int assetType;
+        String assetName = null;
+        int withdrawlDay = 0;
+        int withdrawlAccount = 0;
+        int cardId = 0;
         float balance;
-        long franchisee_id = 0L;
+        int franchiseeId = 0;
         String recipname = " ";
-        float rew_amount;
-        float rew_amount_calculated;
-        long rew_type;
-        String note = " ";
-        long budget_exception = 0L;
-        long reward_exception;
-        long perftype;
-        float conditionAmount; //==rew_amount_calculated
+        float rewardAmount;
+        float rewardAmountCalculated;
+        int rewardType;//'P'oint 'D'iscount
+        String notes = " ";
+        int budgetException = 0;
+        int rewardException;
+        int conditionType;   //전월실적 당월실적
+        float conditionAmount;
         boolean learn;
-
-
-        //_id, type, balance, withdrawalday, cardid
     }
 
-    static class ItemAsset {
-        long id;
-        String name;
-        long type = 1;
-        long cardid;
-        float balance;
-        long withdrawalaccount;
-        long withdrawalday;
-        String nickname;
-        //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
-    }
 
     static class zDbIO {
         static boolean creTable(SQLiteDatabase db, String table, String tablearg) {

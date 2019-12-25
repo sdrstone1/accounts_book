@@ -154,8 +154,8 @@ public class v_Settings0_cat extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        zRecyclerAdapt_Gen.CatAssetAdapter categoryadapter
-                = new zRecyclerAdapt_Gen.CatAssetAdapter(this,recyclerItems, new categoryClickListener());
+        zRecyclerAdapt_Gen.recyclerAdapter categoryadapter
+                = new zRecyclerAdapt_Gen.recyclerAdapter(this,recyclerItems, new categoryClickListener());
 
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();

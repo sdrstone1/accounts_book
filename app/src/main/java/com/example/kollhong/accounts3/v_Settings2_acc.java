@@ -2,8 +2,6 @@ package com.example.kollhong.accounts3;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -11,14 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,18 +87,18 @@ public class v_Settings2_acc extends AppCompatActivity {
             ContentValues values = (ContentValues) valuesListIter.next();
             zRecyclerAdapt_Gen.assetItem item =  new zRecyclerAdapt_Gen.assetItem();
             item.id = values.getAsLong(TABLE_ID);
-            item.asset_type = values.getAsLong(ASSET_TYPE);
+            item.assetType = values.getAsLong(ASSET_TYPE);
             item.name = values.getAsString(NAME);
             item.balance = values.getAsFloat(BALANCE);
-            item.withdrawalaccount = values.getAsLong(WITHDRAWALACCOUNT);
-            item.withdrawalday = values.getAsLong(WITHDRAWALDAY);
-            item.cardid = values.getAsLong(CARD_ID);
+            item.withdrawalAccount = values.getAsLong(WITHDRAWALACCOUNT);
+            item.withdrawalDay = values.getAsLong(WITHDRAWALDAY);
+            item.cardId = values.getAsLong(CARD_ID);
             assetItemList.add(item);
         }
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        zRecyclerAdapt_Gen.CatAssetAdapter assetAdapter = new zRecyclerAdapt_Gen.CatAssetAdapter(this, assetItemList,new assetOnClickListener());
+        zRecyclerAdapt_Gen.recyclerAdapter assetAdapter = new zRecyclerAdapt_Gen.recyclerAdapter(this, assetItemList,new assetOnClickListener());
         recyclerView.setAdapter(assetAdapter);
         assetAdapter.notifyDataSetChanged();
 

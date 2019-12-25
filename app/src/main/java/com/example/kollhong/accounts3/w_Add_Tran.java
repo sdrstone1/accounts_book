@@ -90,14 +90,14 @@ public class w_Add_Tran extends AppCompatActivity {
                     ContentValues learnValues = mDB.getLearnData(itemTransactions.recipname);
                     if(learnValues != null){
                         //learnValues();
-                        itemTransactions.category_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.CATEGORY_ID);
-                        itemTransactions.asset_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.ASSET_ID);
-                        itemTransactions.franchisee_id = learnValues.getAsLong(zDBScheme.LEARN_TABLE.FRANCHISEE_ID);
+                        itemTransactions.categoryId = learnValues.getAsLong(zDBScheme.LEARN_TABLE.CATEGORY_ID);
+                        itemTransactions.assetId = learnValues.getAsLong(zDBScheme.LEARN_TABLE.ASSET_ID);
+                        itemTransactions.franchiseeId = learnValues.getAsLong(zDBScheme.LEARN_TABLE.FRANCHISEE_ID);
 
-                        setCategoryOnTab(itemTransactions.category_id);
+                        setCategoryOnTab(itemTransactions.categoryId);
                         setAccountOnUpdate();
 
-                        if(itemTransactions.asset_type == ASSET_TYPE_DEBIT_CARD || itemTransactions.asset_type == ASSET_TYPE_CREDIT_CARD)
+                        if(itemTransactions.assetType == ASSET_TYPE_DEBIT_CARD || itemTransactions.assetType == ASSET_TYPE_CREDIT_CARD)
                             setRecispinnerOnUpdate();
                     }
                 }
@@ -110,7 +110,7 @@ public class w_Add_Tran extends AppCompatActivity {
         mDB = new zDBMan(this, true);
         itemTransactions = new zDBScheme.ItemTransactions();
 
-        itemTransactions.timeinmillis = calendar.getTimeInMillis();
+        itemTransactions.transactionTime = calendar.getTimeInMillis();
 
         int tab_num = 1;
         setTab(tab_num);
@@ -141,7 +141,7 @@ public class w_Add_Tran extends AppCompatActivity {
         }
         else if(id == R.id.itemDelete){
             if (itemTransactions.isUpdate){
-                mDB.deleteTrans(itemTransactions.transaction_id);
+                mDB.deleteTrans(itemTransactions.transactionId);
             }
             else{
                 this.finish();
@@ -176,7 +176,7 @@ public class w_Add_Tran extends AppCompatActivity {
                 ContentValues transactionsValues = mDB.getTransbyID(intent.getLongExtra("UpdateTrans", 0));
                 UpdateDisplay(transactionsValues);        //trans 레코드 가져와서 띄우기
             } else {
-                itemTransactions.timeinmillis = calendar.getTimeInMillis();
+                itemTransactions.transactionTime = calendar.getTimeInMillis();
             }
         }
     }
@@ -185,39 +185,39 @@ public class w_Add_Tran extends AppCompatActivity {
         if (values != null) {
 
             itemTransactions.isUpdate = true;
-            itemTransactions.transaction_id = values.getAsLong(zDBScheme.TABLE_ID);
-            itemTransactions.timeinmillis = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.TRANSACTON_TIME);
+            itemTransactions.transactionId = values.getAsLong(zDBScheme.TABLE_ID);
+            itemTransactions.transactionTime = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.TRANSACTON_TIME);
             setTimeText();
 
-            itemTransactions.category_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.CATEGORY_ID);
+            itemTransactions.categoryId = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.CATEGORY_ID);
             setCategoryOnUpdate();
 
             itemTransactions.amount = values.getAsFloat(zDBScheme.TRANSACTIONS_TABLE.AMOUNT);
             amount_view.setText(String.valueOf(itemTransactions.amount));
 
-            itemTransactions.asset_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.ASSET_ID);
+            itemTransactions.assetId = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.ASSET_ID);
             setAccountOnUpdate();
 
             itemTransactions.recipname = values.getAsString(zDBScheme.TRANSACTIONS_TABLE.RECIPIENT);
             recip_view.setText(itemTransactions.recipname);
 
-            itemTransactions.note = values.getAsString(zDBScheme.TRANSACTIONS_TABLE.NOTE);
-            note_view.setText(itemTransactions.note);
+            itemTransactions.notes = values.getAsString(zDBScheme.TRANSACTIONS_TABLE.NOTE);
+            note_view.setText(itemTransactions.notes);
 
-            itemTransactions.franchisee_id = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
+            itemTransactions.franchiseeId = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
 
-            if (itemTransactions.asset_type == ASSET_TYPE_DEBIT_CARD || itemTransactions.asset_type == ASSET_TYPE_CREDIT_CARD)
+            if (itemTransactions.assetType == ASSET_TYPE_DEBIT_CARD || itemTransactions.assetType == ASSET_TYPE_CREDIT_CARD)
                 setRecispinnerOnUpdate();
 
-            itemTransactions.budget_exception = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
-            itemTransactions.rew_amount_calculated = values.getAsFloat(zDBScheme.TRANSACTIONS_TABLE.REWARD_CACULATED);
-            itemTransactions.reward_exception = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_EXCEPTION);
-            itemTransactions.rew_type = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_TYPE);
+            itemTransactions.budgetException = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.FRANCHISEE_ID);
+            itemTransactions.rewardAmountCalculated = values.getAsFloat(zDBScheme.TRANSACTIONS_TABLE.REWARD_CACULATED);
+            itemTransactions.rewardException = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_EXCEPTION);
+            itemTransactions.rewardType = values.getAsLong(zDBScheme.TRANSACTIONS_TABLE.REWARD_TYPE);
         }
     }
 
     public void onSetDate (View v) throws ParseException {
-        itemTransactions.timeinmillis = transactionsDatePicker.getTimeinmillis();      //timeinmillis는 전역변수이므로 변경 필요
+        itemTransactions.transactionTime = transactionsDatePicker.getTimeinmillis();      //timeinmillis는 전역변수이므로 변경 필요
         setTimeText();
     }
 
@@ -233,22 +233,22 @@ public class w_Add_Tran extends AppCompatActivity {
         }
 
 
-        if (itemTransactions.asset_id == 0) {
+        if (itemTransactions.assetId == 0) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
 
-        if (itemTransactions.asset_type == ASSET_TYPE_DEBIT_CARD || itemTransactions.asset_type == ASSET_TYPE_CREDIT_CARD) {
-            if (itemTransactions.cardid == 0) {
+        if (itemTransactions.assetType == ASSET_TYPE_DEBIT_CARD || itemTransactions.assetType == ASSET_TYPE_CREDIT_CARD) {
+            if (itemTransactions.cardId == 0) {
                 Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_acc_missing, Snackbar.LENGTH_LONG).show();
                 return;
             }
         }
-        if (itemTransactions.category_id == 0) {
+        if (itemTransactions.categoryId == 0) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_cat_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
-        if (itemTransactions.timeinmillis == 0L) {
+        if (itemTransactions.transactionTime == 0L) {
             Snackbar.make(findViewById(R.id.add_Layout), R.string.snackbar_trans_time_missing, Snackbar.LENGTH_LONG).show();
             return;
         }
@@ -256,7 +256,7 @@ public class w_Add_Tran extends AppCompatActivity {
         itemTransactions.learn = checkedTextView.isChecked();
 
         itemTransactions.recipname = recip_view.getText().toString();
-        itemTransactions.note = note_view.getText().toString();
+        itemTransactions.notes = note_view.getText().toString();
         mDB.addTransactiononSave(itemTransactions);
 
         finish();
@@ -269,7 +269,7 @@ public class w_Add_Tran extends AppCompatActivity {
 
         Bundle args = new Bundle();
 
-        args.putLong("timeinmillis", itemTransactions.timeinmillis);
+        args.putLong("timeinmillis", itemTransactions.transactionTime);
         //TODO 년월일시분 전달
 
         dialogFragment.setArguments(args);
@@ -309,12 +309,12 @@ public class w_Add_Tran extends AppCompatActivity {
             zRecyclerAdapt_Gen.assetItem recycleritem = new zRecyclerAdapt_Gen.assetItem();
 
             recycleritem.id = contentitem.getAsLong(TABLE_ID);
-            recycleritem.asset_type = contentitem.getAsLong(ASSET_TYPE);
+            recycleritem.assetType = contentitem.getAsLong(ASSET_TYPE);
             recycleritem.name = contentitem.getAsString(NAME);
             recycleritem.balance = contentitem.getAsFloat(BALANCE);
-            recycleritem.withdrawalaccount = contentitem.getAsLong(WITHDRAWALACCOUNT);
-            recycleritem.withdrawalday = contentitem.getAsLong(WITHDRAWALDAY);
-            recycleritem.cardid = contentitem.getAsLong(CARD_ID);
+            recycleritem.withdrawalAccount = contentitem.getAsLong(WITHDRAWALACCOUNT);
+            recycleritem.withdrawalDay = contentitem.getAsLong(WITHDRAWALDAY);
+            recycleritem.cardId = contentitem.getAsLong(CARD_ID);
 
             assetItemList.add(recycleritem);
 
@@ -330,8 +330,8 @@ public class w_Add_Tran extends AppCompatActivity {
         RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
 
-        zRecyclerAdapt_Gen.CatAssetAdapter bottomsheetAdapter
-                = new zRecyclerAdapt_Gen.CatAssetAdapter(this,contentValuesList, clickListener);
+        zRecyclerAdapt_Gen.recyclerAdapter bottomsheetAdapter
+                = new zRecyclerAdapt_Gen.recyclerAdapter(this,contentValuesList, clickListener);
 
         recyclerView.setAdapter(bottomsheetAdapter);
 
@@ -344,7 +344,7 @@ public class w_Add_Tran extends AppCompatActivity {
     }
 
     private void Check_Card_Info() {
-        ContentValues cardinfo = mDB.getCardinfo(itemTransactions.cardid);
+        ContentValues cardinfo = mDB.getCardinfo(itemTransactions.cardId);
         //ListIterator cardinfoIterator = cardinfo.listIterator();
         List<ItemRecipient> recipList = new ArrayList<>();
 
@@ -377,8 +377,8 @@ public class w_Add_Tran extends AppCompatActivity {
         List<ItemRecipient> recipList = new ArrayList<>();
 
         ItemRecipient itemRecipient = new ItemRecipient();
-        itemRecipient.recipid = 0;
-        itemRecipient.recipient = "해당 없음";
+        itemRecipient.recipientId = 0;
+        itemRecipient.recipientName = "해당 없음";
         recipList.add(itemRecipient);
 
         String[] perfsplit = values.getAsString(REWARD_EXCEPTIONS).split(":");
@@ -387,9 +387,9 @@ public class w_Add_Tran extends AppCompatActivity {
         for (int l = 0; l < perflen; l++) {     //10101, 20100
             itemRecipient = new ItemRecipient();
 
-            itemRecipient.recipid = Long.parseLong(perfsplit[l]);
-            itemRecipient.recipient = mDB.getFranchiseeName(itemRecipient.recipid);
-            itemRecipient.conditionexception = 1;
+            itemRecipient.recipientId = Long.parseLong(perfsplit[l]);
+            itemRecipient.recipientName = mDB.getFranchiseeName(itemRecipient.recipientId);
+            itemRecipient.rewardExceptions = 1;
             recipList.add(itemRecipient);
         }
 
@@ -434,11 +434,11 @@ public class w_Add_Tran extends AppCompatActivity {
                 boolean duplicate = false;
                 recipid = Long.parseLong(recip[k]);
                 for (int p = 0; p < recipList.size(); p++) {
-                    if (recipid == recipList.get(p).recipid) {       //중복
+                    if (recipid == recipList.get(p).recipientId) {       //중복
                         recipList.get(p).conditiontype = conditiontype;
                         recipList.get(p).conditionAmount = conperf;
-                        recipList.get(p).rewtype = rewtype;
-                        recipList.get(p).rewamount = rewamount;
+                        recipList.get(p).rewardType = rewtype;
+                        recipList.get(p).rewardPercent = rewamount;
                         duplicate = true;
                         break;
                     }
@@ -446,14 +446,14 @@ public class w_Add_Tran extends AppCompatActivity {
                 }
                 if (!duplicate) {
                     itemRecipient = new ItemRecipient();
-                    itemRecipient.recipid = recipid;
-                    itemRecipient.recipient = mDB.getFranchiseeName(recipid);
+                    itemRecipient.recipientId = recipid;
+                    itemRecipient.recipientName = mDB.getFranchiseeName(recipid);
                     itemRecipient.conditiontype = conditiontype;
                     itemRecipient.conditionAmount = conperf;
-                    itemRecipient.rewamount = rewamount;
-                    itemRecipient.rewtype = rewtype;
+                    itemRecipient.rewardPercent = rewamount;
+                    itemRecipient.rewardType = rewtype;
                     recipList.add(itemRecipient);
-                    Log.w("카드 정보", "리워드 : " + itemRecipient.rewamount +"", null);
+                    Log.w("카드 정보", "리워드 : " + itemRecipient.rewardPercent +"", null);
                 }
             }
         }
@@ -469,19 +469,19 @@ public class w_Add_Tran extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         data.getLongExtra("timeinmillis", 0);
         if (BuildConfig.isTEST)
-            Log.w("timeinmillis returned", itemTransactions.timeinmillis + "");
+            Log.w("timeinmillis returned", itemTransactions.transactionTime + "");
     }
 
     private void setTimeText() {
 
         TextView date_text = findViewById(R.id.add_tran_time);
 
-        calendar.setTimeInMillis(itemTransactions.timeinmillis);     //나중에 사용하기 위한 변수 저장.
+        calendar.setTimeInMillis(itemTransactions.transactionTime);     //나중에 사용하기 위한 변수 저장.
 
         df.setCalendar(calendar);
 
         Date date = new Date();
-        date.setTime(itemTransactions.timeinmillis);
+        date.setTime(itemTransactions.transactionTime);
 
         String dff = df.format(date);
 
@@ -507,9 +507,9 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setCategory(String name, long id) {
 
-        itemTransactions.category_name = name;
+        itemTransactions.categoryName = name;
         cat_view.setText(name);
-        itemTransactions.category_id = id;
+        itemTransactions.categoryId = id;
     }
 
     private void setCategoryOnTab(long cat_id) {
@@ -522,30 +522,30 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setCategoryOnUpdate(){
 
-        int temp_level = mDB.getCatLevel(itemTransactions.category_id);
+        int temp_level = mDB.getCatLevel(itemTransactions.categoryId);
         if(temp_level == 0 || temp_level ==1 || temp_level == 2){        setTab(0);}
         else if(temp_level == 3 || temp_level ==4 || temp_level == 5){        setTab(1);}
         else if(temp_level == 6 || temp_level ==7 || temp_level == 8){        setTab(2);}
 
-        setCategory(  mDB.getCategoryName( itemTransactions.category_id), itemTransactions.category_id);
+        setCategory(  mDB.getCategoryName( itemTransactions.categoryId), itemTransactions.categoryId);
     }
 
     public void setAccount(View v){
         zRecyclerAdapt_Gen.assetItem item = (zRecyclerAdapt_Gen.assetItem) v.getTag();
 
-        itemTransactions.cardid = item.cardid;
-        itemTransactions.asset_id = item.id;
-        itemTransactions.asset_name = item.name;
-        itemTransactions.asset_type = item.asset_type;
-        itemTransactions.withdrawlday = item.withdrawalday;
-        itemTransactions.withdrawlaccount = item.withdrawalaccount;
+        itemTransactions.cardId = item.cardId;
+        itemTransactions.assetId = item.id;
+        itemTransactions.assetName = item.name;
+        itemTransactions.assetType = item.assetType;
+        itemTransactions.withdrawlDay = item.withdrawalDay;
+        itemTransactions.withdrawlAccount = item.withdrawalAccount;
         itemTransactions.balance = item.balance;
 
-        acc_view.setText(itemTransactions.asset_name);
+        acc_view.setText(itemTransactions.assetName);
 
-        if (itemTransactions.asset_type == 2) {
+        if (itemTransactions.assetType == 2) {
             Check_Card_Info();
-        } else if (itemTransactions.asset_type == 3) {
+        } else if (itemTransactions.assetType == 3) {
             Credit_Card();
         } else {
             setTransInvisible();
@@ -553,22 +553,22 @@ public class w_Add_Tran extends AppCompatActivity {
     }   //TODO 데이터 무결성 확인
 
     private void setAccountOnUpdate(){
-        ContentValues cursor = mDB.getAssetInfo(itemTransactions.asset_id);
+        ContentValues cursor = mDB.getAssetInfo(itemTransactions.assetId);
 
-        itemTransactions.asset_id = cursor.getAsLong(TABLE_ID);
-        itemTransactions.asset_type = cursor.getAsLong(ASSET_TYPE);
-        itemTransactions.asset_name = cursor.getAsString(NAME);
+        itemTransactions.assetId = cursor.getAsLong(TABLE_ID);
+        itemTransactions.assetType = cursor.getAsLong(ASSET_TYPE);
+        itemTransactions.assetName = cursor.getAsString(NAME);
 
         itemTransactions.balance = cursor.getAsFloat(BALANCE);
-        itemTransactions.withdrawlaccount = cursor.getAsLong(WITHDRAWALACCOUNT);
-        itemTransactions.withdrawlday = cursor.getAsLong(WITHDRAWALDAY);
-        itemTransactions.cardid = cursor.getAsLong(CARD_ID);
+        itemTransactions.withdrawlAccount = cursor.getAsLong(WITHDRAWALACCOUNT);
+        itemTransactions.withdrawlDay = cursor.getAsLong(WITHDRAWALDAY);
+        itemTransactions.cardId = cursor.getAsLong(CARD_ID);
 
-        acc_view.setText(itemTransactions.asset_name);
+        acc_view.setText(itemTransactions.assetName);
 
-        if (itemTransactions.asset_type == 2) {
+        if (itemTransactions.assetType == 2) {
             Check_Card_Info();
-        } else if (itemTransactions.asset_type == 3) {
+        } else if (itemTransactions.assetType == 3) {
             Credit_Card();
         } else {
             setTransInvisible();
@@ -578,15 +578,15 @@ public class w_Add_Tran extends AppCompatActivity {
 
     private void setRecipient(ItemRecipient itemRecipient){
 
-        itemTransactions.franchisee_id = itemRecipient.recipid;
-        itemTransactions.recipname = itemRecipient.recipient;
-        itemTransactions.reward_exception = itemRecipient.conditionexception;
-        itemTransactions.perftype = itemRecipient.conditiontype;
+        itemTransactions.franchiseeId = itemRecipient.recipientId;
+        itemTransactions.recipname = itemRecipient.recipientName;
+        itemTransactions.rewardException = itemRecipient.rewardExceptions;
+        itemTransactions.conditionType = itemRecipient.conditiontype;
         itemTransactions.conditionAmount = itemRecipient.conditionAmount;
-        itemTransactions.rew_type = itemRecipient.rewtype;
-        itemTransactions.rew_amount = itemRecipient.rewamount;
-        itemTransactions.rew_amount_calculated = (float) (itemTransactions.rew_amount * 0.01 * itemTransactions.amount);
-        Log.e("rew inf","금액 " + itemTransactions.amount +"rew_amount"+ itemTransactions.rew_amount+ "calculated" + itemTransactions.rew_amount_calculated);
+        itemTransactions.rewardType = itemRecipient.rewardType;
+        itemTransactions.rewardAmount = itemRecipient.rewardPercent;
+        itemTransactions.rewardAmountCalculated = (float) (itemTransactions.rewardAmount * 0.01 * itemTransactions.amount);
+        Log.e("rew inf","금액 " + itemTransactions.amount +"rew_amount"+ itemTransactions.rewardAmount + "calculated" + itemTransactions.rewardAmountCalculated);
     }
 
     private void setRecispinnerOnUpdate(){
@@ -595,7 +595,7 @@ public class w_Add_Tran extends AppCompatActivity {
         ItemRecipient itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemRecipient) VCV.rew_spin.getItemAtPosition(i);
-            if( itemRecipient.recipid == itemTransactions.franchisee_id) {
+            if( itemRecipient.recipientId == itemTransactions.franchiseeId) {
                 //i -= 1;
                 break;
             }
@@ -751,7 +751,7 @@ public class w_Add_Tran extends AppCompatActivity {
 
 
             final ItemRecipient item = (ItemRecipient) getItem(position);
-            text.setText(item.recipient);
+            text.setText(item.recipientName);
             text.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
             text.setPadding(4, 4, 4, 4);
             text.setTag(item);
