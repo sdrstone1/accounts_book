@@ -2,6 +2,7 @@ package com.example.kollhong.accounts3;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.RemoteViews;
@@ -10,6 +11,10 @@ import android.widget.RemoteViews;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.List;
+import java.util.ListIterator;
+
+import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.AMOUNT;
 
 /**
  * Implementation of App Widget functionality.
@@ -49,26 +54,38 @@ public class U_Widget extends AppWidgetProvider {
         long nextMonth = calendar2.getTimeInMillis() - 1l;
         float amount = 0l;
 
-        Cursor cursor = mDB.getTransbyCat(thisMonth, nextMonth);
-        if(cursor.getCount() != 0){
-            while(cursor.moveToNext()){
-                amount += cursor.getFloat(3);
-            }
+        int color_red;
+        int color_gray;
+        int color_blue;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            color_red = context.getColor(android.R.color.holo_red_light);
+            color_gray = context.getColor(android.R.color.darker_gray);
+            color_blue = context.getColor(android.R.color.holo_blue_light);
         }
+        else {
+            color_red = context.getResources().getColor(android.R.color.holo_red_light);
+            color_gray = context.getResources().getColor(android.R.color.darker_gray);
+            color_blue = context.getResources().getColor(android.R.color.holo_blue_light);
+        }
+
+        List<ContentValues> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
+        ListIterator ListIter = valuesList.listIterator();
+
+
+        while(ListIter.hasNext()){
+            ContentValues values = (ContentValues) ListIter.next();
+            amount += values.getAsFloat(AMOUNT);
+        }
+
         views.setTextViewText(R.id.expense, amount+"");
         if(amount < 0) {
-
-            int color_red = context.getResources().getColor(android.R.color.holo_red_light,null);
-
             views.setTextColor(R.id.expense, color_red);
         }
         else if(amount == 0){
-            int color_gray = context.getResources().getColor(android.R.color.darker_gray,null);
             views.setTextColor(R.id.expense, color_gray);
         }
         else if(amount > 0){
-
-            int color_blue = context.getResources().getColor(android.R.color.holo_blue_light,null);
             views.setTextColor(R.id.expense, color_blue);
         }
         // Instruct the widget manager to update the widget

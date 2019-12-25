@@ -81,7 +81,7 @@ public class zRecyclerAdapt_Gen {
         View.OnClickListener listener;
 
 
-        CatAssetAdapter(Context cxt, AppCompatActivity ac, List<recyclerItem> item, View.OnClickListener clickListener) {
+        CatAssetAdapter(AppCompatActivity ac, List<recyclerItem> item, View.OnClickListener clickListener) {
             //context = cxt;
             activity = ac;
             items = item;

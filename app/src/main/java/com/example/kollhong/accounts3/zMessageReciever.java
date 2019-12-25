@@ -4,10 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
@@ -20,6 +17,9 @@ import android.util.Log;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static com.example.kollhong.accounts3.zDBScheme.LEARN_TABLE.*;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 public class zMessageReciever extends BroadcastReceiver {
 
@@ -122,26 +122,19 @@ public class zMessageReciever extends BroadcastReceiver {
     public long addTrans(){
         //학습에서 기록 확인
         itemTransactions.transaction_id = 0;
-        Cursor cursor = mDB.getLearnData(itemTransactions.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
-        if(cursor.getCount() != 0){
-            cursor.moveToNext();
+        ContentValues values = mDB.getLearnData(itemTransactions.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
+        if(values != null){
+            //values.moveToNext();
             //data.trans_id = cursor.getLong(0);
-            if(!cursor.isNull(1))
-                itemTransactions.category_id =  cursor.getLong(1);
-            if(!cursor.isNull(2))
-                itemTransactions.asset_id = cursor.getLong(2);
+            itemTransactions.category_id =  values.getAsLong(TABLE_ID);
+            itemTransactions.asset_id = values.getAsLong(ASSET_ID);
 
-            if(!cursor.isNull(3))
-                itemTransactions.franchisee_id = cursor.getLong(3);
-            if(!cursor.isNull(4))
-                itemTransactions.budget_exception = cursor.getInt(4);
-            if(!cursor.isNull(5))
-                itemTransactions.reward_exception = cursor.getInt(5);
-            if(!cursor.isNull(6))
-                itemTransactions.rew_type = cursor.getInt(6);
-            if(!cursor.isNull(7))
-                itemTransactions.rew_amount = cursor.getFloat(7);
-                itemTransactions.rew_amount_calculated = itemTransactions.rew_amount * itemTransactions.amount;
+            itemTransactions.franchisee_id = values.getAsLong(FRANCHISEE_ID);
+            itemTransactions.budget_exception = values.getAsLong(BUDGET_EXCEPTION);
+            itemTransactions.reward_exception = values.getAsLong(REWARD_EXCEPTION);
+            itemTransactions.rew_type = values.getAsLong(REWARD_TYPE);
+            itemTransactions.rew_amount = values.getAsFloat(REWARD);
+            itemTransactions.rew_amount_calculated = itemTransactions.rew_amount * itemTransactions.amount;
         }else {
             itemTransactions.category_id = 3;       //이체 항목으로 지정
             itemTransactions.asset_id = 0;
@@ -152,7 +145,6 @@ public class zMessageReciever extends BroadcastReceiver {
             itemTransactions.rew_amount = 0;
             itemTransactions.rew_amount_calculated = 0;
         }
-        cursor.close();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -227,12 +219,12 @@ public class zMessageReciever extends BroadcastReceiver {
                 }
 
 
-                Cursor cursor = mDB.getAssetInfo(itemTransactions.asset_id);
-                if( cursor.getCount() != 0){
-                    cursor.moveToNext();
-                    charSequence = charSequence + "\n" + acc + " : " + cursor.getString(2);       //accname
+                ContentValues values = mDB.getAssetInfo(itemTransactions.asset_id);
+                if( values != null){
+                    //values.moveToNext();
+                    charSequence = charSequence + "\n" + acc + " : " + values.getAsString(RECIPIENT);       //accname
                 }
-                cursor.close();
+//                values.close();
 
                 charSequence = charSequence + "\n" + recip + " : "+ itemTransactions.recipname ;//recipient
                 String recip_name = mDB.getFranchiseeName(itemTransactions.franchisee_id);

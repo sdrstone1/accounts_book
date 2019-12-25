@@ -1,5 +1,6 @@
 package com.example.kollhong.accounts3;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
@@ -21,6 +22,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+
+import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 31/05/2018.
@@ -29,7 +34,7 @@ import java.util.List;
 public class v_Settings2_acc extends AppCompatActivity {
     zDBMan mDB;
 
-    List<zDBMan.ItemAcc> itemAccs = new ArrayList<>();
+    //List<zDBMan.ItemAcc> itemAccs = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,31 +79,34 @@ public class v_Settings2_acc extends AppCompatActivity {
         Account_recycler(mDB.getAssetList());
     }
 
-    private void Account_recycler(Cursor cursor) {
+    private void Account_recycler(List<ContentValues> valuesList) {
 
         RecyclerView recyclerView = findViewById(R.id.pref_accounts_recycler);
 
-        itemAccs = new ArrayList<>();
+        //itemAccs = new ArrayList<>();
+        ListIterator valuesListIter = valuesList.listIterator();
 
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                zDBMan.ItemAcc item =  mDB.getItemAcc();
-                item.id = cursor.getLong(0);
-                item.type = cursor.getInt(1);
-                item.name = cursor.getString(2);
-                item.balance = cursor.getFloat(3);
-                item.withdrawalaccount = cursor.getInt(4);
-                item.withdrawalday = cursor.getInt(5);
-                item.cardid = cursor.getLong(6);
-                itemAccs.add(item);
-            }
+        List<zRecyclerAdapt_Gen.recyclerItem> assetItemList = new ArrayList<>();
+
+
+        while (valuesListIter.hasNext()) {
+            ContentValues values = (ContentValues) valuesListIter.next();
+            zRecyclerAdapt_Gen.assetItem item =  new zRecyclerAdapt_Gen.assetItem();
+            item.id = values.getAsLong(TABLE_ID);
+            item.asset_type = values.getAsLong(ASSET_TYPE);
+            item.name = values.getAsString(NAME);
+            item.balance = values.getAsFloat(BALANCE);
+            item.withdrawalaccount = values.getAsLong(WITHDRAWALACCOUNT);
+            item.withdrawalday = values.getAsLong(WITHDRAWALDAY);
+            item.cardid = values.getAsLong(CARD_ID);
+            assetItemList.add(item);
         }
-        cursor.close();
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Account_adapter accountadapter = new Account_adapter();
-        recyclerView.setAdapter(accountadapter);
-        accountadapter.notifyDataSetChanged();
+        zRecyclerAdapt_Gen.CatAssetAdapter assetAdapter = new zRecyclerAdapt_Gen.CatAssetAdapter(this, assetItemList,new assetOnClickListener());
+        recyclerView.setAdapter(assetAdapter);
+        assetAdapter.notifyDataSetChanged();
 
 
 
@@ -107,7 +115,7 @@ public class v_Settings2_acc extends AppCompatActivity {
 
     private void updateAccount(View v){
         //TextView view = (TextView) v;
-        zDBMan.ItemAcc itemAcc = (zDBMan.ItemAcc) v.getTag();
+        zRecyclerAdapt_Gen.assetItem itemAcc = (zRecyclerAdapt_Gen.assetItem) v.getTag();
 
         Intent intent = new Intent(getApplicationContext(),v_Settings2_acc_add.class);
         intent.putExtra("isUpdate", true);
@@ -116,6 +124,14 @@ public class v_Settings2_acc extends AppCompatActivity {
 
     }   //TODO 데이터 무결성 확인
 
+    private class assetOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            updateAccount(v);
+        }
+    }
+
+    /*
     private  class Account_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Account_adapter() {}
 
@@ -160,11 +176,6 @@ public class v_Settings2_acc extends AppCompatActivity {
                 int rotation = display.getRotation();
                 display.getSize(point );
 
-                /*
-                float density  = getResources().getDisplayMetrics().density;
-                float dpHeight = outMetrics.heightPixels / density;
-                float dpWidth  = outMetrics.widthPixels / density;
-*/
                 ViewGroup.LayoutParams params = v.getLayoutParams();
 
 
@@ -174,5 +185,7 @@ public class v_Settings2_acc extends AppCompatActivity {
                 else params.width = point.y ;
             }
         }
+
     }
+    */
 }

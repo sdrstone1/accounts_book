@@ -250,27 +250,27 @@ public class zDBMan {
     }
 
 
-    void addAsset(boolean isUpdate, ItemAcc itemAcc){
+    void addAsset(boolean isUpdate, ItemAsset itemAsset){
         ContentValues values = new ContentValues();
-        values.put(ASSET_TABLE.NAME, itemAcc.name);
+        values.put(ASSET_TABLE.NAME, itemAsset.name);
 
-        values.put(ASSET_TABLE.CARD_ID, itemAcc.cardid);
-        values.put(ASSET_TABLE.NICKNAME,itemAcc.nickname);
+        values.put(ASSET_TABLE.CARD_ID, itemAsset.cardid);
+        values.put(ASSET_TABLE.NICKNAME, itemAsset.nickname);
 
-        if(itemAcc.type == 1L ){     //현금
-            values.put(ASSET_TABLE.BALANCE, itemAcc.balance);
+        if(itemAsset.type == 1L ){     //현금
+            values.put(ASSET_TABLE.BALANCE, itemAsset.balance);
         }
-        else if (itemAcc.type == 2L){       //체크카드
-            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAcc.withdrawalaccount);
+        else if (itemAsset.type == 2L){       //체크카드
+            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAsset.withdrawalaccount);
         }
-        else if (itemAcc.type == 3L){       //신용카드
-            values.put(ASSET_TABLE.BALANCE, itemAcc.balance);
-            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAcc.withdrawalaccount);
-            values.put(ASSET_TABLE.WITHDRAWALDAY, itemAcc.withdrawalday);
+        else if (itemAsset.type == 3L){       //신용카드
+            values.put(ASSET_TABLE.BALANCE, itemAsset.balance);
+            values.put(ASSET_TABLE.WITHDRAWALACCOUNT, itemAsset.withdrawalaccount);
+            values.put(ASSET_TABLE.WITHDRAWALDAY, itemAsset.withdrawalday);
         }
 
         if(isUpdate) {      //id확인
-            zDbIO.updateRecord(db, TABLE_ASSET, values, "? = '?' ", new String[] {TABLE_ID, Long.toString(itemAcc.id) });
+            zDbIO.updateRecord(db, TABLE_ASSET, values, "? = '?' ", new String[] {TABLE_ID, Long.toString(itemAsset.id) });
         }
         else{
             //db.insert("accounts", null, values);

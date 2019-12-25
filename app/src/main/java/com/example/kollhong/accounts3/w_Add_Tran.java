@@ -332,7 +332,7 @@ public class w_Add_Tran extends AppCompatActivity {
 
 
         zRecyclerAdapt_Gen.CatAssetAdapter bottomsheetAdapter
-                = new zRecyclerAdapt_Gen.CatAssetAdapter(this,this,contentValuesList, clickListener);
+                = new zRecyclerAdapt_Gen.CatAssetAdapter(this,contentValuesList, clickListener);
 
         recyclerView.setAdapter(bottomsheetAdapter);
 

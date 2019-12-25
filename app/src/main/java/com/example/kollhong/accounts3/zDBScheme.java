@@ -149,7 +149,7 @@ public final class zDBScheme {
         //_id, type, balance, withdrawalday, cardid
     }
 
-    static class ItemAcc {
+    static class ItemAsset {
         long id;
         String name;
         long type = 1;

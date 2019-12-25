@@ -1,5 +1,6 @@
 package com.example.kollhong.accounts3;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -28,8 +29,11 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ListIterator;
 
 import static android.view.View.GONE;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
+import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.*;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -155,37 +159,40 @@ public class B_Manage1_stat extends Fragment {
 
 
         catItems.clear();
-        Cursor cursor = mDB.getTransbyCat(thisMonth, nextMonth);
+        List<ContentValues> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
+        ListIterator valuesListIter = valuesList.listIterator();
+
         long list[] = {0l};
 
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                TransItem transItem = new TransItem();
-                //t._id, t.categoryid, c.name, t.amount
-                transItem.trans_id = cursor.getLong(0);
-                transItem.cat_id = cursor.getLong(1);
-                transItem.cat_name = cursor.getString(2);
-                transItem.amount = cursor.getFloat(3);
-                transItems.add(transItem);
-            }
+        while (valuesListIter.hasNext()) {
+            ContentValues values = (ContentValues) valuesListIter.next();
 
-            long name = -1;
-
-            for (int i = 0; i < transItems.size(); i++) {
-                if (transItems.get(i).cat_id != name) {
-                    ItemperCat itemPerCat = new ItemperCat();
-
-                    itemPerCat.acc_name = transItems.get(i).cat_name;
-                    catItems.add(itemPerCat);
-                    name = transItems.get(i).cat_id;
-
-                }
-
-                catItems.get(catItems.size() - 1).amount += transItems.get(i).amount;
-
-
-            }
+            TransItem transItem = new TransItem();
+            //t._id, t.categoryid, c.name, t.amount
+            transItem.trans_id = values.getAsLong(TABLE_ID);
+            transItem.cat_id = values.getAsLong(CATEGORY_ID);
+            transItem.cat_name = values.getAsString(CATEGORY_NAME);
+            transItem.amount = values.getAsFloat(AMOUNT);
+            transItems.add(transItem);
         }
+
+        long name = -1;
+
+        for (int i = 0; i < transItems.size(); i++) {
+            if (transItems.get(i).cat_id != name) {
+                ItemperCat itemPerCat = new ItemperCat();
+
+                itemPerCat.acc_name = transItems.get(i).cat_name;
+                catItems.add(itemPerCat);
+                name = transItems.get(i).cat_id;
+
+            }
+
+            catItems.get(catItems.size() - 1).amount += transItems.get(i).amount;
+
+
+        }
+
 
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);

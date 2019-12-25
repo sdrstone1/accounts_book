@@ -1,6 +1,7 @@
 package com.example.kollhong.accounts3;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +32,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+
+import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
+import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 06/06/2018.
@@ -49,8 +54,9 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     TextView with_date;
     TextView with_date_txt ;
 
-    zDBMan.ItemAcc itemAcc ;
+
     zDBMan mDB;
+    zDBScheme.ItemAsset itemAsset = new zDBScheme.ItemAsset();
 
     boolean isUpdate;
 
@@ -72,18 +78,18 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
         set_with_acc_spinner();
 
-        itemAcc = mDB.getItemAcc();
+
 
         if(isUpdate){
             long id = intent.getLongExtra("id",0l);
             update(id);
         }
 
-        long TAB_INDEX = itemAcc.type - 1;
+        long TAB_INDEX = itemAsset.type - 1;
 
         TabLayout tabLayout = findViewById(R.id.add_acc_tablayout);
         tabLayout.addOnTabSelectedListener(new tabListener());
-        TabLayout.Tab tab = tabLayout.getTabAt(TAB_INDEX);
+        TabLayout.Tab tab = tabLayout.getTabAt((int)TAB_INDEX);
         tab.select();
 
 
@@ -110,7 +116,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     private void changeViewOnTab(int position){
         switch(position) {
             case 0: {       //현금 -> 출금계좌, 출금일, 카드 선택 숨기기
-                itemAcc.type = 1;
+                itemAsset.type = 1;
 
                 bal_txt.setText(R.string.balance);
                 bal_txt.setVisibility(View.VISIBLE);
@@ -124,7 +130,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                 break;
             }
             case 1: {       //체크카드 ->잔액, 출금일 숨기기
-                itemAcc.type = 2;
+                itemAsset.type = 2;
 
                 bal_txt.setText(R.string.balance);
                 bal_txt.setVisibility(View.INVISIBLE);
@@ -141,7 +147,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                 break;
             }
             case 2: {       //신용카드 -> 잔액 ->한도로 변
-                itemAcc.type = 3;
+                itemAsset.type = 3;
                 bal_txt.setText(R.string.maxed_out);
                 bal_txt.setVisibility(View.VISIBLE);
                 bal_text.setVisibility(View.VISIBLE);
@@ -170,10 +176,10 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.menu_save_but)
         {
-            itemAcc.name = name_txt.getText()+"";
-            itemAcc.nickname = nick_txt.getText()+"";
-            itemAcc.balance = Float.valueOf(bal_text.getText()+"") ;
-            mDB.addAsset(isUpdate,itemAcc);
+            itemAsset.name = name_txt.getText()+"";
+            itemAsset.nickname = nick_txt.getText()+"";
+            itemAsset.balance = Float.valueOf(bal_text.getText()+"") ;
+            mDB.addAsset(isUpdate,itemAsset);
             finish();
             return true;
         }
@@ -184,7 +190,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         else if(id == R.id.itemDelete){
             if (isUpdate){
 
-                mDB.deleteAcc(itemAcc.id);
+                mDB.deleteAcc(itemAsset.id);
                 this.finish();
             }
 
@@ -203,7 +209,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         final NumberPicker datePicker = view.findViewById(R.id.date_picker);
         datePicker.setMaxValue(30);
         datePicker.setMinValue(1);
-        datePicker.setValue(itemAcc.withdrawalday);
+        datePicker.setValue((int) itemAsset.withdrawalday);
 
         builder.setView(view);
 
@@ -215,8 +221,8 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                     }
 
                     public void SaveinDialog() {
-                        itemAcc.withdrawalday =datePicker.getValue();
-                        with_date_txt.setText(itemAcc.withdrawalday+"");
+                        itemAsset.withdrawalday =datePicker.getValue();
+                        with_date_txt.setText(itemAsset.withdrawalday+"");
                     }
                 });
 
@@ -233,37 +239,38 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
     private void update(long id){
 
-        Cursor cursor = mDB.getAssetInfo(id);
-        if(cursor.getCount() != 0){
-            cursor.moveToNext();
+        ContentValues values = mDB.getAssetInfo(id);
+        if(values!= null){
+            //values.moveToNext();
             //_id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid
-            itemAcc.id = cursor.getLong(0);
-            itemAcc.type = cursor.getInt(1);
-            itemAcc.name = cursor.getString(2);
-            itemAcc.nickname = cursor.getString(3);
-            itemAcc.balance = cursor.getFloat(4);
-            itemAcc.withdrawalaccount = cursor.getInt(5);
-            itemAcc.withdrawalday = cursor.getInt(6);
-            itemAcc.cardid = cursor.getLong(7);
+            itemAsset.id = values.getAsLong(TABLE_ID);
+            itemAsset.type = values.getAsLong(NAME);
+            itemAsset.name = values.getAsString(NAME);
+            itemAsset.nickname = values.getAsString(NICKNAME);
+            itemAsset.balance = values.getAsFloat(BALANCE);
+            itemAsset.withdrawalaccount = values.getAsLong(WITHDRAWALACCOUNT);
+            itemAsset.withdrawalday = values.getAsLong(WITHDRAWALDAY);
+            itemAsset.cardid = values.getAsLong(CARD_ID);
 
-            bal_text.setText(String.valueOf(itemAcc.balance));
+            bal_text.setText(String.valueOf(itemAsset.balance));
             //어카운트 스피너 가져오기 -> 셋
 
-            name_txt.setText(itemAcc.name);
-            nick_txt.setText(itemAcc.nickname);
+            name_txt.setText(itemAsset.name);
+            nick_txt.setText(itemAsset.nickname);
 
             set_with_acc_spinner_onUpdate();
 
 
-            with_date_txt.setText(String.valueOf(itemAcc.withdrawalday));
+            with_date_txt.setText(String.valueOf(itemAsset.withdrawalday));
         }
-        cursor.close();
     }
 
     private void set_with_acc_spinner(){
-        Cursor cursor = mDB.getBankAssetList_forCard();
+        List<ContentValues> valuesList = mDB.getBankAssetList_forCard();
+        ListIterator ListIter = valuesList.listIterator();
 
-        final List<ItemSpinner> itemBanks = makeadapter(cursor);
+        ContentValues values;
+        final List<ItemSpinner> itemBanks = makeadapter(valuesList);
 
         spinadapter spinadapters = new spinadapter(this,android.R.layout.simple_spinner_item,itemBanks);
         with_acc_spin.setAdapter(spinadapters);
@@ -272,7 +279,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ItemSpinner itemSpinner = itemBanks.get(position);
 
-                itemAcc.withdrawalaccount = Integer.parseInt(itemSpinner.id+"");
+                itemAsset.withdrawalaccount = Integer.parseInt(itemSpinner.id+"");
             }
 
             @Override
@@ -280,7 +287,6 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
             }
         });
-        cursor.close();
         spinadapters.notifyDataSetChanged();
 
     }
@@ -296,7 +302,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ItemSpinner itemSpinner = itemCards.get(position);
 
-                itemAcc.cardid = Integer.parseInt(String.valueOf(itemSpinner.id));
+                itemAsset.cardid = Integer.parseInt(String.valueOf(itemSpinner.id));
             }
 
             @Override
@@ -328,7 +334,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         ItemSpinner itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemSpinner) with_acc_spin.getItemAtPosition(i);
-            if( itemRecipient.id == itemAcc.withdrawalaccount) {
+            if( itemRecipient.id == itemAsset.withdrawalaccount) {
                 //i -= 1;
                 break;
             }
@@ -346,7 +352,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         ItemSpinner itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemSpinner) card_id_spin.getItemAtPosition(i);
-            if( itemRecipient.id == itemAcc.cardid) {
+            if( itemRecipient.id == itemAsset.cardid) {
                 i -= 1;
                 break;
             }
@@ -407,17 +413,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             return createViewFromResource(inflater, position, convertView, parent, mDropDownResource);
         }
 
-        @Override
-        public void setDropDownViewTheme(@Nullable Resources.Theme theme) {
-            if (theme == null) {
-                mDropDownInflater = null;
-            } else if (theme == mInflater.getContext().getTheme()) {
-                mDropDownInflater = mInflater;
-            } else {
-                final Context context = new ContextThemeWrapper(mContext, theme);
-                mDropDownInflater = LayoutInflater.from(context);
-            }
-        }
+
 
         private @NonNull
         View createViewFromResource(@NonNull LayoutInflater inflater, int position,
