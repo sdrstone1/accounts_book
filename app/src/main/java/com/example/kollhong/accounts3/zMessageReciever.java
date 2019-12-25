@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.*;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -133,7 +132,7 @@ public class zMessageReciever extends BroadcastReceiver {
             itemTransactions.budget_exception = values.getAsLong(BUDGET_EXCEPTION);
             itemTransactions.reward_exception = values.getAsLong(REWARD_EXCEPTION);
             itemTransactions.rew_type = values.getAsLong(REWARD_TYPE);
-            itemTransactions.rew_amount = values.getAsFloat(REWARD);
+            itemTransactions.rew_amount = values.getAsFloat(REWARD_PERCENT);
             itemTransactions.rew_amount_calculated = itemTransactions.rew_amount * itemTransactions.amount;
         }else {
             itemTransactions.category_id = 3;       //이체 항목으로 지정

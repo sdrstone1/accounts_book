@@ -38,12 +38,13 @@ public final class zDBScheme {
         public static final String WITHDRAWALDAY = "withdrawalday";
         public static final String CARD_ID = "cardinfo";
     }
+
     public static final class CARD_INFO_TABLE {
         public static final String COMPANY = "company";
         public static final String CARD_NAME = "card_name";
         public static final String ASSET_TYPE = "asset_type";
         public static final String REWARD_EXCEPTIONS = "reward_exceptions";
-        public static final String REAWRD_SECTIONS = "reawrd_sections";
+        public static final String REWARD_SECTIONS = "reward_sections";
         public static final String REWARD_FRANCHISEE_1 = "reward_franchisee1";
         public static final String REWARD_AMOUNT_1 = "reward_amount1";
         public static final String REWARD_FRANCHISEE_2 = "reward_franchisee2";
@@ -64,6 +65,7 @@ public final class zDBScheme {
         public static final String REWARD_EXCEPTION = "reward_exception";
         public static final String BUDGET = "budget";
     }
+
     public static final class LEARN_TABLE {
         public static final String RECIPIENT = "recipient";
         public static final String CATEGORY_ID = "category_id";
@@ -72,7 +74,7 @@ public final class zDBScheme {
         public static final String BUDGET_EXCEPTION = "budget_exception";
         public static final String REWARD_EXCEPTION = "reward_exception";
         public static final String REWARD_TYPE = "reward_type";
-        public static final String REWARD = "reward_amount";
+        public static final String REWARD_PERCENT = "reward_percent";
     }
 
     public static final class FRANCHISEE_CODE_TABLE {
@@ -93,7 +95,6 @@ public final class zDBScheme {
         public static final String REWARD_CACULATED = "reward_caculated";
     }
 
-
     public static final class TRANSACTIONS_VIEW {
         public static final String TRANSACTON_TIME = "transacton_time";
         public static final String AMOUNT = "amount";
@@ -105,6 +106,117 @@ public final class zDBScheme {
         public static final String ASSET_NAME = "asset_name";
         public static final String RECIPIENT = "recipient";
         public static final String REWARD_CACULATED = "reward_caculated";
+    }
+
+    abstract static class DBItem{
+        int tableId;
+        abstract String getType();
+    }
+    static class AssetTableItem extends DBItem{
+        int assetType;
+        String name;
+        String nickname;
+        float balance;
+        String notes;
+        int withdrawalAccount;
+        int withdrawalDay;
+        int cardId;
+
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
+    }
+
+    static class CardInfoTableItem extends DBItem{
+        String company;
+        String cardName;
+        int assetType;
+        String rewardExceptions;
+        String rewardSections;
+        String franchisee_1;
+        String amount_1;
+        String franchisee_2;
+        String amount_2;
+        String franchisee_3;
+        String amount_3;
+        String franchisee_4;
+        String amount_4;
+
+        @Override
+        String getType() {
+            return TABLE_CARD_INFO;
+        }
+    }
+
+    static class CategoryTableItem extends DBItem{
+        int catLevel;
+        int parentId;
+        String name;
+        String rewardExceptions;
+        float budget;
+
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
+    }
+    static class LearnTableItem extends DBItem{
+        String recipientName;
+        int categoryId;
+        int assetId;
+        int franchiseeId;
+        String budgetExceptions;
+        String rewardExceptions;
+        String rewardType;
+        float rewardPercent;
+
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
+    }
+    static class FranchiseeTableItem extends DBItem{
+        String name;
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
+    }
+    static class TransactionsTableItem extends DBItem{
+        long transactionTime;
+        int categoryId;
+        float amount;
+        int assetId;
+        String recipientName;
+        String notes;
+        int franchiseeId;
+        String budgetExceptions;
+        String rewardExceptions;
+        String rewardType;
+        float rewardCalculated;
+
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
+    }
+    static class TransactionsViewTableItem extends DBItem{
+        long transactionTime;
+        float amount;
+        int categoryId;
+        int categoryLevel;
+        String categoryName;
+        String parentCategoryName;
+        int assetId;
+        String assetName;
+        String recipientName;
+        float rewardCalculated;
+
+        @Override
+        String getType() {
+            return TABLE_ASSET;
+        }
     }
 
     public static class ItemRecipient {

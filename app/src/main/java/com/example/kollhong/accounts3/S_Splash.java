@@ -81,7 +81,7 @@ public class S_Splash extends AppCompatActivity {
                 "\t`card_name`\tTEXT,\n" +
                 "\t`asset_type`\tINTEGER NOT NULL DEFAULT 1,\n" +
                 "\t`reward_exceptions`\tTEXT,\n" +
-                "\t`reawrd_sections`\tTEXT,\n" +
+                "\t`reward_sections`\tTEXT,\n" +
                 "\t`reward_franchisee1`\tTEXT,\n" +
                 "\t`reward_amount1`\tTEXT,\n" +
                 "\t`reward_franchisee2`\tTEXT,\n" +

@@ -38,7 +38,6 @@ import static com.example.kollhong.accounts3.zDBScheme.*;
 import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
 import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.ASSET_TYPE;
 import static com.example.kollhong.accounts3.zDBScheme.CARD_INFO_TABLE.*;
-import static com.example.kollhong.accounts3.zRecyclerAdapt_Gen.RECYCLERITEM_TYPE_CATEGORY;
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
 import static java.text.DateFormat.getTimeInstance;
@@ -395,7 +394,7 @@ public class w_Add_Tran extends AppCompatActivity {
         }
 
 
-        String[] sections = values.getAsString(REAWRD_SECTIONS).split(":");
+        String[] sections = values.getAsString(REWARD_SECTIONS).split(":");
         int size = sections.length;
         for (int i = 0; i < size; i++) {   //첫글자 따기 둘째 글자 따기 //b0, c5
             int conditiontype = 0;

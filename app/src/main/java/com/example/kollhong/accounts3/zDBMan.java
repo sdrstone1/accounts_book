@@ -2,15 +2,19 @@ package com.example.kollhong.accounts3;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.kollhong.accounts3.zDBScheme.*;
+import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.ASSET_TYPE;
+import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.*;
 
 /**
  * Created by KollHong on 01/05/2018.
@@ -38,15 +42,25 @@ public class zDBMan {
 
     //TODO return list of objects
     List<ContentValues> getTransHistory(long today00, long today2359){
-        String[] columns = {TABLE_ID, TRANSACTIONS_VIEW.TRANSACTON_TIME,TRANSACTIONS_VIEW.AMOUNT,TRANSACTIONS_VIEW.RECIPIENT,TRANSACTIONS_VIEW.CATEGORY_LEVEL,TRANSACTIONS_VIEW.CATEGORY_NAME,TRANSACTIONS_VIEW.PARENT_CATEGORY_NAME,TRANSACTIONS_VIEW.ASSET_NAME};
+        String[] columns = {TABLE_ID, TRANSACTON_TIME,AMOUNT,RECIPIENT,CATEGORY_LEVEL,CATEGORY_NAME,PARENT_CATEGORY_NAME,ASSET_NAME};
         Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
                 "? >= ? and ? <= ?",
-                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today00),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today2359)},
-                TRANSACTIONS_VIEW.TRANSACTON_TIME + "desc");
-        if(cursor.getCount != 0){
+                new String[] { TRANSACTON_TIME, Long.toString(today00), TRANSACTON_TIME, Long.toString(today2359)},
+                TRANSACTON_TIME + "desc");
+        List<TransactionsViewTableItem> DBtransactionsItemList = new ArrayList<>();
+        TransactionsViewTableItem DBtransactionsItem;
+        if(cursor.getCount() != 0){
             while(cursor.moveToNext()){
-                object.id = cursor.getString(cursor.getColumnIndex(TABLE_ID));
-
+                DBtransactionsItem = new TransactionsViewTableItem();
+                DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBtransactionsItem.transactionTime = cursor.getLong(cursor.getColumnIndex(TRANSACTON_TIME));
+                DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
+                DBtransactionsItem.recipientName = cursor.getString(cursor.getColumnIndex(RECIPIENT));
+                DBtransactionsItem.categoryLevel = cursor.getInt(cursor.getColumnIndex(CATEGORY_LEVEL));
+                DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+                DBtransactionsItem.parentCategoryName = cursor.getString(cursor.getColumnIndex(PARENT_CATEGORY_NAME));
+                DBtransactionsItem.assetName = cursor.getString(cursor.getColumnIndex(ASSET_NAME));
+                DBtransactionsItemList.add(DBtransactionsItem);
             }
         }
         cursor.close();
@@ -54,117 +68,332 @@ public class zDBMan {
     }
 
     List<ContentValues> getTransByAcc(long thisMonth, long nextMonth){
-        String[] columns ={TABLE_ID, TRANSACTIONS_VIEW.TRANSACTON_TIME, TRANSACTIONS_VIEW.AMOUNT, TRANSACTIONS_VIEW.RECIPIENT, TRANSACTIONS_VIEW.CATEGORY_LEVEL, TRANSACTIONS_VIEW.CATEGORY_ID,TRANSACTIONS_VIEW.ASSET_ID,TRANSACTIONS_VIEW.ASSET_NAME,TRANSACTIONS_VIEW.REWARD_CACULATED};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
+        String[] columns ={TABLE_ID, TRANSACTON_TIME, AMOUNT, RECIPIENT, CATEGORY_LEVEL, CATEGORY_ID,ASSET_ID,ASSET_NAME,REWARD_CACULATED};
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
                 "? >= ? and ? <= ?",
-                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(thisMonth),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(nextMonth)},
+                new String[] { TRANSACTON_TIME, Long.toString(thisMonth), TRANSACTON_TIME, Long.toString(nextMonth)},
                 TRANSACTIONS_VIEW.ASSET_ID);
+        List<TransactionsViewTableItem> DBtransactionsItemList = new ArrayList<>();
+        TransactionsViewTableItem DBtransactionsItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBtransactionsItem = new TransactionsViewTableItem();
+                DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBtransactionsItem.transactionTime = cursor.getLong(cursor.getColumnIndex(TRANSACTON_TIME));
+                DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
+                DBtransactionsItem.recipientName = cursor.getString(cursor.getColumnIndex(RECIPIENT));
+                DBtransactionsItem.categoryLevel = cursor.getInt(cursor.getColumnIndex(CATEGORY_LEVEL));
+                DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
+                DBtransactionsItem.assetId = cursor.getInt(cursor.getColumnIndex(ASSET_ID));
+                DBtransactionsItem.assetName = cursor.getString(cursor.getColumnIndex(ASSET_NAME));
+                DBtransactionsItem.rewardCalculated = cursor.getFloat(cursor.getColumnIndex(REWARD_CACULATED));
+
+                DBtransactionsItemList.add(DBtransactionsItem);
+            }
+        }
+        cursor.close();
         return contentValuesList;
     }
 
     List<ContentValues> getTransbyCat(long thisMonth, long nextMonth){
-        String[] columns ={TABLE_ID, TRANSACTIONS_VIEW.AMOUNT,TRANSACTIONS_VIEW.CATEGORY_ID, TRANSACTIONS_VIEW.CATEGORY_NAME };
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
+        String[] columns ={TABLE_ID, AMOUNT,CATEGORY_ID, CATEGORY_NAME };
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
                 "? >= ? and ? <= ?",
-                new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(thisMonth),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(nextMonth)},
+                new String[] { TRANSACTON_TIME, Long.toString(thisMonth), TRANSACTON_TIME, Long.toString(nextMonth)},
                 TRANSACTIONS_VIEW.CATEGORY_ID);
+        List<TransactionsViewTableItem> DBtransactionsItemList = new ArrayList<>();
+        TransactionsViewTableItem DBtransactionsItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBtransactionsItem = new TransactionsViewTableItem();
+                DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
+                DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
+                DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+                DBtransactionsItemList.add(DBtransactionsItem);
+            }
+        }
+        cursor.close();
         return contentValuesList;
     }
 
     ContentValues getTransbyID(long id){
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, null, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
-        if (contentValuesList.isEmpty()) return null;
-        return contentValuesList.get(0);
+
+        if(cursor.getCount() != 0){
+
+            cursor.moveToNext();
+            TransactionsViewTableItem DBtransactionsItem = new TransactionsViewTableItem();
+            DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+            DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
+            DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
+            DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+
+            cursor.close();
+
+            return contentValuesList.get(0);
+        }
+        else{
+            cursor.close();
+            return null;
+        }
 
     }
 
     String getCategoryName(long id){
         String[] columns ={CATEGORY_TABLE.NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
-        if(contentValuesList.isEmpty()) {
+
+        if(cursor.getCount() != 0){
+            cursor.moveToNext();
+
+            String name = cursor.getString(cursor.getColumnIndex(CATEGORY_TABLE.NAME));
+            cursor.close();
+
+            return name;
+        }
+        else{
+            cursor.close();
             Log.e("Get Category Name ","By CATEGORY ID Failed : No Matching Category ID");
             return null;
         }
 
-        return contentValuesList.get(0).getAsString(CATEGORY_TABLE.NAME);
     }
 
     int getCatLevel(long id){
         String[] columns ={CATEGORY_TABLE.CAT_LEVEL};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
-        if(contentValuesList.isEmpty()) {
-            Log.e("Get Category Level ","By CATEGORY ID Failed : No Matching Category ID");
+
+        if(cursor.getCount() != 0){
+            cursor.moveToNext();
+
+            int level = cursor.getInt(cursor.getColumnIndex(CATEGORY_TABLE.CAT_LEVEL));
+            cursor.close();
+
+            return level;
+        }
+        else {
+            cursor.close();
+            Log.e("Get Category Level ", "By CATEGORY ID Failed : No Matching Category ID");
             return -1;
         }
-
-        return contentValuesList.get(0).getAsInteger(CATEGORY_TABLE.CAT_LEVEL);
     }
 
-    List<ContentValues> getChildCategoryList(long id){
+    List<CategoryTableItem> getChildCategoryList(long id){
         String[] columns ={TABLE_ID, CATEGORY_TABLE.NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
                 "? = '?' ", new String[] { CATEGORY_TABLE.PARENT_ID, Long.toString(id)}, null);
-        return contentValuesList;
+        List<CategoryTableItem> DBCategoryItemList = new ArrayList<>();
+        CategoryTableItem DBCategoryItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBCategoryItem = new CategoryTableItem();
+                DBCategoryItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBCategoryItem.name = cursor.getString(cursor.getColumnIndex(CATEGORY_TABLE.NAME));
+                DBCategoryItemList.add(DBCategoryItem);
+            }
+        }
+        cursor.close();
+        return DBCategoryItemList;
     }
 
-    List<ContentValues> getChildCategoryList(String name){
+    List<CategoryTableItem> getChildCategoryList(String name){
         String[] columns ={TABLE_ID, CATEGORY_TABLE.NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CATEGORY, columns, //select all columns
                 "? = '?' ", new String[] { CATEGORY_TABLE.PARENT_ID, name}, null);
-        return contentValuesList;
+        List<CategoryTableItem> DBCategoryItemList = new ArrayList<>();
+        CategoryTableItem DBCategoryItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBCategoryItem = new CategoryTableItem();
+                DBCategoryItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBCategoryItem.name = cursor.getString(cursor.getColumnIndex(CATEGORY_TABLE.NAME));
+                DBCategoryItemList.add(DBCategoryItem);
+            }
+        }
+        cursor.close();
+        return DBCategoryItemList;
     }
 
 
 
-    List<ContentValues> getAssetList(){
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
+    List<AssetTableItem> getAssetList(){
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
                 null,null, null);
-        return contentValuesList;
+        List<AssetTableItem> DBAssetItemList = new ArrayList<>();
+        AssetTableItem DBAssetItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBAssetItem = new AssetTableItem();
+                DBAssetItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBAssetItem.assetType = cursor.getInt(cursor.getColumnIndex(ASSET_TYPE));
+                DBAssetItem.name = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NAME));
+                DBAssetItem.nickname = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NICKNAME));
+                DBAssetItem.balance = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.BALANCE));
+                DBAssetItem.notes = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NOTES));
+                DBAssetItem.withdrawalAccount = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.WITHDRAWALACCOUNT));
+                DBAssetItem.withdrawalDay = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.WITHDRAWALDAY));
+                DBAssetItem.cardId = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.CARD_ID));
+                DBAssetItemList.add(DBAssetItem);
+            }
+        }
+        cursor.close();
+        return DBAssetItemList;
     }
 
-    ContentValues getAssetInfo(long id){
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
+    AssetTableItem getAssetInfo(long id){
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_ASSET, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
-        if(contentValuesList.isEmpty()) return null;
-        return contentValuesList.get(0);
+
+        if(cursor.getCount() != 0){
+            cursor.moveToNext();
+            AssetTableItem DBAssetItem = new AssetTableItem();
+            DBAssetItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+            DBAssetItem.assetType = cursor.getInt(cursor.getColumnIndex(ASSET_TYPE));
+            DBAssetItem.name = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NAME));
+            DBAssetItem.nickname = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NICKNAME));
+            DBAssetItem.balance = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.BALANCE));
+            DBAssetItem.notes = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NOTES));
+            DBAssetItem.withdrawalAccount = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.WITHDRAWALACCOUNT));
+            DBAssetItem.withdrawalDay = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.WITHDRAWALDAY));
+            DBAssetItem.cardId = cursor.getInt(cursor.getColumnIndex(ASSET_TABLE.CARD_ID));
+            cursor.close();
+
+            return DBAssetItem;
+        }
+        else{
+            cursor.close();
+            return null;
+        }
     }
 
-    List<ContentValues> getBankAssetList_forCard(){
+    List<AssetTableItem> getBankAssetList_forCard(){
         String[] columns ={TABLE_ID, ASSET_TABLE.NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, columns, //select all columns
-                "? = '?' ", new String[] { ASSET_TABLE.ASSET_TYPE, Integer.toString(ASSET_TYPE_BANK_BOOK)}, null);
-        return contentValuesList;
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_ASSET, columns, //select all columns
+                "? = '?' ", new String[] { ASSET_TYPE, Integer.toString(ASSET_TYPE_BANK_BOOK)}, null);
+        List<AssetTableItem> DBAssetItemList = new ArrayList<>();
+        AssetTableItem DBAssetItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBAssetItem = new AssetTableItem();
+                DBAssetItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBAssetItem.name = cursor.getString(cursor.getColumnIndex(ASSET_TABLE.NAME));
+                DBAssetItemList.add(DBAssetItem);
+            }
+        }
+        cursor.close();
+        return DBAssetItemList;
     }
 
-    ContentValues getCardinfo(long card_id) {
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_CARD_INFO, null, //select all columns
+    CardInfoTableItem getCardinfo(long card_id) {
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CARD_INFO, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(card_id)}, null);
-        if (contentValuesList.isEmpty())return null;
-        return contentValuesList.get(0);
+
+        if(cursor.getCount() != 0){
+            cursor.moveToNext();
+            CardInfoTableItem DBcardInfoItem = new CardInfoTableItem();
+
+            DBcardInfoItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+            DBcardInfoItem.company = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.COMPANY));
+            DBcardInfoItem.cardName = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.CARD_NAME));
+            DBcardInfoItem.assetType = cursor.getInt(cursor.getColumnIndex(CARD_INFO_TABLE.ASSET_TYPE));
+            DBcardInfoItem.rewardExceptions = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_EXCEPTIONS));
+            DBcardInfoItem.rewardSections = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_SECTIONS));
+            DBcardInfoItem.franchisee_1 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_1));
+            DBcardInfoItem.amount_1 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_1));
+            DBcardInfoItem.franchisee_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_2));
+            DBcardInfoItem.amount_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_2));
+            DBcardInfoItem.franchisee_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_3));
+            DBcardInfoItem.amount_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_3));
+            DBcardInfoItem.franchisee_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_4));
+            DBcardInfoItem.amount_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_4));
+
+            cursor.close();
+
+            return DBcardInfoItem;
+        }
+        else{
+            cursor.close();
+            return null;
+        }
+
+
+
     }
 
-    List<ContentValues> getCardListByType(int type){
+    List<CardInfoTableItem> getCardListByType(int type){
         String[] columns ={TABLE_ID, CARD_INFO_TABLE.CARD_NAME, CARD_INFO_TABLE.COMPANY};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_ASSET, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_CARD_INFO, columns, //select all columns
                 "? = '?' ", new String[] { CARD_INFO_TABLE.ASSET_TYPE, Integer.toString(type)}, null);
-        return contentValuesList;
+        List<CardInfoTableItem> DBcardInfoItemList = new ArrayList<>();
+        CardInfoTableItem DBcardInfoItem;
+        if(cursor.getCount() != 0){
+            while(cursor.moveToNext()){
+                DBcardInfoItem = new CardInfoTableItem();
+                DBcardInfoItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+                DBcardInfoItem.cardName = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.CARD_NAME));
+                DBcardInfoItem.company = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.COMPANY));
+                DBcardInfoItemList.add(DBcardInfoItem);
+            }
+        }
+        cursor.close();
+        return DBcardInfoItemList;
     }
 
     String getFranchiseeName(long id){
         String[] columns ={TABLE_ID, FRANCHISEE_CODE_TABLE.NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db,TABLE_FRANCHISEE_CODE, columns, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db,TABLE_FRANCHISEE_CODE, columns, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
-        if(contentValuesList.isEmpty()) return null;
-        return contentValuesList.get(0).getAsString(FRANCHISEE_CODE_TABLE.NAME);
+
+
+
+        if(cursor.getCount() != 0){
+
+            cursor.moveToNext();
+            String name = cursor.getString(cursor.getColumnIndex(FRANCHISEE_CODE_TABLE.NAME));
+
+            cursor.close();
+
+            return contentValuesList.get(0);
+        }
+        else{
+            cursor.close();
+            return null;
+        }
+
     }
 
     //TODO perfexception 칼럼 없어짐
     ContentValues getLearnData(String name){        //이름과 계좌가 같을 경우
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db,TABLE_LEARN, null, //select all columns
+        Cursor cursor = zDbIO.getRecordList(db,TABLE_LEARN, null, //select all columns
                 "? = '?' ", new String[] { LEARN_TABLE.RECIPIENT, name}, null);
+
+
+
+        if(cursor.getCount() != 0){
+
+            cursor.moveToNext();
+            TransactionsViewTableItem DBtransactionsItem = new TransactionsViewTableItem();
+            DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+            DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
+            DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
+            DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+
+            cursor.close();
+
+            return contentValuesList.get(0);
+        }
+        else{
+            cursor.close();
+            return null;
+        }
+
+
+
+
         if(contentValuesList.isEmpty()) return null;
         return contentValuesList.get(0);
     }
@@ -355,7 +584,7 @@ public class zDBMan {
         values.put(LEARN_TABLE.BUDGET_EXCEPTION, data.budget_exception);
         values.put(LEARN_TABLE.REWARD_EXCEPTION, data.reward_exception);
         values.put(LEARN_TABLE.REWARD_TYPE, data.rew_type);
-        values.put(LEARN_TABLE.REWARD, data.rew_amount);
+        values.put(LEARN_TABLE.REWARD_PERCENT, data.rew_amount);
 
 
 
