@@ -191,9 +191,11 @@ public final class zDBScheme {
             return true;
         }
 
-        static List<ContentValues> getRecordList(SQLiteDatabase db, String table, String[] columns, String where, String[] whereArgs, String orderBy) {
-            Cursor cursor = db.query(table, columns, where, whereArgs, null, null, orderBy);
+        static Cursor getRecordList(SQLiteDatabase db, String table, String[] columns, String where, String[] whereArgs, String orderBy) {
+            return db.query(table, columns, where, whereArgs, null, null, orderBy);
+            /*
             List<ContentValues> contentValuesList = new ArrayList<>();
+
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
                     ContentValues contentValues = new ContentValues();   //거래 기록 표시
@@ -231,6 +233,8 @@ public final class zDBScheme {
             }
             cursor.close();
             return contentValuesList;
+
+             */
         }
 
         static void delRecord(SQLiteDatabase db, String table, long id) {

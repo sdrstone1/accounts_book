@@ -34,46 +34,22 @@ public class zDBMan {
     //TODO 컨트롤러 영역은 UI부분임
     //TODO 커서 리턴하지 말기!
     //TODO 쿼리 대신 ContentValues 사용하면 함수 전부 다 합칠 수 잇을 듯
-    /*
-    zDBScheme.ItemCat getItemCat(){
 
-        return new zDBScheme.ItemCat();
-    }
-    zDBScheme.ItemAcc getItemAcc(){
-        return new zDBScheme.ItemAcc();
-    }
-*/
-    /*
-     private double getRecord(long startdate, long enddate) {
-        Cursor cursor = mDbMan.getRecordCursor(db, recordTable, new String[]{recordTableVar[0], recordTableVar[1]}, recordTableVar[0] + " BETWEEN '" + startdate + "' AND '" + enddate + "'");
-        //SQLiteDatabase db, String table, String[] col, String where
-        double record = 0d;
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-
-                record = record + cursor.getDouble(1);
-            }
-
-        }
-        cursor.close();
-        return record;
-    }
-    //add record
-    boolean putRecord(Date date, Double measurement) {
-        ContentValues values = new ContentValues();
-        values.put(recordTableVar[0], date.getTime());
-        values.put(recordTableVar[1], measurement);
-        return mDbMan.putRecord(db, recordTable, values);
-    }
-     */
 
     //TODO return list of objects
     List<ContentValues> getTransHistory(long today00, long today2359){
         String[] columns = {TABLE_ID, TRANSACTIONS_VIEW.TRANSACTON_TIME,TRANSACTIONS_VIEW.AMOUNT,TRANSACTIONS_VIEW.RECIPIENT,TRANSACTIONS_VIEW.CATEGORY_LEVEL,TRANSACTIONS_VIEW.CATEGORY_NAME,TRANSACTIONS_VIEW.PARENT_CATEGORY_NAME,TRANSACTIONS_VIEW.ASSET_NAME};
-        List<ContentValues> contentValuesList = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
+        Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
                 "? >= ? and ? <= ?",
                 new String[] { TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today00),TRANSACTIONS_VIEW.TRANSACTON_TIME, Long.toString(today2359)},
                 TRANSACTIONS_VIEW.TRANSACTON_TIME + "desc");
+        if(cursor.getCount != 0){
+            while(cursor.moveToNext()){
+                object.id = cursor.getString(cursor.getColumnIndex(TABLE_ID));
+
+            }
+        }
+        cursor.close();
         return contentValuesList;
     }
 
