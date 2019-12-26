@@ -112,7 +112,7 @@ public class zRecyclerAdapt_Gen {
 
         @Override
         int getType() {
-            return 0;
+            return B_Manage0_acc_Asset;
         }
     }
 
@@ -374,6 +374,6 @@ public class zRecyclerAdapt_Gen {
                 remittance = v.findViewById(R.id.remittance);
                 reward = v.findViewById(R.id.rewardview);
             }
-
+        }
     }
 }
