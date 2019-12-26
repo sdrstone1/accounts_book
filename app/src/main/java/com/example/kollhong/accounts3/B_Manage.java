@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ public class B_Manage extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragList.add(new B_Manage0_acc());
+        fragList.add(new B_Manage0_Asset());
         fragList.add(new B_Manage1_stat());
         fragList.add(new B_Manage2_bud());
         fragList.add(new B_Manage3_reci());

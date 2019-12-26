@@ -5,8 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,9 +30,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-
-import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 06/06/2018.
@@ -56,7 +50,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
 
     zDBMan mDB;
-    zDBScheme.ItemAsset itemAsset = new zDBScheme.ItemAsset();
+    DBItem.AssetItem assetItem = new DBItem.AssetItem();
 
     boolean isUpdate;
 
@@ -82,10 +76,10 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
         if(isUpdate){
             long id = intent.getLongExtra("id",0l);
-            update(id);
+            updateDisplay(id);
         }
 
-        long TAB_INDEX = itemAsset.type - 1;
+        long TAB_INDEX = assetItem.assetType - 1;
 
         TabLayout tabLayout = findViewById(R.id.add_acc_tablayout);
         tabLayout.addOnTabSelectedListener(new tabListener());
@@ -116,7 +110,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     private void changeViewOnTab(int position){
         switch(position) {
             case 0: {       //현금 -> 출금계좌, 출금일, 카드 선택 숨기기
-                itemAsset.type = 1;
+                assetItem.assetType = 1;
 
                 bal_txt.setText(R.string.balance);
                 bal_txt.setVisibility(View.VISIBLE);
@@ -130,7 +124,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                 break;
             }
             case 1: {       //체크카드 ->잔액, 출금일 숨기기
-                itemAsset.type = 2;
+                assetItem.assetType = 2;
 
                 bal_txt.setText(R.string.balance);
                 bal_txt.setVisibility(View.INVISIBLE);
@@ -147,7 +141,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                 break;
             }
             case 2: {       //신용카드 -> 잔액 ->한도로 변
-                itemAsset.type = 3;
+                assetItem.assetType = 3;
                 bal_txt.setText(R.string.maxed_out);
                 bal_txt.setVisibility(View.VISIBLE);
                 bal_text.setVisibility(View.VISIBLE);
@@ -176,10 +170,10 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.menu_save_but)
         {
-            itemAsset.name = name_txt.getText()+"";
-            itemAsset.nickname = nick_txt.getText()+"";
-            itemAsset.balance = Float.valueOf(bal_text.getText()+"") ;
-            mDB.addAsset(isUpdate,itemAsset);
+            assetItem.name = name_txt.getText()+"";
+            assetItem.nickname = nick_txt.getText()+"";
+            assetItem.balance = Float.valueOf(bal_text.getText()+"") ;
+            mDB.addAsset(isUpdate, assetItem);
             finish();
             return true;
         }
@@ -190,7 +184,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         else if(id == R.id.itemDelete){
             if (isUpdate){
 
-                mDB.deleteAcc(itemAsset.id);
+                mDB.deleteAcc(assetItem.tableId);
                 this.finish();
             }
 
@@ -209,7 +203,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         final NumberPicker datePicker = view.findViewById(R.id.date_picker);
         datePicker.setMaxValue(30);
         datePicker.setMinValue(1);
-        datePicker.setValue((int) itemAsset.withdrawalday);
+        datePicker.setValue((int) assetItem.withdrawalDay);
 
         builder.setView(view);
 
@@ -221,8 +215,8 @@ public class v_Settings2_acc_add extends AppCompatActivity {
                     }
 
                     public void SaveinDialog() {
-                        itemAsset.withdrawalday =datePicker.getValue();
-                        with_date_txt.setText(itemAsset.withdrawalday+"");
+                        assetItem.withdrawalDay =datePicker.getValue();
+                        with_date_txt.setText(assetItem.withdrawalDay+"");
                     }
                 });
 
@@ -237,40 +231,33 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void update(long id){
+    private void updateDisplay(long id){
 
-        ContentValues values = mDB.getAssetInfo(id);
+        DBItem.AssetItem values = mDB.getAssetInfo(id);
         if(values!= null){
             //values.moveToNext();
             //_id, type, name, nickname, balance, withdrawalaccount, withdrawalday, cardid
-            itemAsset.id = values.getAsLong(TABLE_ID);
-            itemAsset.type = values.getAsLong(NAME);
-            itemAsset.name = values.getAsString(NAME);
-            itemAsset.nickname = values.getAsString(NICKNAME);
-            itemAsset.balance = values.getAsFloat(BALANCE);
-            itemAsset.withdrawalaccount = values.getAsLong(WITHDRAWALACCOUNT);
-            itemAsset.withdrawalday = values.getAsLong(WITHDRAWALDAY);
-            itemAsset.cardid = values.getAsLong(CARD_ID);
+            assetItem = values;
 
-            bal_text.setText(String.valueOf(itemAsset.balance));
+            bal_text.setText(String.valueOf(assetItem.balance));
             //어카운트 스피너 가져오기 -> 셋
 
-            name_txt.setText(itemAsset.name);
-            nick_txt.setText(itemAsset.nickname);
+            name_txt.setText(assetItem.name);
+            nick_txt.setText(assetItem.nickname);
 
             set_with_acc_spinner_onUpdate();
 
 
-            with_date_txt.setText(String.valueOf(itemAsset.withdrawalday));
+            with_date_txt.setText(String.valueOf(assetItem.withdrawalDay));
         }
     }
 
     private void set_with_acc_spinner(){
-        List<ContentValues> valuesList = mDB.getBankAssetList_forCard();
+        List<DBItem.AssetItem> valuesList = mDB.getBankAssetList_forCard();
         ListIterator ListIter = valuesList.listIterator();
 
         ContentValues values;
-        final List<ItemSpinner> itemBanks = makeadapter(valuesList);
+        final List<ItemSpinner> itemBanks = makeSpinAdapter_Asset(valuesList);
 
         spinadapter spinadapters = new spinadapter(this,android.R.layout.simple_spinner_item,itemBanks);
         with_acc_spin.setAdapter(spinadapters);
@@ -279,7 +266,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ItemSpinner itemSpinner = itemBanks.get(position);
 
-                itemAsset.withdrawalaccount = Integer.parseInt(itemSpinner.id+"");
+                assetItem.withdrawalAccount = Integer.parseInt(itemSpinner.id+"");
             }
 
             @Override
@@ -292,8 +279,8 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     }
 
     private void set_card_spinner(int type){
-        Cursor cursor = mDB.getCardListByType(type-1);
-        final List<ItemSpinner> itemCards = makeadapter(cursor);
+        List<DBItem.CardInfoItem>  cardInfoItemList = mDB.getCardListByType(type-1);
+        final List<ItemSpinner> itemCards = makeSpinAdapter_Card(cardInfoItemList);
 
         spinadapter spinadapters = new spinadapter(this,android.R.layout.simple_spinner_item,itemCards);
         card_id_spin.setAdapter(spinadapters);
@@ -302,7 +289,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ItemSpinner itemSpinner = itemCards.get(position);
 
-                itemAsset.cardid = Integer.parseInt(String.valueOf(itemSpinner.id));
+                assetItem.cardId = Integer.parseInt(String.valueOf(itemSpinner.id));
             }
 
             @Override
@@ -310,23 +297,45 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
             }
         });
-        cursor.close();
         spinadapters.notifyDataSetChanged();
     }
 
-    private List<ItemSpinner> makeadapter(Cursor cursor){
+    private List<ItemSpinner> makeSpinAdapter_Asset(List<DBItem.AssetItem> assetItemList){
         List<ItemSpinner> items = new ArrayList<>();
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                ItemSpinner item =  new ItemSpinner();
-                item.id = cursor.getLong(0);
-                item.name = cursor.getString(2);
-                items.add(item);
-            }
+        ListIterator listIterator = assetItemList.listIterator();
+        DBItem.AssetItem assetItem;
+        while (listIterator.hasNext()) {
+            assetItem = (DBItem.AssetItem) listIterator.next();
+
+            ItemSpinner item =  new ItemSpinner();
+            item.id = assetItem.tableId;
+            item.name = assetItem.name;
+            items.add(item);
         }
+
         return items;
 
     }
+
+    private List<ItemSpinner> makeSpinAdapter_Card(List<DBItem.CardInfoItem> cardItemList){
+        List<ItemSpinner> items = new ArrayList<>();
+        ListIterator listIterator = cardItemList.listIterator();
+        DBItem.CardInfoItem assetItem;
+        while (listIterator.hasNext()) {
+            assetItem = (DBItem.CardInfoItem) listIterator.next();
+
+            ItemSpinner item =  new ItemSpinner();
+            item.id = assetItem.tableId;
+            item.name = assetItem.cardName;
+            items.add(item);
+        }
+
+        return items;
+
+    }
+
+
+
 
     private void set_with_acc_spinner_onUpdate(){
         int size = with_acc_spin.getAdapter().getCount();
@@ -334,7 +343,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         ItemSpinner itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemSpinner) with_acc_spin.getItemAtPosition(i);
-            if( itemRecipient.id == itemAsset.withdrawalaccount) {
+            if( itemRecipient.id == assetItem.withdrawalAccount) {
                 //i -= 1;
                 break;
             }
@@ -352,7 +361,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         ItemSpinner itemRecipient;
         for(i = 0 ; i<size ; i++){
             itemRecipient = (ItemSpinner) card_id_spin.getItemAtPosition(i);
-            if( itemRecipient.id == itemAsset.cardid) {
+            if( itemRecipient.id == assetItem.cardId) {
                 i -= 1;
                 break;
             }

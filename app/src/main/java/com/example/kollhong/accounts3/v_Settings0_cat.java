@@ -2,7 +2,6 @@ package com.example.kollhong.accounts3;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,8 +23,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
 
 /**
  * Created by KollHong on 31/05/2018.
@@ -136,26 +133,25 @@ public class v_Settings0_cat extends AppCompatActivity {
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(v_Settings0_cat.this).toBundle());
         }
     }
-    private void Category_Recycler(List<ContentValues> contentList) {
-        List<zRecyclerAdapt_Gen.recyclerItem> recyclerItems;
-        ListIterator<ContentValues> contentListIterator = contentList.listIterator();
-        ContentValues content;
+
+    private void Category_Recycler(List<DBItem.CategoryItem> contentList) {
+        List<RecyclerItem> recyclerItemList = new ArrayList<>();
+        ListIterator<DBItem.CategoryItem> contentListIterator = contentList.listIterator();
+        DBItem.CategoryItem content;
 
         RecyclerView recyclerView = findViewById(R.id.pref_categories_recycler);
 
-        recyclerItems = new ArrayList<>();
-
         while (contentListIterator.hasNext()) {
             content = contentListIterator.next();
-            zRecyclerAdapt_Gen.settingsItem item = new zRecyclerAdapt_Gen.settingsItem();
-            item.id = content.getAsLong(TABLE_ID);
-            item.name = content.getAsString( zDBScheme.CATEGORY_TABLE.NAME);
-            recyclerItems.add(item);
+            RecyclerItem.CategorySettingsItem item = new RecyclerItem.CategorySettingsItem();
+            item.nameOnlyItem.tableId = content.tableId;
+            item.nameOnlyItem.name = content.name;
+            recyclerItemList.add(item);
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        zRecyclerAdapt_Gen.recyclerAdapter categoryadapter
-                = new zRecyclerAdapt_Gen.recyclerAdapter(this,recyclerItems, new categoryClickListener());
+        zRecyclerAdapt_Gen.RecyclerAdapter categoryadapter
+                = new zRecyclerAdapt_Gen.RecyclerAdapter(this,recyclerItemList, new categoryClickListener());
 
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();

@@ -1,7 +1,11 @@
 package com.example.kollhong.accounts3;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -9,67 +13,58 @@ import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import static java.text.DateFormat.getDateInstance;
+import com.example.kollhong.accounts3.RecyclerItem.*;
+import static com.example.kollhong.accounts3.RecyclerItem.*;
 
 public class zRecyclerAdapt_Gen {
-    static final int ASSET = 0;
-    static final int CATEGORY = 1;
-    static final int SETTINGS = 2;
-    static final int A_Trans0_History_Header = 3;
-    static final int A_Trans0_History_Content = 4;
-    static final int B_Manage0_acc_Asset = 5;
+
 
     zRecyclerAdapt_Gen(){
     }
 
-    abstract static class recyclerItem{
 
 
-        //int class_type; //type 0 == asset, type 1 == category selector, type 2 == cagetory settings
-        abstract int getType();
-//        abstract String getName();
-
-
-    public static class recyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         //Context context;
         Activity activity;
-        List<recyclerItem> items;
-        List<recyclerItem> itemsSearched;
+        List<RecyclerItem> items;
+        List<RecyclerItem> itemsSearched;
         View.OnClickListener listener;
+        //int context;
 
-
-        recyclerAdapter(Activity ac, List<recyclerItem> item, View.OnClickListener clickListener) {
+        RecyclerAdapter(Activity ac, List<RecyclerItem> item, View.OnClickListener clickListener) {
 
             activity = ac;
             items = item;
             listener = clickListener;
             itemsSearched = new ArrayList<>();
             itemsSearched.addAll(items);
-
+            //this.context = context;
         }
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            if(viewType == ASSET || viewType == CATEGORY || viewType == SETTINGS) {
+            if (viewType == ASSET || viewType == CATEGORY || viewType == v_Settings0_cat) {
                 View view = activity.getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
                 return new settingsViewholder(view);
-            }
-            else if (viewType == A_Trans0_History_Header) {      //헤더
+            } else if (viewType == A_Trans0_History_Header) {      //헤더
                 View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_header, parent, false);
-                return new HeaderViewHolder(view);
+                return new assetSummaryHeaderHolder(view);
             } else if (viewType == A_Trans0_History_Content) {
                 View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_content, parent, false);
 
                 return new ContentViewHolder(view);
-            } else if(viewType == B_Manage0_acc_Asset) {
+            } else if (viewType == B_Manage0_Asset_Header) {
                 View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
-                return new assetHolder(view);
+                return new assetSummaryHolder(view);
+            } else if (viewType == B_Manage1_stat_Category_Header) {
+                View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
+                return new categorySummaryHolder(view);
             } else {
                 Log.w("리사이클러뷰", "에러");
                 return null;
@@ -83,98 +78,91 @@ public class zRecyclerAdapt_Gen {
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            recyclerItem item = items.get(position);
-            if(item.getType() == ASSET) {
-                assetItem assetitem = (assetItem)item;
+            RecyclerItem item = items.get(position);
+            if (item.getType() == ASSET) {
+                assetItem assetitem = (assetItem) item;
 
                 settingsViewholder viewholder = (settingsViewholder) holder;
-                viewholder.textView.setText(assetitem.name);
+                viewholder.textView.setText(assetitem.item.name);
                 View v = viewholder.textView;
                 v.setTag(item);
                 viewholder.textView.setOnClickListener(listener);
-            }
-            else if(item.getType() == CATEGORY){
+            } else if (item.getType() == CATEGORY || item.getType() == v_Settings0_cat) {
                 categoryItem categoryitem = (categoryItem) item;
 
                 settingsViewholder viewholder = (settingsViewholder) holder;
-                viewholder.textView.setText(categoryitem.name);
+                viewholder.textView.setText(categoryitem.nameOnlyItem.name);
                 View v = viewholder.textView;
                 v.setTag(item);
                 viewholder.textView.setOnClickListener(listener);
-            }
-            else if(item.getType() == SETTINGS){
-                settingsItem settingsitem = (settingsItem)item;
+            } else if (item.getType() == A_Trans0_History_Header) {
 
-                settingsViewholder viewholder = (settingsViewholder) holder;
-                viewholder.textView.setText(settingsitem.name);
-                View v = viewholder.textView;
-                v.setTag(item);
-                viewholder.textView.setOnClickListener(listener);
-            }
-            else if(item.getType() == A_Trans0_History_Header){
-
-                HeaderViewHolder viewHolder = (HeaderViewHolder) holder;
-                HeaderItem headerItem = (HeaderItem) item;
+                assetSummaryHeaderHolder viewHolder = (assetSummaryHeaderHolder) holder;
+                dateHeaderItem dateHeaderItem = (dateHeaderItem) item;
 
 
-                headerItem.date.setTime(headerItem.transactionTime);
-                headerItem.format = headerItem.df.format(headerItem.date);
+                dateHeaderItem.date.setTime(dateHeaderItem.transactionTime);
+                dateHeaderItem.format = dateHeaderItem.df.format(dateHeaderItem.date);
 
-                viewHolder.time.setText(headerItem.format);
-            }
-            else if(item.getType() == A_Trans0_History_Content){
+                viewHolder.time.setText(dateHeaderItem.format);
+            } else if (item.getType() == A_Trans0_History_Content) {
                 ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
 
-                ContentItem contentItem = (ContentItem) item;
+                HistoryContentItem historyContentItem = (HistoryContentItem) item;
 
-                holder.itemView.setTag(contentItem.transId);
+                holder.itemView.setTag(historyContentItem.item.tableId);
                 holder.itemView.setOnClickListener(listener);
 
-                if (contentItem.categoryLevel == 0l || contentItem.categoryLevel == 1l) { //0,1,2        3,4,5           6,7,8
-                    contentViewHolder.list_cat.setText(contentItem.categoryName);
+                if (historyContentItem.item.categoryLevel == 0l || historyContentItem.item.categoryLevel == 1l) { //0,1,2        3,4,5           6,7,8
+                    contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                }
-                else if (contentItem.categoryLevel == 2l) {
-                    contentViewHolder.list_cat.setText(contentItem.parentCategoryName);
-                    contentViewHolder.list_cat2nd.setText(contentItem.categoryName);
+                } else if (historyContentItem.item.categoryLevel == 2l) {
+                    contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
+                    contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                }
-                else if (contentItem.categoryLevel == 3l || contentItem.categoryLevel == 4l) {
-                    contentViewHolder.list_cat.setText(contentItem.categoryName);
+                } else if (historyContentItem.item.categoryLevel == 3l || historyContentItem.item.categoryLevel == 4l) {
+                    contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                }
-                else if (contentItem.categoryLevel == 5l) {
-                    contentViewHolder.list_cat.setText(contentItem.parentCategoryName);
-                    contentViewHolder.list_cat2nd.setText(contentItem.categoryName);
+                } else if (historyContentItem.item.categoryLevel == 5l) {
+                    contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
+                    contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                }
-                else if (contentItem.categoryLevel == 6l || contentItem.categoryLevel == 7l) {
-                    contentViewHolder.list_cat.setText(contentItem.categoryName);
+                } else if (historyContentItem.item.categoryLevel == 6l || historyContentItem.item.categoryLevel == 7l) {
+                    contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
-                }
-                else if (contentItem.categoryLevel == 8l) {
+                } else if (historyContentItem.item.categoryLevel == 8l) {
 
-                    contentViewHolder.list_cat.setText(contentItem.parentCategoryName);
-                    contentViewHolder.list_cat2nd.setText(contentItem.categoryName);
+                    contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
+                    contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
                 }
 
-                contentViewHolder.list_amount.setText(contentItem.amount + "");
-                contentViewHolder.list_accounts.setText(contentItem.assetName);
-                contentViewHolder.list_reci.setText(contentItem.recipientName);
+                contentViewHolder.list_amount.setText(historyContentItem.item.amount + "");
+                contentViewHolder.list_accounts.setText(historyContentItem.item.assetName);
+                contentViewHolder.list_reci.setText(historyContentItem.item.recipientName);
 
-            }
-            else if(item.getType() == B_Manage0_acc_Asset) {
-                ItemPerAcc assetItem = (ItemPerAcc) item;
-                assetHolder assetHolder =  (assetHolder) holder;
+            } else if (item.getType() == B_Manage0_Asset_Header) {
+                AssetSummaryItem assetItem = (AssetSummaryItem) item;
+                assetSummaryHolder assetSummaryHolder = (assetSummaryHolder) holder;
 
-                assetHolder.name.setText(assetItem.assetName);
-                assetHolder.income.setText(String.valueOf(assetItem.amountIn));
-                assetHolder.expense.setText(String.valueOf(assetItem.amountOut));
-                assetHolder.remittance.setText(String.valueOf(assetItem.amountRemain));
+                assetSummaryHolder.name.setText(assetItem.assetName);
+                assetSummaryHolder.income.setText(String.valueOf(assetItem.IncomeSummary));
+                assetSummaryHolder.expense.setText(String.valueOf(assetItem.ExpenseSummary));
+                assetSummaryHolder.remittance.setText(String.valueOf(assetItem.TransferSummary));
                 CharSequence string = activity.getApplicationContext().getResources().getText(R.string.reward);
-                String reward = String.valueOf(Float.valueOf(assetItem.reward).intValue());
-                assetHolder.reward.setText( string + "   " + reward);
+                String reward = String.valueOf(Float.valueOf(assetItem.RewardSummary).intValue());
+                assetSummaryHolder.reward.setText(string + "   " + reward);
+            }
+
+            else if (item.getType() == B_Manage1_stat_Category_Header){
+
+                categorySummaryHolder catSummaryHolder =  (categorySummaryHolder) holder;
+                CategorySummaryItem catSummaryItem = (CategorySummaryItem) item;
+
+                catSummaryHolder.name.setText(catSummaryItem.assetName);
+                //accHolder.income.setText(String.valueOf(itemVO.amount_in));
+                catSummaryHolder.expense.setText(String.valueOf(catSummaryItem.amount));
+                //accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
             }
         }
 
@@ -191,12 +179,12 @@ public class zRecyclerAdapt_Gen {
             if (query.length() == 0) {
                 items.addAll(itemsSearched);
             }
-            for (recyclerItem wp : itemsSearched) {
+            for (RecyclerItem wp : itemsSearched) {
                 if (wp.getType() == A_Trans0_History_Header) {
                     items.add(wp);
-                } else if(wp.getType() == A_Trans0_History_Content){
+                } else if (wp.getType() == A_Trans0_History_Content) {
                     //wp = (ContentItem) wp;
-                    if (((ContentItem) wp).recipientName.toLowerCase(Locale.getDefault())
+                    if (((HistoryContentItem) wp).item.recipientName.toLowerCase(Locale.getDefault())
                             .contains(query)) {
                         items.add(wp);
 
@@ -216,7 +204,7 @@ public class zRecyclerAdapt_Gen {
                 Point point = new Point();
                 Display display = activity.getWindowManager().getDefaultDisplay();
                 int rotation = display.getRotation();
-                display.getSize(point );
+                display.getSize(point);
 
                 /*
                 디스플레이 정보 가져오기- 사용하지는 않았지만 좋은 정보여서 남겨 둠
@@ -228,9 +216,9 @@ public class zRecyclerAdapt_Gen {
 
 
                 if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-                    params.width = point.x ;
+                    params.width = point.x;
 
-                else params.width = point.y ;
+                else params.width = point.y;
                 v.setLayoutParams(params);
             }
         }
@@ -254,11 +242,10 @@ public class zRecyclerAdapt_Gen {
                 list_accounts = v.findViewById(R.id.list_accounts);
                 list_amount = v.findViewById(R.id.list_amount);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    color_blue = ContextCompat.getColor(activity.getApplicationContext(),android.R.color.holo_blue_light);
-                    color_red = ContextCompat.getColor(activity.getApplicationContext(),android.R.color.holo_red_light);
-                    color_gray = ContextCompat.getColor(activity.getApplicationContext(),android.R.color.darker_gray);
-                }
-                else{
+                    color_blue = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.holo_blue_light);
+                    color_red = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.holo_red_light);
+                    color_gray = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.darker_gray);
+                } else {
                     color_blue = v.getResources().getColor(android.R.color.holo_blue_light);
                     color_red = v.getResources().getColor(android.R.color.holo_red_light);
                     color_gray = v.getResources().getColor(android.R.color.darker_gray);
@@ -269,24 +256,24 @@ public class zRecyclerAdapt_Gen {
         }
 
 
-        private class HeaderViewHolder extends RecyclerView.ViewHolder {
+        private class assetSummaryHeaderHolder extends RecyclerView.ViewHolder {
             public TextView time;
 
-            public HeaderViewHolder(View v) {
+            public assetSummaryHeaderHolder(View v) {
                 super(v);
                 time = v.findViewById(R.id.Time);
 
             }
         }
 
-        public class assetHolder extends RecyclerView.ViewHolder {
+        public class assetSummaryHolder extends RecyclerView.ViewHolder {
             TextView name;
             TextView income;
             TextView expense;
             TextView remittance;
             TextView reward;
 
-            public assetHolder(View v) {
+            public assetSummaryHolder(View v) {
                 super(v);
                 name = v.findViewById(R.id.acc_name);
                 income = v.findViewById(R.id.income);
@@ -295,5 +282,69 @@ public class zRecyclerAdapt_Gen {
                 reward = v.findViewById(R.id.rewardview);
             }
         }
+
+
+        public class categorySummaryHolder extends RecyclerView.ViewHolder {
+            TextView name;
+            //TextView income;
+            TextView expense;
+            //TextView remittance;
+
+            public categorySummaryHolder(View v) {
+                super(v);
+                name = v.findViewById(R.id.acc_name);
+                v.findViewById(R.id.income).setVisibility(View.INVISIBLE);
+                expense = v.findViewById(R.id.expense);
+                v.findViewById(R.id.remittance).setVisibility(View.INVISIBLE);
+                v.findViewById(R.id.inc).setVisibility(View.INVISIBLE);
+                v.findViewById(R.id.remmi).setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+
+
+    static public class DividerItemDecoration extends RecyclerView.ItemDecoration {
+
+        private  final int[] ATTRS = new int[]{android.R.attr.listDivider};
+
+        private Drawable divider;
+
+        /**
+         * Default divider will be used
+         */
+        public DividerItemDecoration(Context context) {
+            final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
+            divider = styledAttributes.getDrawable(0);
+            styledAttributes.recycle();
+        }
+
+        /**
+         * Custom divider will be used
+         */
+        public DividerItemDecoration(Context context, int resId) {
+            divider = ContextCompat.getDrawable(context, resId);
+        }
+
+        @Override
+        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            int left = parent.getPaddingLeft();
+            int right = parent.getWidth() - parent.getPaddingRight();
+
+            int childCount = parent.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View child = parent.getChildAt(i);
+
+                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+
+                int top = child.getBottom() + params.bottomMargin;
+                int bottom = top + divider.getIntrinsicHeight();
+
+                divider.setBounds(left, top, right, bottom);
+                divider.draw(c);
+            }
+        }
+
+
     }
 }

@@ -6,22 +6,32 @@ import java.util.Date;
 import static java.text.DateFormat.getDateInstance;
 
 public abstract class DBItem {
-    public static final int TABLE_ASSET = 101;
-    public static final int TABLE_CARD_INFO = 102;
-    public static final int TABLE_CATEGORY = 103;
-    public static final int TABLE_LEARN = 104;
-    public static final int TABLE_FRANCHISEE_CODE = 105;
-    public static final int TABLE_TRANSACTIONS = 106;
-    public static final int TABLE_TRANSACTIONS_VIEW = 107;
-    static final int ASSET = 201;
-    static final int CATEGORY = 202;
-    static final int SETTINGS = 203;
-    static final int A_Trans0_History_Header = 204;
-    static final int A_Trans0_History_Content = 205;
-    static final int B_Manage0_acc_Asset = 206;
+    public static final int TYPE_ASSET = 101;
+    public static final int TYPE_CARD_INFO = 102;
+    public static final int TYPE_CATEGORY = 103;
+    public static final int TYPE_LEARN = 104;
+    public static final int TYPE_FRANCHISEE_CODE = 105;
+    public static final int TYPE_TRANSACTIONS = 106;
+    public static final int TYPE_TRANSACTIONS_VIEW = 107;
+    public static final int TYPE_DATA_RECIPIENT = 106;
+    public static final int TYPE_DATA_TRANSACTIONS = 107;
+    public static final int TYPE_DATE_HEADER = 108;
+    public static final int TYPE_ASSET_SUMMARY = 109;
+    public static final int TYPE_CATEGORY_SUMMARY = 110;
 
+
+
+
+    //int context;
     int tableId;
+
+    /*
+    DBItem(int context) {
+        this.context = context;
+    }
+*/
     abstract int getType();
+    //int getContext(){ return context;}
 
     static class AssetItem extends DBItem{
         int assetType;
@@ -35,8 +45,12 @@ public abstract class DBItem {
 
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_ASSET;
         }
+/*
+        AssetItem(int context){
+            super(context);
+        }*/
     }
 
     static class CardInfoItem extends DBItem{
@@ -56,8 +70,12 @@ public abstract class DBItem {
 
         @Override
         int getType() {
-            return TABLE_CARD_INFO;
+            return TYPE_CARD_INFO;
         }
+/*
+        CardInfoItem(int context){
+            super(context);
+        }*/
     }
 
     static class CategoryItem extends DBItem{
@@ -69,8 +87,12 @@ public abstract class DBItem {
 
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_CATEGORY;
         }
+
+      /*  CategoryItem(int context){
+            super(context);
+        }*/
     }
     static class LearnItem extends DBItem{
         String recipientName;
@@ -84,15 +106,23 @@ public abstract class DBItem {
 
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_LEARN;
         }
+/*
+        LearnItem(int context){
+            super(context);
+        }*/
     }
     static class FranchiseeItem extends DBItem{
         String name;
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_FRANCHISEE_CODE;
         }
+
+       /* FranchiseeItem(int context){
+            super(context);
+        }*/
     }
     static class TransactionsItem extends DBItem{
         long transactionTime;
@@ -109,106 +139,91 @@ public abstract class DBItem {
 
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_TRANSACTIONS;
         }
+
+       /* TransactionsItem(int context){
+            super(context);
+        }*/
     }
+
     static class TransactionsViewItem extends DBItem{
         long transactionTime;
         float amount;
+        int assetId;
+        String assetName;
         int categoryId;
         int categoryLevel;
         String categoryName;
         String parentCategoryName;
-        int assetId;
-        String assetName;
         String recipientName;
-        float rewardCalculated;
+        float rewardCalculated = 1.175494e-38F;
 
         @Override
         int getType() {
-            return TABLE_ASSET;
+            return TYPE_TRANSACTIONS_VIEW;
         }
+
+        /*TransactionsViewItem(int context){
+            super(context);
+        }*/
     }
 
 
-    //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
-    static class assetItem extends DBItem{
-        int id;
-        String name;
-        int assetType = 1;
-        int cardId;
-        float balance;
-        int withdrawalAccount;
-        int withdrawalDay;
-        String nickname;
-
-        @Override
-        int getType() {
-            return ASSET;
-        }
-
-    }
-    static class categoryItem extends DBItem {
-        int id;
-        String name;
-
-        @Override
-        int getType() {
-            return CATEGORY;
-        }
-    }
-    static class settingsItem extends DBItem{
-        int id;
-        String name;
-
-        @Override
-        int getType() {
-            return SETTINGS;
-        }
-    }
-
-    static class HeaderItem extends DBItem {
-        long transactionTime;
-        DateFormat df = getDateInstance(DateFormat.MEDIUM);
-        Date date = new Date();
-        String format;
-
-        @Override
-        int getType() {
-            return A_Trans0_History_Header;
-        }
-    }
-
-    static class ContentItem extends DBItem {
-        int transId;
+    public static class ItemRecipient extends DBItem{ // May be Franchisee Table or Learn Table
+        int recipientId;
         String recipientName;
-        String assetName;
-        String categoryName;
-        String parentCategoryName;
+        int rewardExceptions;
+        int conditiontype =0;   //전월실적(b), 당월 실적(c)
+        float conditionAmount = 0;
+        int rewardType = 0 ;       //p(oint), d(iscount)
+        float rewardPercent = 0;    //0.7
+
+        @Override
+        int getType() {
+            return TYPE_DATA_RECIPIENT;
+        }
+
+       /* ItemRecipient(int context){
+            super(context);
+        }*/
+    }
+    public static class ItemTransactions extends DBItem{    //Combination of tables
+        boolean isUpdate = false;
+        boolean learn;
+
+        int transactionId;
+        int categoryId = 0;
+        String categoryName = null;
+        long transactionTime = 0L;
         float amount;
-        int categoryLevel;
+        int assetId = 0;
+        int assetType;
+        String assetName = null;
+        int withdrawlDay = 0;
+        int withdrawlAccount = 0;
+        int cardId = 0;
+        float balance;
+        int franchiseeId = 0;
+        String recipname = " ";
+        float rewardAmount;
+        float rewardAmountCalculated;
+        int rewardType;//'P'oint 'D'iscount
+        String notes = " ";
+        int budgetException = 0;
+        int rewardException;
+        int conditionType;   //전월실적 당월실적
+        float conditionAmount;
 
-        //amount, recipient, account, category
+
         @Override
         int getType() {
-            return A_Trans0_History_Content;
+            return TYPE_DATA_TRANSACTIONS;
         }
-    }
 
-
-
-    public static class ItemPerAcc extends DBItem{
-        String assetName;
-
-        float amountIn;
-        float amountOut;
-        float amountRemain;
-        float reward = 0;
-
-        @Override
-        int getType() {
-            return B_Manage0_acc_Asset;
-        }
+/*        ItemTransactions(int context){
+            super(context);
+        }*/
     }
 
 }

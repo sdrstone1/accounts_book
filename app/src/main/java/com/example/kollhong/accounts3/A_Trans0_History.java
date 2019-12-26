@@ -27,6 +27,8 @@ import java.util.*;
 
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
+//import com.example.kollhong.accounts3.DBItem.*;
+import com.example.kollhong.accounts3.RecyclerItem.*;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -41,7 +43,7 @@ public class A_Trans0_History extends Fragment {
     int month;
 
 //    List<ItemVO> list;
-    zRecyclerAdapt_Gen.recyclerAdapter transAdapter;
+    zRecyclerAdapt_Gen.RecyclerAdapter transAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -154,8 +156,8 @@ public class A_Trans0_History extends Fragment {
         //날짜를 안다 하루씩 빼가면서 찾기
         //하루가 지날 때마다 날짜 헤더 표시하기
         //list = new ArrayList<>();
-        List<zDBScheme.TransactionsViewItem> transactionHistory;
-        List<zRecyclerAdapt_Gen.recyclerItem> recyclerItems = new ArrayList<>();
+        List<DBItem.TransactionsViewItem> transactionHistoryList;
+        List<RecyclerItem> recyclerItemList = new ArrayList<>();
         for (int day2 = max_day; day2 >= min_day; day2--) {
             calendar.set(Calendar.DAY_OF_MONTH, day2);
 
@@ -165,31 +167,25 @@ public class A_Trans0_History extends Fragment {
             today2359 = calendar2.getTimeInMillis() - 1l;
             calendar2.setTimeInMillis(today2359);
 
-            transactionHistory = mDB.getTransHistory(today00, today2359);
-            ListIterator iterator = transactionHistory.listIterator();
-            zDBScheme.TransactionsViewItem transactionsViewItem;
+            transactionHistoryList = mDB.getTransHistory(today00, today2359);
+            ListIterator iterator = transactionHistoryList.listIterator();
+            DBItem.TransactionsViewItem transactionsViewItem;
 
             if(iterator.hasNext()) {
-                zRecyclerAdapt_Gen.HeaderItem headerItem = new zRecyclerAdapt_Gen.HeaderItem();
-                headerItem.transactionTime = today00;
-                recyclerItems.add(headerItem);       //거래 날짜 표시
+                dateHeaderItem HeaderItem = new dateHeaderItem();
+                HeaderItem.transactionTime = today00;
+                recyclerItemList.add(HeaderItem);       //거래 날짜 표시
 
                 while (iterator.hasNext()) {
-                    zRecyclerAdapt_Gen.ContentItem item = new zRecyclerAdapt_Gen.ContentItem();
-                    transactionsViewItem = (zDBScheme.TransactionsViewItem) iterator.next();
-                    item.transId = transactionsViewItem.tableId;
-                    item.amount = transactionsViewItem.amount;
-                    item.recipientName = transactionsViewItem.recipientName;
-                    item.categoryLevel = transactionsViewItem.categoryLevel;
-                    item.categoryName = transactionsViewItem.categoryName;
-                    item.parentCategoryName = transactionsViewItem.parentCategoryName;
-                    item.assetName = transactionsViewItem.assetName;
-                    recyclerItems.add(item);
+                    transactionsViewItem = (DBItem.TransactionsViewItem) iterator.next();
+                    HistoryContentItem item = new HistoryContentItem();
+                    item.item = transactionsViewItem;
+                    recyclerItemList.add(item);
                 }
             }
         }
 
-        transAdapter = new zRecyclerAdapt_Gen.recyclerAdapter(getActivity(), recyclerItems,new TransactionClickListener());
+        transAdapter = new zRecyclerAdapt_Gen.RecyclerAdapter(getActivity(), recyclerItemList,new TransactionClickListener());
         recyclerView.setAdapter(transAdapter);
         DividerItemDecoration divider = new DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
@@ -200,10 +196,10 @@ public class A_Trans0_History extends Fragment {
         @Override
         public void onClick(View v) {
 
-            zRecyclerAdapt_Gen.ContentItem contentItem = (zRecyclerAdapt_Gen.ContentItem) v.getTag();
-            Log.e("Updating Trans, ", "trans_id : " + contentItem.transId);
+            HistoryContentItem contentItem = (HistoryContentItem) v.getTag();
+            Log.e("Updating Trans, ", "trans_id : " + contentItem.item.tableId);
             Intent intent = new Intent(getContext(), w_Add_Tran.class);
-            intent.putExtra("UpdateTrans", contentItem.transId);
+            intent.putExtra("UpdateTrans", contentItem.item.tableId);
             startActivity(intent);
         }
     }

@@ -98,7 +98,7 @@ public class v_Settings2_acc extends AppCompatActivity {
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        zRecyclerAdapt_Gen.recyclerAdapter assetAdapter = new zRecyclerAdapt_Gen.recyclerAdapter(this, assetItemList,new assetOnClickListener());
+        zRecyclerAdapt_Gen.RecyclerAdapter assetAdapter = new zRecyclerAdapt_Gen.RecyclerAdapter(this, assetItemList,new assetOnClickListener());
         recyclerView.setAdapter(assetAdapter);
         assetAdapter.notifyDataSetChanged();
 

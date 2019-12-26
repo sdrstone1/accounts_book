@@ -15,6 +15,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.example.kollhong.accounts3.zDBScheme.*;
 import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.ASSET_TYPE;
 import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.*;
+import com.example.kollhong.accounts3.DBItem.*;
 
 /**
  * Created by KollHong on 01/05/2018.
@@ -86,7 +87,11 @@ public class zDBMan {
                 DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
                 DBtransactionsItem.assetId = cursor.getInt(cursor.getColumnIndex(ASSET_ID));
                 DBtransactionsItem.assetName = cursor.getString(cursor.getColumnIndex(ASSET_NAME));
-                DBtransactionsItem.rewardCalculated = cursor.getFloat(cursor.getColumnIndex(REWARD_CACULATED));
+
+                int index = cursor.getColumnIndexOrThrow(REWARD_CACULATED);
+                if( index != -1){
+                    DBtransactionsItem.rewardCalculated = cursor.getFloat(index);
+                }
 
                 DBtransactionsItemList.add(DBtransactionsItem);
             }

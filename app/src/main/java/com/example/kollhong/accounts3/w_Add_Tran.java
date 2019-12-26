@@ -41,6 +41,7 @@ import static com.example.kollhong.accounts3.zDBScheme.CARD_INFO_TABLE.*;
 import static java.text.DateFormat.getDateInstance;
 import static java.text.DateFormat.getDateTimeInstance;
 import static java.text.DateFormat.getTimeInstance;
+import static com.example.kollhong.accounts3.DBItem.*;
 
 public class w_Add_Tran extends AppCompatActivity {
 
@@ -54,7 +55,7 @@ public class w_Add_Tran extends AppCompatActivity {
 
     VisibleControlView VCV;
     zDBMan mDB;
-    zDBScheme.ItemTransactions itemTransactions;
+    ItemTransactions itemTransactions;
 
     Calendar calendar = Calendar.getInstance();
     DateFormat df = getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
@@ -108,7 +109,7 @@ public class w_Add_Tran extends AppCompatActivity {
         VCV = new VisibleControlView();
 
         mDB = new zDBMan(this, true);
-        itemTransactions = new zDBScheme.ItemTransactions();
+        itemTransactions = new ItemTransactions();
 
         itemTransactions.transactionTime = calendar.getTimeInMillis();
 
@@ -330,8 +331,8 @@ public class w_Add_Tran extends AppCompatActivity {
         RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
 
-        zRecyclerAdapt_Gen.recyclerAdapter bottomsheetAdapter
-                = new zRecyclerAdapt_Gen.recyclerAdapter(this,contentValuesList, clickListener);
+        zRecyclerAdapt_Gen.RecyclerAdapter bottomsheetAdapter
+                = new zRecyclerAdapt_Gen.RecyclerAdapter(this,contentValuesList, clickListener);
 
         recyclerView.setAdapter(bottomsheetAdapter);
 

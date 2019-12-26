@@ -1,14 +1,8 @@
 package com.example.kollhong.accounts3;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -31,9 +25,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 
-import static android.view.View.GONE;
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
-import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.*;
+import com.example.kollhong.accounts3.DBItem.*;
+import com.example.kollhong.accounts3.RecyclerItem.*;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -45,7 +38,7 @@ public class B_Manage1_stat extends Fragment {
 
     zDBMan mDB;
 
-    List<ItemperCat> catItems = new ArrayList<>();
+    List<RecyclerItem> catSummaryItemList = new ArrayList<>();
 
 
     @Override
@@ -104,8 +97,9 @@ public class B_Manage1_stat extends Fragment {
 //리스트로 차트 만들기
     public void makePieChart(){
         List<PieEntry> entries = new ArrayList<>();
-        for(int i = 0 ; i < catItems.size() ; i++ ) {
-            entries.add( new PieEntry(catItems.get(i).amount,catItems.get(i).acc_name));
+        for(int i = 0; i < catSummaryItemList.size() ; i++ ) {
+            CategorySummaryItem categorySummaryItem = (CategorySummaryItem) catSummaryItemList.get(i);
+            entries.add( new PieEntry(categorySummaryItem.amount, categorySummaryItem.assetName));
 
         }
         Context context = getContext();
@@ -134,7 +128,7 @@ public class B_Manage1_stat extends Fragment {
     }
 
     public void makeRecyclerView() {
-        List<TransItem> transItems = new ArrayList<>();
+        List<RecyclerItem> recyclerItemList = new ArrayList<>();
         Calendar calendar2 = Calendar.getInstance();
 
         TextView dateView = getView().findViewById(R.id.dateView);
@@ -158,161 +152,42 @@ public class B_Manage1_stat extends Fragment {
         long nextMonth = calendar2.getTimeInMillis() - 1l;
 
 
-        catItems.clear();
-        List<ContentValues> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
+        catSummaryItemList.clear();
+        List<TransactionsViewItem> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
         ListIterator valuesListIter = valuesList.listIterator();
 
         long list[] = {0l};
-
+        int catId = -1;
+        float amount = 0;
         while (valuesListIter.hasNext()) {
-            ContentValues values = (ContentValues) valuesListIter.next();
+            TransactionsViewItem values = (TransactionsViewItem) valuesListIter.next();
+            if (values.categoryId != catId) {
+                CategorySummaryItem summaryItem = new CategorySummaryItem();
 
-            TransItem transItem = new TransItem();
-            //t._id, t.categoryid, c.name, t.amount
-            transItem.trans_id = values.getAsLong(TABLE_ID);
-            transItem.cat_id = values.getAsLong(CATEGORY_ID);
-            transItem.cat_name = values.getAsString(CATEGORY_NAME);
-            transItem.amount = values.getAsFloat(AMOUNT);
-            transItems.add(transItem);
-        }
+                summaryItem.assetName = values.categoryName;
+                summaryItem.amount = amount;
 
-        long name = -1;
+                catSummaryItemList.add(summaryItem);
 
-        for (int i = 0; i < transItems.size(); i++) {
-            if (transItems.get(i).cat_id != name) {
-                ItemperCat itemPerCat = new ItemperCat();
-
-                itemPerCat.acc_name = transItems.get(i).cat_name;
-                catItems.add(itemPerCat);
-                name = transItems.get(i).cat_id;
-
+                catId = values.categoryId;
+                amount = 0;
             }
 
-            catItems.get(catItems.size() - 1).amount += transItems.get(i).amount;
-
-
+            amount += values.amount;
         }
+
 
 
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        Myadapter myadapter = new Myadapter(catItems);
+        zRecyclerAdapt_Gen.RecyclerAdapter myadapter = new zRecyclerAdapt_Gen.RecyclerAdapter(getActivity(),catSummaryItemList,null);
         recyclerView.setAdapter(myadapter);
-        DividerItemDecoration divider = new DividerItemDecoration(getContext());
+        zRecyclerAdapt_Gen.DividerItemDecoration divider = new zRecyclerAdapt_Gen.DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
         myadapter.notifyDataSetChanged();
 
     }
 
-    public class TransItem{
-        long trans_id;
-        long cat_id;
-        String cat_name;
-        float amount;
-    }
-
-    public class ItemperCat {
-        String acc_name;
-        float amount;
-        //float amount_out;
-        //float amount_rem;
-
-    }
-
-    private class Myadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-        private final List<ItemperCat> list;
-
-        public Myadapter(List<ItemperCat> list){
-            this.list=list;
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        @NonNull
-        @Override           //한번만 실행
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.b_manage_frag0_recycler, parent, false);
-            return new Myadapter.accHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-
-            ItemperCat itemVO = list.get(position);
-
-            Myadapter.accHolder accHolder =  (Myadapter.accHolder) holder;
-
-            accHolder.name.setText(itemVO.acc_name);
-            //accHolder.income.setText(String.valueOf(itemVO.amount_in));
-            accHolder.expense.setText(String.valueOf(itemVO.amount));
-            //accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
-
-
-        }
-
-        public class accHolder extends RecyclerView.ViewHolder {
-            TextView name;
-            //TextView income;
-            TextView expense;
-            //TextView remittance;
-
-            public accHolder(View v) {
-                super(v);
-                name = v.findViewById(R.id.acc_name);
-                v.findViewById(R.id.income).setVisibility(View.INVISIBLE);
-                expense = v.findViewById(R.id.expense);
-                v.findViewById(R.id.remittance).setVisibility(View.INVISIBLE);
-                v.findViewById(R.id.inc).setVisibility(View.INVISIBLE);
-                v.findViewById(R.id.remmi).setVisibility(View.INVISIBLE);
-            }
-        }
-    }
-
-    public class DividerItemDecoration extends RecyclerView.ItemDecoration {
-
-        private  final int[] ATTRS = new int[]{android.R.attr.listDivider};
-
-        private Drawable divider;
-
-        /**
-         * Default divider will be used
-         */
-        public DividerItemDecoration(Context context) {
-            final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
-            divider = styledAttributes.getDrawable(0);
-            styledAttributes.recycle();
-        }
-
-        /**
-         * Custom divider will be used
-         */
-        public DividerItemDecoration(Context context, int resId) {
-            divider = ContextCompat.getDrawable(context, resId);
-        }
-
-        @Override
-        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-            int left = parent.getPaddingLeft();
-            int right = parent.getWidth() - parent.getPaddingRight();
-
-            int childCount = parent.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View child = parent.getChildAt(i);
-
-                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-                int top = child.getBottom() + params.bottomMargin;
-                int bottom = top + divider.getIntrinsicHeight();
-
-                divider.setBounds(left, top, right, bottom);
-                divider.draw(c);
-            }
-        }
-    }
 
 
 }

@@ -69,13 +69,13 @@ public class U_Widget extends AppWidgetProvider {
             color_blue = context.getResources().getColor(android.R.color.holo_blue_light);
         }
 
-        List<ContentValues> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
+        List<DBItem.TransactionsViewItem> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
         ListIterator ListIter = valuesList.listIterator();
 
 
         while(ListIter.hasNext()){
-            ContentValues values = (ContentValues) ListIter.next();
-            amount += values.getAsFloat(AMOUNT);
+            DBItem.TransactionsViewItem values = (DBItem.TransactionsViewItem) ListIter.next();
+            amount += values.amount;
         }
 
         views.setTextViewText(R.id.expense, amount+"");

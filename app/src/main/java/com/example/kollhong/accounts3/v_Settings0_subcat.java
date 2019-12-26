@@ -2,7 +2,6 @@ package com.example.kollhong.accounts3;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +20,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by KollHong on 01/06/2018.
@@ -157,149 +157,91 @@ public class v_Settings0_subcat extends AppCompatActivity {
         finish();
     }
 
-    private void Category_Recycler(Cursor cursor) {
-        List<zDBMan.ItemCat> itemCats = new ArrayList<>();
+    private void Category_Recycler(List<DBItem.CategoryItem> contentList) {
+        List<RecyclerItem> recyclerItemList = new ArrayList<>();
+        ListIterator<DBItem.CategoryItem> contentListIterator = contentList.listIterator();
+        DBItem.CategoryItem content;
+
         RecyclerView recyclerView = findViewById(R.id.pref_categories_edit_recycler);
 
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                zDBMan.ItemCat item = mDB.getItemCat();
-                item.id = cursor.getLong(0);
-                item.name = cursor.getString(1);
-                itemCats.add(item);
-            }
+        while (contentListIterator.hasNext()) {
+            content = contentListIterator.next();
+            RecyclerItem.CategorySettingsItem item = new RecyclerItem.CategorySettingsItem();
+            item.nameOnlyItem.tableId = content.tableId;
+            item.nameOnlyItem.name = content.name;
+            recyclerItemList.add(item);
         }
-        cursor.close();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Category_adapter categoryadapter = new Category_adapter(itemCats);
+        zRecyclerAdapt_Gen.RecyclerAdapter categoryadapter = new zRecyclerAdapt_Gen.RecyclerAdapter(this,recyclerItemList,new categoryClickListener());
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();
     }
 
-    private  class Category_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        List<zDBMan.ItemCat> items;
-        Category_adapter(List<zDBMan.ItemCat> item2) {
-            items = item2;
-        }
+
+
+    private class categoryClickListener implements View.OnClickListener{
+
         String name;
-        long idL;
+        int tableId;
         EditText editText;
 
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
-            return new Category_adapter.categoryNameHolder(view);
-        }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            final zDBMan.ItemCat itemcat = items.get(position);
+        public void onClick(View v) {//
+            //텍스트의 이름과 번호 받아서 다이얼로그 생성
+            TextView view = (TextView) v;
 
+            tableId = Integer.parseInt((view.getTag().toString()));
+            name = String.valueOf(view.getText());
+            //TODO 이름 변경 팝업 띄우기
 
-            Category_adapter.categoryNameHolder newholder = (Category_adapter.categoryNameHolder) holder;
-            newholder.textView.setText(itemcat.name);
-            View v = newholder.textView;
-            v.setTag(itemcat.id+"");
-            newholder.textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {       //
-                    //텍스트의 이름과 번호 받아서 다이얼로그 생성
-                    TextView view = (TextView) v;
-
-
-                    idL = Long.parseLong( view.getTag().toString());
-
-                    name = String.valueOf(view.getText());
-                    //TODO 이름 변경 팝업 띄우기
-
-
-                    buildDialog();
-
-
-                }
-
-                private void buildDialog() {
-                    View view =  getLayoutInflater().inflate(R.layout.v_pref0_categories_edit_diag,null);
-                    editText = view.findViewById(R.id.diag_text);
-                    editText.setText(name);
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings0_subcat.this);
-                    builder.setTitle(R.string.title_frag_settings_name_update);
-                    builder.setCancelable(true);
-
-                    builder.setView(view);
-
-                    builder.setPositiveButton(R.string.title_alertdialog_update_button,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    SaveinDialog();
-                                    dialog.cancel();
-                                }
-
-                                private void SaveinDialog() {
-                                    name = String.valueOf(editText.getText());
-                                    mDB.updateCat(idL,name);
-                                    String name = mDB.getCategoryName(cat_id);
-                                    Category_Recycler(mDB.getChildCategoryList(name));
-
-                                }
-                            });
-
-                    builder.setNegativeButton(R.string.title_alertdialog_cancel_button,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.setNeutralButton(R.string.delete,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mDB.deleteCat(idL);
-                                    dialog.dismiss();
-                                }
-                            });
-
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                }
-
-            });
+            buildDialog();
         }
 
-        @Override
-        public int getItemCount() {
-//                return 4;
-            return items.size();
+        private void buildDialog() {
+            View view = getLayoutInflater().inflate(R.layout.v_pref0_categories_edit_diag, null);
+            editText = view.findViewById(R.id.diag_text);
+            editText.setText(name);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings0_subcat.this);
+            builder.setTitle(R.string.title_frag_settings_name_update);
+            builder.setCancelable(true);
+
+            builder.setView(view);
+
+            builder.setPositiveButton(R.string.title_alertdialog_update_button,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            SaveinDialog();
+                            dialog.cancel();
+                        }
+
+                        private void SaveinDialog() {
+                            name = String.valueOf(editText.getText());
+                            mDB.updateCat(tableId, name);
+                            String name = mDB.getCategoryName(cat_id);
+                            Category_Recycler(mDB.getChildCategoryList(name));
+
+                        }
+                    });
+
+            builder.setNegativeButton(R.string.title_alertdialog_cancel_button,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            builder.setNeutralButton(R.string.delete,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mDB.deleteCat(tableId);
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
-
-        public class categoryNameHolder extends RecyclerView.ViewHolder {
-            TextView textView;
-
-            public categoryNameHolder(View v) {
-                super(v);
-                textView = (TextView) v.findViewById(R.id.add_tran_category_name);
-                Point point = new Point();
-                Display display = getWindowManager().getDefaultDisplay();
-                int rotation = display.getRotation();
-                display.getSize(point );
-
-                /*
-                float density  = getResources().getDisplayMetrics().density;
-                float dpHeight = outMetrics.heightPixels / density;
-                float dpWidth  = outMetrics.widthPixels / density;
-*/
-                ViewGroup.LayoutParams params = v.getLayoutParams();
-
-
-                if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-                    params.width = point.x;
-
-                else params.width = point.y ;
-            }
-        }
-
     }
 }

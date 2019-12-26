@@ -98,53 +98,17 @@ public final class zDBScheme {
     public static final class TRANSACTIONS_VIEW {
         public static final String TRANSACTON_TIME = "transacton_time";
         public static final String AMOUNT = "amount";
+        public static final String ASSET_ID = "asset_id";
+        public static final String ASSET_NAME = "asset_name";
         public static final String CATEGORY_ID = "category_id";
         public static final String CATEGORY_LEVEL = "category_level";
         public static final String CATEGORY_NAME = "category_name";
         public static final String PARENT_CATEGORY_NAME = "parent_category_name";
-        public static final String ASSET_ID = "asset_id";
-        public static final String ASSET_NAME = "asset_name";
         public static final String RECIPIENT = "recipient";
         public static final String REWARD_CACULATED = "reward_caculated";
     }
 
-    public static class ItemRecipient {
-        int recipientId;
-        String recipientName;
-        int rewardExceptions;
-        int conditiontype =0;   //전월실적(b), 당월 실적(c)
-        float conditionAmount = 0;
-        int rewardType = 0 ;       //p(oint), d(iscount)
-        float rewardPercent = 0;    //0.7
-    }
 
-    public static class ItemTransactions {
-        boolean isUpdate = false;
-
-        int transactionId;
-        int categoryId = 0;
-        String categoryName = null;
-        long transactionTime = 0L;
-        float amount;
-        int assetId = 0;
-        int assetType;
-        String assetName = null;
-        int withdrawlDay = 0;
-        int withdrawlAccount = 0;
-        int cardId = 0;
-        float balance;
-        int franchiseeId = 0;
-        String recipname = " ";
-        float rewardAmount;
-        float rewardAmountCalculated;
-        int rewardType;//'P'oint 'D'iscount
-        String notes = " ";
-        int budgetException = 0;
-        int rewardException;
-        int conditionType;   //전월실적 당월실적
-        float conditionAmount;
-        boolean learn;
-    }
 
 
     static class zDbIO {
