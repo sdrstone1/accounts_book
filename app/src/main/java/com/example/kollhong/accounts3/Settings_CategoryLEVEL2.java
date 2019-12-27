@@ -2,34 +2,29 @@ package com.example.kollhong.accounts3;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by KollHong on 01/06/2018.
  */
 
-public class v_Settings0_subcat extends AppCompatActivity {
-    zDBMan mDB;
+public class Settings_CategoryLEVEL2 extends AppCompatActivity {
+    DB_Controll mDB;
 
-    long cat_id;
+    int cat_id;
     int cat_level;
     TextView namefield;
 
@@ -40,9 +35,9 @@ public class v_Settings0_subcat extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.v_pref0_categories_edit);
-        cat_id = getIntent().getLongExtra("id", 0);
+        cat_id = getIntent().getIntExtra("id", 0);
 
-        mDB = new zDBMan(getApplicationContext(),true);
+        mDB = new DB_Controll(getApplicationContext(),true);
         cat_level =mDB.getCatLevel(cat_id);
 
         String name = mDB.getCategoryName(cat_id);
@@ -54,7 +49,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
         Category_Recycler(mDB.getChildCategoryList(name));
 
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.cat_fab);
+        final FloatingActionButton fab =  findViewById(R.id.cat_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,7 +57,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
                 final EditText editText = listener.findViewById(R.id.diag_text);
                 editText.setHint(R.string.title_frag_settings_name_add_hint);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings0_subcat.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Settings_CategoryLEVEL2.this);
                 builder.setTitle(R.string.title_frag_settings_name_add);
                 builder.setCancelable(true);
 
@@ -120,7 +115,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
         else if(id == R.id.itemDelete){
 
 
-            AlertDialog.Builder builder2 = new AlertDialog.Builder(v_Settings0_subcat.this);
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(Settings_CategoryLEVEL2.this);
             builder2.setTitle(R.string.deleteask);
             builder2.setMessage(R.string.deleteaskmsg);
             builder2.setCancelable(true);
@@ -159,13 +154,12 @@ public class v_Settings0_subcat extends AppCompatActivity {
 
     private void Category_Recycler(List<DBItem.CategoryItem> contentList) {
         List<RecyclerItem> recyclerItemList = new ArrayList<>();
-        ListIterator<DBItem.CategoryItem> contentListIterator = contentList.listIterator();
-        DBItem.CategoryItem content;
+        //ListIterator<DBItem.CategoryItem> contentListIterator = contentList.listIterator();
+
 
         RecyclerView recyclerView = findViewById(R.id.pref_categories_edit_recycler);
 
-        while (contentListIterator.hasNext()) {
-            content = contentListIterator.next();
+        for(DBItem.CategoryItem content : contentList){
             RecyclerItem.CategorySettingsItem item = new RecyclerItem.CategorySettingsItem();
             item.nameOnlyItem.tableId = content.tableId;
             item.nameOnlyItem.name = content.name;
@@ -173,7 +167,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        zRecyclerAdapt_Gen.RecyclerAdapter categoryadapter = new zRecyclerAdapt_Gen.RecyclerAdapter(this,recyclerItemList,new categoryClickListener());
+        Recycler_Adapter.RecyclerAdapter categoryadapter = new Recycler_Adapter.RecyclerAdapter(this,recyclerItemList,new categoryClickListener());
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();
     }
@@ -204,7 +198,7 @@ public class v_Settings0_subcat extends AppCompatActivity {
             editText = view.findViewById(R.id.diag_text);
             editText.setText(name);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings0_subcat.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(Settings_CategoryLEVEL2.this);
             builder.setTitle(R.string.title_frag_settings_name_update);
             builder.setCancelable(true);
 

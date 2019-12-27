@@ -1,16 +1,16 @@
 package com.example.kollhong.accounts3;
 
-import java.text.DateFormat;
-import java.util.Date;
+import android.util.Log;
 
-import static java.text.DateFormat.getDateInstance;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class DBItem {
     public static final int TYPE_ASSET = 101;
     public static final int TYPE_CARD_INFO = 102;
     public static final int TYPE_CATEGORY = 103;
     public static final int TYPE_LEARN = 104;
-    public static final int TYPE_FRANCHISEE_CODE = 105;
+    public static final int TYPE_DATA_NAME_ONLY = 105;
     public static final int TYPE_TRANSACTIONS = 106;
     public static final int TYPE_TRANSACTIONS_VIEW = 107;
     public static final int TYPE_DATA_RECIPIENT = 106;
@@ -53,29 +53,104 @@ public abstract class DBItem {
         }*/
     }
 
-    static class CardInfoItem extends DBItem{
+    static class CardInfoItem extends DBItem {
         String company;
         String cardName;
         int assetType;
         String rewardExceptions;//10003:10050
         String rewardSections;//b10:c90
-        String franchisee_1;//10050:50000
-        String amount_1;//0.8p
-        String franchisee_2;
-        String amount_2;//1.2d
-        String franchisee_3;
-        String amount_3;
-        String franchisee_4;
-        String amount_4;
+        String[] franchisee = {};//10050:50000
+        String[] amount = {};//0.8p
+        /*
+                String franchisee_1;//10050:50000
+                String amount_1;//0.8p
+                String franchisee_2;
+                String amount_2;//1.2d
+                String franchisee_3;
+                String amount_3;
+                String franchisee_4;
+                String amount_4;
+                */
+        List<NameOnlyItem> rewardExceptionList = new ArrayList<>();
 
         @Override
         int getType() {
             return TYPE_CARD_INFO;
         }
-/*
-        CardInfoItem(int context){
-            super(context);
-        }*/
+
+        List<ItemRecipient> getRewardExceptionList(DB_Controll mDB) {
+            List<ItemRecipient> recipientList = new ArrayList<>();
+
+            String[] split = rewardExceptions.split(":");
+            int size = split.length;
+            for (String s : split) {     //10101, 20100
+                ItemRecipient recipient = new ItemRecipient();
+
+                recipient.tableId = Integer.parseInt(s);
+                recipient.recipientName = mDB.getFranchiseeName(recipient.tableId);
+                recipient.rewardExceptions = 1;
+                recipientList.add(recipient);
+            }
+            return recipientList;
+        }
+
+        List<ItemRecipient> getRewardRecipientList(DB_Controll mDB) {
+            List<ItemRecipient> recipientList = new ArrayList<>();
+
+            String[] split = rewardSections.split(":");
+            int size = split.length;
+            for (int i = 0; i < size; i++) {   //첫글자 따기 둘째 글자 따기 //b0, c5
+                int conditiontype = 0;
+                String condtype = split[i].substring(0, 1);
+                if (condtype.equals("b")) {
+                    conditiontype = 0;
+                } else if (condtype.equals("c")) {
+                    conditiontype = 1;
+                } else {
+                    Log.w("카드 정보 오류", "실적 조건 유형(전월 현월 파싱 오류.", null);
+                }
+                int conditionAmount = Integer.parseInt(split[i].substring(1));
+
+
+                String[] franchisee = this.franchisee[i].split(":");      //3,5번째.
+                String[] amount = this.amount[i].split(":");
+
+                int franchiseeLength = franchisee.length;
+
+
+                for (int j = 0; j < franchiseeLength; j++) {
+
+                    int recipientId;
+                    String rew = amount[j].substring(0, 1);
+                    int rewtype = 0;
+                    if (rew.equals("p")) {
+                        rewtype = 0;
+                    } else if (rew.equals("d")) {
+                        rewtype = 1;
+                    } else {
+                        Log.w("카드 정보 오류", "리워드 타입 파싱 오류. : " + rew, null);
+                    }
+
+                    float rewamount = Float.parseFloat(amount[j].substring(1));
+
+
+                    recipientId = Integer.parseInt(franchisee[j]);
+                    ItemRecipient itemRecipient = new ItemRecipient();
+                    itemRecipient.tableId = recipientId;
+                    itemRecipient.recipientName = mDB.getFranchiseeName(recipientId);
+                    itemRecipient.conditiontype = conditiontype;
+                    itemRecipient.conditionAmount = conditionAmount;
+                    itemRecipient.rewardPercent = rewamount;
+                    itemRecipient.rewardType = rewtype;
+                    recipientList.add(itemRecipient);
+                    Log.w("카드 정보", "리워드 : " + itemRecipient.rewardPercent + "", null);
+
+                }
+            }
+            return recipientList;
+        }
+
+
     }
 
     static class CategoryItem extends DBItem{
@@ -99,9 +174,9 @@ public abstract class DBItem {
         int categoryId;
         int assetId;
         int franchiseeId;
-        String budgetExceptions;
-        String rewardExceptions;
-        String rewardType;
+        int budgetException;
+        int rewardException;
+        int rewardType;
         float rewardPercent;
 
         @Override
@@ -113,17 +188,6 @@ public abstract class DBItem {
             super(context);
         }*/
     }
-    static class FranchiseeItem extends DBItem{
-        String name;
-        @Override
-        int getType() {
-            return TYPE_FRANCHISEE_CODE;
-        }
-
-       /* FranchiseeItem(int context){
-            super(context);
-        }*/
-    }
     static class TransactionsItem extends DBItem{
         long transactionTime;
         int categoryId;
@@ -132,9 +196,9 @@ public abstract class DBItem {
         String recipientName;
         String notes;
         int franchiseeId;
-        String budgetExceptions;
-        String rewardExceptions;
-        String rewardType;
+        int budgetException;
+        int rewardException;
+        int rewardType; //'P'oint 'D'iscount
         float rewardCalculated;
 
         @Override
@@ -170,8 +234,16 @@ public abstract class DBItem {
     }
 
 
+
+    static class NameOnlyItem extends DBItem{
+        String name;
+        @Override
+        int getType() {
+            return TYPE_DATA_NAME_ONLY;
+        }
+    }
+    
     public static class ItemRecipient extends DBItem{ // May be Franchisee Table or Learn Table
-        int recipientId;
         String recipientName;
         int rewardExceptions;
         int conditiontype =0;   //전월실적(b), 당월 실적(c)
@@ -205,7 +277,7 @@ public abstract class DBItem {
         int cardId = 0;
         float balance;
         int franchiseeId = 0;
-        String recipname = " ";
+        String recipientName = " ";
         float rewardAmount;
         float rewardAmountCalculated;
         int rewardType;//'P'oint 'D'iscount

@@ -10,13 +10,13 @@ import java.util.prefs.Preferences;
  * Created by KollHong on 14/04/2018.
  */
 
-public class zPrefMan {
+public class Preferences_Controll {
     Preferences mPrefs;
     private SharedPreferences mPref;
     private SharedPreferences.Editor mPrefEdit;
     Boolean init;
     Context context;
-    zPrefMan(Context appcontext){
+    Preferences_Controll(Context appcontext){
         context = appcontext;
         mPref = PreferenceManager.getDefaultSharedPreferences(context);
         //mPref = context.getSharedPreferences(Pref_name,Context.MODE_PRIVATE);
@@ -33,7 +33,7 @@ public class zPrefMan {
     void setInit(){
         mPrefEdit = mPref.edit();
         mPrefEdit.putBoolean("initialized", true);
-        mPrefEdit.commit();
+        mPrefEdit.apply();
     }
 
     boolean getSMSEnabled() {
@@ -49,11 +49,11 @@ public class zPrefMan {
     void setSMSRegistered(boolean set) {
         mPrefEdit = mPref.edit();
         mPrefEdit.putBoolean("SMSReg", set);
-        mPrefEdit.commit();
+        mPrefEdit.apply();
     }
     public void ClearSharedPref(){      //if(BuildConfig.isTest)
         mPrefEdit = mPref.edit();
         mPrefEdit.clear();
-        mPrefEdit.commit();
+        mPrefEdit.apply();
     }
 }

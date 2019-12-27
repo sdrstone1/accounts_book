@@ -7,43 +7,38 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
+import com.example.kollhong.accounts3.RecyclerItem.HistoryContentItem;
+import com.example.kollhong.accounts3.RecyclerItem.dateHeaderItem;
 
 import java.util.*;
 
-import static java.text.DateFormat.getDateInstance;
-import static java.text.DateFormat.getDateTimeInstance;
 //import com.example.kollhong.accounts3.DBItem.*;
-import com.example.kollhong.accounts3.RecyclerItem.*;
 
 /**
  * Created by KollHong on 25/03/2018.
  */
 
 
-public class A_Trans0_History extends Fragment {
+public class Transaction_History extends Fragment {
     Calendar calendar;
 
     TextView dateView;
-    zDBMan mDB;
+    DB_Controll mDB;
     int month;
 
 //    List<ItemVO> list;
-    zRecyclerAdapt_Gen.RecyclerAdapter transAdapter;
+    Recycler_Adapter.RecyclerAdapter transAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,7 +49,7 @@ public class A_Trans0_History extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull  View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         dateView = view.findViewById(R.id.dateView);
@@ -65,7 +60,7 @@ public class A_Trans0_History extends Fragment {
 
         calendar = Calendar.getInstance();
 
-        mDB = new zDBMan(getContext(), false);
+        mDB = new DB_Controll(getContext(), false);
 
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -164,7 +159,7 @@ public class A_Trans0_History extends Fragment {
             today00 = calendar.getTimeInMillis();
             calendar2.setTimeInMillis(today00);
             calendar2.add(Calendar.DAY_OF_MONTH, 1);
-            today2359 = calendar2.getTimeInMillis() - 1l;
+            today2359 = calendar2.getTimeInMillis() - 1L;
             calendar2.setTimeInMillis(today2359);
 
             transactionHistoryList = mDB.getTransHistory(today00, today2359);
@@ -185,7 +180,7 @@ public class A_Trans0_History extends Fragment {
             }
         }
 
-        transAdapter = new zRecyclerAdapt_Gen.RecyclerAdapter(getActivity(), recyclerItemList,new TransactionClickListener());
+        transAdapter = new Recycler_Adapter.RecyclerAdapter(getActivity(), recyclerItemList,new TransactionClickListener());
         recyclerView.setAdapter(transAdapter);
         DividerItemDecoration divider = new DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
@@ -198,7 +193,7 @@ public class A_Trans0_History extends Fragment {
 
             HistoryContentItem contentItem = (HistoryContentItem) v.getTag();
             Log.e("Updating Trans, ", "trans_id : " + contentItem.item.tableId);
-            Intent intent = new Intent(getContext(), w_Add_Tran.class);
+            Intent intent = new Intent(getContext(), TransactionAdd_Activity.class);
             intent.putExtra("UpdateTrans", contentItem.item.tableId);
             startActivity(intent);
         }

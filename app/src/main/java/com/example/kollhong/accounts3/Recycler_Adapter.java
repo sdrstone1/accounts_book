@@ -12,19 +12,18 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
+import com.example.kollhong.accounts3.RecyclerItem.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static java.text.DateFormat.getDateInstance;
-import com.example.kollhong.accounts3.RecyclerItem.*;
 import static com.example.kollhong.accounts3.RecyclerItem.*;
 
-public class zRecyclerAdapt_Gen {
+public class Recycler_Adapter {
 
 
-    zRecyclerAdapt_Gen(){
+    Recycler_Adapter(){
     }
 
 
@@ -113,24 +112,24 @@ public class zRecyclerAdapt_Gen {
                 holder.itemView.setTag(historyContentItem.item.tableId);
                 holder.itemView.setOnClickListener(listener);
 
-                if (historyContentItem.item.categoryLevel == 0l || historyContentItem.item.categoryLevel == 1l) { //0,1,2        3,4,5           6,7,8
+                if (historyContentItem.item.categoryLevel == 0 || historyContentItem.item.categoryLevel == 1) { //0,1,2        3,4,5           6,7,8
                     contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                } else if (historyContentItem.item.categoryLevel == 2l) {
+                } else if (historyContentItem.item.categoryLevel == 2) {
                     contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
                     contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
-                } else if (historyContentItem.item.categoryLevel == 3l || historyContentItem.item.categoryLevel == 4l) {
+                } else if (historyContentItem.item.categoryLevel == 3 || historyContentItem.item.categoryLevel == 4) {
                     contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                } else if (historyContentItem.item.categoryLevel == 5l) {
+                } else if (historyContentItem.item.categoryLevel == 5) {
                     contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
                     contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
-                } else if (historyContentItem.item.categoryLevel == 6l || historyContentItem.item.categoryLevel == 7l) {
+                } else if (historyContentItem.item.categoryLevel == 6 || historyContentItem.item.categoryLevel == 7) {
                     contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
                     contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
-                } else if (historyContentItem.item.categoryLevel == 8l) {
+                } else if (historyContentItem.item.categoryLevel == 8) {
 
                     contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
                     contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
@@ -199,7 +198,7 @@ public class zRecyclerAdapt_Gen {
 
             public settingsViewholder(View v) {
                 super(v);
-                textView = (TextView) v.findViewById(R.id.add_tran_category_name);
+                textView =  v.findViewById(R.id.add_tran_category_name);
 
                 Point point = new Point();
                 Display display = activity.getWindowManager().getDefaultDisplay();

@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.kollhong.accounts3.S_FirstLaunch$PlaceholderFragment">
+    tools:context="com.example.kollhong.accounts3.Splash_OneTimeInit$PlaceholderFragment">
 
     <RadioGroup
         android:id="@+id/radioGroup"

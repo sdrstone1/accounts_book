@@ -1,6 +1,7 @@
 package com.example.kollhong.accounts3;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by KollHong on 25/03/2018.
  */
 
-public class B_Manage extends Fragment {
+public class Statistics_View extends Fragment {
     private SectionsPagerAdapter MSectionsPagerAdapter;
     private ViewPager MViewPager;
 
@@ -32,27 +33,27 @@ public class B_Manage extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragList.add(new B_Manage0_Asset());
-        fragList.add(new B_Manage1_stat());
-        fragList.add(new B_Manage2_bud());
-        fragList.add(new B_Manage3_reci());
-        fragList.add((new B_Manage4_rew()));
+        fragList.add(new Statistics_Asset());
+        fragList.add(new Statistics_Category());
+        fragList.add(new Statistics_Budget());
+        fragList.add(new Statistics_Recipient());
+        fragList.add((new Statistics_Reward()));
 
         return inflater.inflate(R.layout.b_manage_frag, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 //        tab_num = getArguments().getInt("tab", 0);
 
         MFM =  getChildFragmentManager();
         MSectionsPagerAdapter = new SectionsPagerAdapter(MFM);
 
-        MViewPager = (ViewPager) getView().findViewById(R.id.manage_container);
+        MViewPager =  getView().findViewById(R.id.manage_container);
         MViewPager.setAdapter(MSectionsPagerAdapter);
 
-        tabLayout = (TabLayout) getView().findViewById(R.id.manage_tab);
+        tabLayout =  getView().findViewById(R.id.manage_tab);
         TabLayout.Tab tab = tabLayout.getTabAt(tab_num);
         //tabLayout.clearOnTabSelectedListeners();
 
@@ -92,10 +93,7 @@ public class B_Manage extends Fragment {
 
         @Override
         public Fragment getItem(int id) {
-
-            Fragment frag = fragList.get(id);
-
-            return frag;
+            return  fragList.get(id);
         }
 
         @Override

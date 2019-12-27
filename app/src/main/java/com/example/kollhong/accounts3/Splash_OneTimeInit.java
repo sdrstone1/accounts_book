@@ -2,27 +2,24 @@ package com.example.kollhong.accounts3;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.Toast;
-import com.example.kollhong.accounts3.R;
 
-public class S_FirstLaunch extends AppCompatActivity {
+public class Splash_OneTimeInit extends AppCompatActivity {
     int radio_checked = 0;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -61,14 +58,14 @@ public class S_FirstLaunch extends AppCompatActivity {
 
     public void onFinish(View view) {
         if(radio_checked == 2) {
-            zPrefMan mPref = new zPrefMan(getApplicationContext());
+            Preferences_Controll mPref = new Preferences_Controll(getApplicationContext());
             mPref.setInit();
             mPref.setSMSRegistered(true);
             getSMSPerm();
 
         }
         else if (radio_checked == 1) {
-            zPrefMan mPref = new zPrefMan(getApplicationContext());
+            Preferences_Controll mPref = new Preferences_Controll(getApplicationContext());
             mPref.setInit();
             mPref.setSMSRegistered(false);
             finish();
@@ -133,15 +130,13 @@ public class S_FirstLaunch extends AppCompatActivity {
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.s_first_launch_frag0, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.s_first_launch_frag0, container, false);
         }
     }
     public static class infoFragment extends  Fragment{
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootview = inflater.inflate(R.layout.s_first_launch_frag1, container,false);
-            return rootview;
+            return inflater.inflate(R.layout.s_first_launch_frag1, container,false);
         }
     }
 

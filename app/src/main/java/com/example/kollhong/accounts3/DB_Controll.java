@@ -6,22 +6,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import com.example.kollhong.accounts3.DBItem.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.kollhong.accounts3.zDBScheme.*;
-import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.ASSET_TYPE;
-import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.*;
-import com.example.kollhong.accounts3.DBItem.*;
+import static com.example.kollhong.accounts3.DB_Scheme.*;
+import static com.example.kollhong.accounts3.DB_Scheme.ASSET_TABLE.ASSET_TYPE;
+import static com.example.kollhong.accounts3.DB_Scheme.LEARN_TABLE.ASSET_ID;
+import static com.example.kollhong.accounts3.DB_Scheme.LEARN_TABLE.CATEGORY_ID;
+import static com.example.kollhong.accounts3.DB_Scheme.LEARN_TABLE.RECIPIENT;
+import static com.example.kollhong.accounts3.DB_Scheme.LEARN_TABLE.*;
+import static com.example.kollhong.accounts3.DB_Scheme.TRANSACTIONS_VIEW.*;
 
 /**
  * Created by KollHong on 01/05/2018.
  */
 
-public class zDBMan {
+public class DB_Controll {
     private SQLiteDatabase db;
     //여기서 읽기 쓰기 작업 모두 진행
     //여기서 디비 객체 선언
@@ -31,7 +34,7 @@ public class zDBMan {
 
 
 
-    zDBMan(Context context, boolean RW){
+    DB_Controll(Context context, boolean RW){
         db = context.openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null); //null of cursorFactory tells to use standard SQLiteCursor
     }
 
@@ -122,18 +125,18 @@ public class zDBMan {
         return DBtransactionsItemList;
     }
 
-    TransactionsViewItem getTransbyID(long id){
+    TransactionsItem getTransbyID(long id){
         Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, null, //select all columns
                 "? = '?' ", new String[] { TABLE_ID, Long.toString(id)}, null);
 
         if(cursor.getCount() != 0){
 
             cursor.moveToNext();
-            TransactionsViewItem DBtransactionsItem = new TransactionsViewItem();
+            TransactionsItem DBtransactionsItem = new TransactionsItem();
             DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
             DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
             DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
-            DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+           // DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
 
             cursor.close();
 
@@ -307,15 +310,17 @@ public class zDBMan {
             DBcardInfoItem.assetType = cursor.getInt(cursor.getColumnIndex(CARD_INFO_TABLE.ASSET_TYPE));
             DBcardInfoItem.rewardExceptions = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_EXCEPTIONS));
             DBcardInfoItem.rewardSections = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_SECTIONS));
-            DBcardInfoItem.franchisee_1 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_1));
-            DBcardInfoItem.amount_1 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_1));
-            DBcardInfoItem.franchisee_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_2));
-            DBcardInfoItem.amount_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_2));
-            DBcardInfoItem.franchisee_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_3));
-            DBcardInfoItem.amount_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_3));
-            DBcardInfoItem.franchisee_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_4));
-            DBcardInfoItem.amount_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_4));
 
+            for (int i = 0 ; i<4; i++) {
+                DBcardInfoItem.franchisee[i] = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_STRING+ (i - 1)));
+                DBcardInfoItem.amount[i] = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_STRING + (i - 1)));
+               /* DBcardInfoItem.franchisee_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_2));
+                DBcardInfoItem.amount_2 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_2));
+                DBcardInfoItem.franchisee_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_3));
+                DBcardInfoItem.amount_3 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_3));
+                DBcardInfoItem.franchisee_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_FRANCHISEE_4));
+                DBcardInfoItem.amount_4 = cursor.getString(cursor.getColumnIndex(CARD_INFO_TABLE.REWARD_AMOUNT_4));*/
+            }
             cursor.close();
 
             return DBcardInfoItem;
@@ -336,6 +341,8 @@ public class zDBMan {
         List<CardInfoItem> DBcardInfoItemList = new ArrayList<>();
         CardInfoItem DBcardInfoItem;
         if(cursor.getCount() != 0){
+
+
             while(cursor.moveToNext()){
                 DBcardInfoItem = new CardInfoItem();
                 DBcardInfoItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
@@ -365,20 +372,25 @@ public class zDBMan {
     }
 
     //TODO perfexception 칼럼 없어짐
-    TransactionsViewItem getLearnData(String name){        //이름과 계좌가 같을 경우
+    LearnItem getLearnData(String name){        //이름과 계좌가 같을 경우
         Cursor cursor = zDbIO.getRecordList(db,TABLE_LEARN, null, //select all columns
-                "? = '?' ", new String[] { LEARN_TABLE.RECIPIENT, name}, null);
+                "? = '?' ", new String[] { RECIPIENT, name}, null);
 
         if(cursor.getCount() != 0){
             cursor.moveToNext();
-            TransactionsViewItem DBtransactionsItem = new TransactionsViewItem();
-            DBtransactionsItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
-            DBtransactionsItem.amount = cursor.getFloat(cursor.getColumnIndex(AMOUNT));
-            DBtransactionsItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
-            DBtransactionsItem.categoryName = cursor.getString(cursor.getColumnIndex(CATEGORY_NAME));
+            LearnItem DBlearnItem = new LearnItem();
+            DBlearnItem.tableId = cursor.getInt(cursor.getColumnIndex(TABLE_ID));
+            DBlearnItem.recipientName = cursor.getString(cursor.getColumnIndex(RECIPIENT));
+            DBlearnItem.categoryId = cursor.getInt(cursor.getColumnIndex(CATEGORY_ID));
+            DBlearnItem.assetId = cursor.getInt(cursor.getColumnIndex(ASSET_ID));
+            DBlearnItem.franchiseeId = cursor.getInt(cursor.getColumnIndex(FRANCHISEE_ID));
+            DBlearnItem.budgetException = cursor.getInt(cursor.getColumnIndex(BUDGET_EXCEPTION));
+            DBlearnItem.rewardException = cursor.getInt(cursor.getColumnIndex(REWARD_EXCEPTION));
+            DBlearnItem.rewardType = cursor.getInt(cursor.getColumnIndex(REWARD_TYPE));
+            DBlearnItem.rewardPercent = cursor.getFloat(cursor.getColumnIndex(REWARD_PERCENT));
             cursor.close();
 
-            return DBtransactionsItem;
+            return DBlearnItem;
         }
         else{
             cursor.close();
@@ -395,7 +407,7 @@ public class zDBMan {
         values.put(TRANSACTIONS_TABLE.CATEGORY_ID, inputData.categoryId);
         values.put(TRANSACTIONS_TABLE.AMOUNT, inputData.amount);
         values.put(TRANSACTIONS_TABLE.ASSET_ID, inputData.assetId);
-        values.put(TRANSACTIONS_TABLE.RECIPIENT, inputData.recipname);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, inputData.recipientName);
         values.put(TRANSACTIONS_TABLE.NOTE, inputData.notes);
         values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, inputData.franchiseeId);
         values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, inputData.budgetException);
@@ -405,7 +417,7 @@ public class zDBMan {
 
 
         // 잔액 변동 체크
-        TransactionsViewItem transbyID = getTransbyID(inputData.transactionId);
+        TransactionsItem transbyID = getTransbyID(inputData.transactionId);
         if(transbyID != null){
             float tmp_amount = transbyID.amount;
             tmp_amount = tmp_amount - inputData.amount;
@@ -467,7 +479,7 @@ public class zDBMan {
         //타입에 따라 바꾸기
     }
 
-    void addCat(int cat_Level, Long parent, String name){
+    void addCat(int cat_Level, int parent, String name){
 
         ContentValues values = new ContentValues();
         values.put(CATEGORY_TABLE.CAT_LEVEL, cat_Level + 1);
@@ -483,7 +495,7 @@ public class zDBMan {
         values.put(TRANSACTIONS_TABLE.CATEGORY_ID, data.categoryId);
         values.put(TRANSACTIONS_TABLE.AMOUNT, data.amount);
         values.put(TRANSACTIONS_TABLE.ASSET_ID, data.assetId);
-        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipname);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipientName);
         values.put(TRANSACTIONS_TABLE.NOTE, data.notes);
         values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, data.franchiseeId);
         values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, data.budgetException);
@@ -495,14 +507,14 @@ public class zDBMan {
         zDbIO.putRecord(db,TABLE_TRANSACTIONS,values);
     }
 
-    long addTransactionfromReciever(ItemTransactions data) {
+    int addTransactionfromReciever(ItemTransactions data) {
         ContentValues values = new ContentValues();
 
         values.put(TRANSACTIONS_TABLE.TRANSACTON_TIME, data.transactionTime);
         values.put(TRANSACTIONS_TABLE.CATEGORY_ID, data.categoryId);
         values.put(TRANSACTIONS_TABLE.AMOUNT, data.amount);
 
-        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipname);
+        values.put(TRANSACTIONS_TABLE.RECIPIENT, data.recipientName);
         values.put(TRANSACTIONS_TABLE.FRANCHISEE_ID, data.franchiseeId);
         values.put(TRANSACTIONS_TABLE.BUDGET_EXCEPTION, data.budgetException);
         values.put(TRANSACTIONS_TABLE.REWARD_CACULATED, data.rewardAmountCalculated);
@@ -560,20 +572,20 @@ public class zDBMan {
 
     private void updateLearn(ItemTransactions data){
         ContentValues values = new ContentValues();
-        values.put(LEARN_TABLE.RECIPIENT, data.recipname);
-        values.put(LEARN_TABLE.CATEGORY_ID, data.categoryId);
-        values.put(LEARN_TABLE.ASSET_ID, data.assetId);
+        values.put(RECIPIENT, data.recipientName);
+        values.put(CATEGORY_ID, data.categoryId);
+        values.put(ASSET_ID, data.assetId);
         values.put(LEARN_TABLE.FRANCHISEE_ID, data.franchiseeId);
         values.put(LEARN_TABLE.BUDGET_EXCEPTION, data.budgetException);
-        values.put(LEARN_TABLE.REWARD_EXCEPTION, data.rewardException);
-        values.put(LEARN_TABLE.REWARD_TYPE, data.rewardType);
-        values.put(LEARN_TABLE.REWARD_PERCENT, data.rewardAmount);
+        values.put(REWARD_EXCEPTION, data.rewardException);
+        values.put(REWARD_TYPE, data.rewardType);
+        values.put(REWARD_PERCENT, data.rewardAmount);
 
 
 
         try{db.insertOrThrow(TABLE_LEARN,null, values);}
         catch (SQLiteConstraintException e){
-            db.update(TABLE_LEARN, values, "? = '?'",new String[]{LEARN_TABLE.RECIPIENT, data.recipname});
+            db.update(TABLE_LEARN, values, "? = '?'",new String[]{RECIPIENT, data.recipientName});
         }
     }
 

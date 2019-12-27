@@ -1,6 +1,5 @@
 package com.example.kollhong.accounts3;
 
-import android.widget.NumberPicker;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -9,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
+import android.widget.NumberPicker;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -24,7 +23,7 @@ import static java.text.DateFormat.getDateInstance;
  * Created by KollHong on 22/05/2018.
  */
 
-public class w_Add_Tran_Datepicker extends DialogFragment{
+public class TransactionAdd_Activity_DatePicker extends DialogFragment{
 
         String dates[];
         NumberPicker datePicker, hourPicker, minutePicker, ampmPicker;
@@ -145,7 +144,7 @@ public class w_Add_Tran_Datepicker extends DialogFragment{
             c2.setTimeInMillis(timeinmillis);
 
 
-            List<String> dates = new ArrayList<String>();
+            List<String> dates = new ArrayList<>();
             java.text.DateFormat dateFormat = getDateInstance();
             dates.add(dateFormat.format(c1.getTime()));
 

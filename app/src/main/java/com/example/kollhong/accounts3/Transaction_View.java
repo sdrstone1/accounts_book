@@ -1,8 +1,8 @@
 package com.example.kollhong.accounts3;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ import java.util.List;
  */
 
 
-public class A_Trans extends Fragment {
+public class Transaction_View extends Fragment {
 
     private SectionsPagerAdapter TSectionsPagerAdapter;
     private ViewPager TViewPager;
@@ -45,13 +44,13 @@ public class A_Trans extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        fragList.add(new A_Trans0_History());
-        fragList.add(new A_Trans1_Calendar());
+        fragList.add(new Transaction_History());
+        fragList.add(new Transaction_Calendar());
         return inflater.inflate(R.layout.a_trans_frag, container, false);
     }
 
       @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
 
@@ -91,7 +90,7 @@ public class A_Trans extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent add_trans = new Intent(getContext(), w_Add_Tran.class);
+                Intent add_trans = new Intent(getContext(), TransactionAdd_Activity.class);
                 startActivity(add_trans);
             }
         });
@@ -126,9 +125,7 @@ public class A_Trans extends Fragment {
         @Override
         public Fragment getItem(int id) {
 
-            Fragment frag = fragList.get(id);
-
-            return frag;
+            return fragList.get(id);
         }
 
         @Override

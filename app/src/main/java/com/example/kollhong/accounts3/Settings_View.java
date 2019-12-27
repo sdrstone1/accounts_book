@@ -9,12 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
+import android.preference.*;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -32,7 +27,7 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class v_PreferenceActivityTmp extends v_AppCompatPreferenceActivity {
+public class Settings_View extends Settings_Module {
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -208,7 +203,7 @@ public class v_PreferenceActivityTmp extends v_AppCompatPreferenceActivity {
 
         @Override
         public void onAttach(Context context) {
-            Intent intent = new Intent(context, v_Settings0_cat.class);
+            Intent intent = new Intent(context, Settings_Category.class);
             startActivity(intent);
 
             super.onAttach(context);
@@ -241,7 +236,7 @@ public class v_PreferenceActivityTmp extends v_AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), v_PreferenceActivityTmp.class));
+                startActivity(new Intent(getActivity(), Settings_View.class));
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -256,7 +251,7 @@ public class v_PreferenceActivityTmp extends v_AppCompatPreferenceActivity {
     public static class DataSyncPreferenceFragment extends PreferenceFragment {
         @Override
         public void onAttach(Context context) {
-            Intent intent = new Intent(context, v_Settings2_acc.class);
+            Intent intent = new Intent(context, Settings_Asset.class);
             startActivity(intent);
 
             super.onAttach(context);
@@ -286,7 +281,7 @@ public class v_PreferenceActivityTmp extends v_AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), v_PreferenceActivityTmp.class));
+                startActivity(new Intent(getActivity(), Settings_View.class));
                 return true;
             }
             return super.onOptionsItemSelected(item);

@@ -1,6 +1,7 @@
 package com.example.kollhong.accounts3;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,24 +12,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import com.example.kollhong.accounts3.DBItem.TransactionsViewItem;
+import com.example.kollhong.accounts3.RecyclerItem.AssetContentItem;
+import com.example.kollhong.accounts3.RecyclerItem.AssetSummaryItem;
 import com.github.mikephil.charting.charts.PieChart;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 import static android.view.View.GONE;
-import com.example.kollhong.accounts3.DBItem.*;
-import com.example.kollhong.accounts3.RecyclerItem.*;
 
 /**
  * Created by KollHong on 25/03/2018.
  */
 
 
-public class B_Manage0_Asset extends Fragment {
+public class Statistics_Asset extends Fragment {
     Calendar calendar1 = Calendar.getInstance();
 
-    zDBMan mDB;
+    DB_Controll mDB;
 
 
     @Override
@@ -39,9 +43,9 @@ public class B_Manage0_Asset extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mDB = new zDBMan(getContext(),false);
+        mDB = new DB_Controll(getContext(),false);
 
 
         RecyclerView recyclerView;
@@ -103,18 +107,18 @@ public class B_Manage0_Asset extends Fragment {
         long thisMonth = calendar1.getTimeInMillis();
         calendar2.setTimeInMillis(thisMonth);
         calendar2.add(Calendar.MONTH, 1);
-        long nextMonth = calendar2.getTimeInMillis() - 1l;
+        long nextMonth = calendar2.getTimeInMillis() - 1L;
 
 
         List<TransactionsViewItem> transByAcc = mDB.getTransByAcc(thisMonth, nextMonth);
-        ListIterator listIterator = transByAcc.listIterator();
-        TransactionsViewItem transactionItem;
+        //ListIterator listIterator = transByAcc.listIterator();
+
         int assetId = -1;
         float amountIncome = 0, amountExpend = 0, amountTransfer=0, reward = 0;
-        while (listIterator.hasNext()) {
+        for (TransactionsViewItem transactionItem : transByAcc) {
             AssetContentItem contentItem = new AssetContentItem();
 
-            transactionItem = (TransactionsViewItem) listIterator.next();
+           // transactionItem = (TransactionsViewItem) listIterator.next();
 
 
             if (transactionItem.assetId != assetId) {
@@ -158,9 +162,9 @@ public class B_Manage0_Asset extends Fragment {
         }
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        zRecyclerAdapt_Gen.RecyclerAdapter accAdapter = new zRecyclerAdapt_Gen.RecyclerAdapter(getActivity(),recyclerItemList,null);
+        Recycler_Adapter.RecyclerAdapter accAdapter = new Recycler_Adapter.RecyclerAdapter(getActivity(),recyclerItemList,null);
         recyclerView.setAdapter(accAdapter);
-        zRecyclerAdapt_Gen.DividerItemDecoration divider = new zRecyclerAdapt_Gen.DividerItemDecoration(getContext());
+        Recycler_Adapter.DividerItemDecoration divider = new Recycler_Adapter.DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
         accAdapter.notifyDataSetChanged();
 

@@ -2,24 +2,19 @@ package com.example.kollhong.accounts3;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.widget.RemoteViews;
-
-//import com.example.kollhong.accounts3.theta.R;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.List;
-import java.util.ListIterator;
 
-import static com.example.kollhong.accounts3.zDBScheme.TRANSACTIONS_VIEW.AMOUNT;
+//import com.example.kollhong.accounts3.theta.R;
 
 /**
  * Implementation of App Widget functionality.
  */
-public class U_Widget extends AppWidgetProvider {
+public class Widget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
@@ -29,7 +24,7 @@ public class U_Widget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.u_widget);
         //views.setTextViewText(R.id.appwidget_text, widgetText);
 
-        zDBMan mDB = new zDBMan(context,false);
+        DB_Controll mDB = new DB_Controll(context,false);
 
         Calendar calendar1 = Calendar.getInstance();
         Calendar calendar2 = Calendar.getInstance();
@@ -51,8 +46,8 @@ public class U_Widget extends AppWidgetProvider {
         long thisMonth = calendar1.getTimeInMillis();
         calendar2.setTimeInMillis(thisMonth);
         calendar2.add(Calendar.MONTH, 1);
-        long nextMonth = calendar2.getTimeInMillis() - 1l;
-        float amount = 0l;
+        long nextMonth = calendar2.getTimeInMillis() - 1L;
+        float amount = 0F;
 
         int color_red;
         int color_gray;
@@ -70,11 +65,9 @@ public class U_Widget extends AppWidgetProvider {
         }
 
         List<DBItem.TransactionsViewItem> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
-        ListIterator ListIter = valuesList.listIterator();
 
 
-        while(ListIter.hasNext()){
-            DBItem.TransactionsViewItem values = (DBItem.TransactionsViewItem) ListIter.next();
+        for (DBItem.TransactionsViewItem values : valuesList) {
             amount += values.amount;
         }
 

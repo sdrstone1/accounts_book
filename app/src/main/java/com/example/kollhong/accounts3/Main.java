@@ -24,7 +24,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-public class T_Main extends AppCompatActivity
+public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
@@ -50,6 +50,7 @@ public class T_Main extends AppCompatActivity
     //TODO 검색, 필터 메뉴 넣기(앱바),동적 메뉴 표시 -> onprepareoptionsmenu, 아니고 menu inflater.
     //TODO 검색 : 어댑터가 Filterable을 implements 하고, Filter클래스가 Filter를 extend함
 
+    //TODO bottomsheet, spinadapter 도 따로 만들기
     Toolbar toolbar;
     Fragment frag;
     List<Fragment> fragList = new ArrayList<>();
@@ -61,17 +62,17 @@ public class T_Main extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        zPrefMan mPrefMan = new zPrefMan(getApplicationContext());
+        Preferences_Controll mPrefMan = new Preferences_Controll(getApplicationContext());
         if (!mPrefMan.init) {
             /*
             첫 실행이면 웰컴 액티비티 실행
              */
-            Intent firstlaunch_intent = new Intent(getApplicationContext(), S_FirstLaunch.class);
+            Intent firstlaunch_intent = new Intent(getApplicationContext(), Splash_OneTimeInit.class);
             firstlaunch_intent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(firstlaunch_intent);
         }
         if (!mPrefMan.getSMSEnabled()) {
-            unregisterReceiverFromManifest(zMessageReciever.class, getApplicationContext());
+            unregisterReceiverFromManifest(Message_Reciever.class, getApplicationContext());
             if (BuildConfig.isTEST)
                 Log.w("unregister", "unregister");
         }
@@ -85,8 +86,8 @@ public class T_Main extends AppCompatActivity
         } else tab_num = 0;
 
 
-        fragList.add(new A_Trans());
-        fragList.add(new B_Manage());
+        fragList.add(new Transaction_View());
+        fragList.add(new Statistics_View());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.main_frame, fragList.get(0),"trans");
@@ -100,7 +101,7 @@ public class T_Main extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.t_main_activity);
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar =  findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -108,19 +109,19 @@ public class T_Main extends AppCompatActivity
 
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView =  findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -144,7 +145,7 @@ public class T_Main extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent_settings = new Intent(T_Main.this, v_PreferenceActivityTmp.class);
+            Intent intent_settings = new Intent(Main.this, Settings_View.class);
             startActivity(intent_settings);
 
             return true;
@@ -165,44 +166,44 @@ public class T_Main extends AppCompatActivity
         if (id == R.id.Trans_history) {
             //frag = fragList.get(0);
             fragid = 0;
-            A_Trans a_trans = (A_Trans)fragList.get(0);
-            TabLayout.Tab tab = a_trans.tabLayout.getTabAt(0);
+            Transaction_View transactionView = (Transaction_View)fragList.get(0);
+            TabLayout.Tab tab = transactionView.tabLayout.getTabAt(0);
             tab.select();
         } else if (id == R.id.Trans_calendar) {
             fragid = 0;
-            A_Trans a_trans = (A_Trans)fragList.get(0);
-            TabLayout.Tab tab = a_trans.tabLayout.getTabAt(1);
+            Transaction_View transactionView = (Transaction_View)fragList.get(0);
+            TabLayout.Tab tab = transactionView.tabLayout.getTabAt(1);
             tab.select();
         } else if (id == R.id.Stats) {
             fragid = 1;
-                B_Manage b_manage = (B_Manage) fragList.get(1);
-                TabLayout.Tab tab = b_manage.tabLayout.getTabAt(1);
+                Statistics_View statisticsView = (Statistics_View) fragList.get(1);
+                TabLayout.Tab tab = statisticsView.tabLayout.getTabAt(1);
                 tab.select();
 
         } else if (id == R.id.Budget) {
             fragid = 1;
-                B_Manage b_manage = (B_Manage) fragList.get(1);
-                TabLayout.Tab tab = b_manage.tabLayout.getTabAt(2);
+                Statistics_View statisticsView = (Statistics_View) fragList.get(1);
+                TabLayout.Tab tab = statisticsView.tabLayout.getTabAt(2);
 
         } else if (id == R.id.Card_rewards) {
             fragid = 1;
-                B_Manage b_manage = (B_Manage)  fragList.get(1);
-                TabLayout.Tab tab = b_manage.tabLayout.getTabAt(4);
+                Statistics_View statisticsView = (Statistics_View)  fragList.get(1);
+                TabLayout.Tab tab = statisticsView.tabLayout.getTabAt(4);
                 tab.select();
 
         } else if (id == R.id.Recipient) {
             fragid = 1;
-                B_Manage b_manage = (B_Manage)fragList.get(1);
-                TabLayout.Tab tab = b_manage.tabLayout.getTabAt(3);
+                Statistics_View statisticsView = (Statistics_View)fragList.get(1);
+                TabLayout.Tab tab = statisticsView.tabLayout.getTabAt(3);
                 tab.select();
 
         } else if (id == R.id.Accounts) {
             fragid = 1;
-                B_Manage b_manage = (B_Manage)  fragList.get(1);
-                TabLayout.Tab tab = b_manage.tabLayout.getTabAt(0);
+                Statistics_View statisticsView = (Statistics_View)  fragList.get(1);
+                TabLayout.Tab tab = statisticsView.tabLayout.getTabAt(0);
                 tab.select();
         } else if (id == R.id.Settings) {
-            Intent intent_settings = new Intent(T_Main.this, v_PreferenceActivityTmp.class);
+            Intent intent_settings = new Intent(Main.this, Settings_View.class);
             startActivity(intent_settings);
         }else if(id == R.id.nav_send)
         {
@@ -210,7 +211,7 @@ public class T_Main extends AppCompatActivity
             intent.setData(Uri.parse("mailto:sdrstone3@gmail.com"));
             startActivity(intent);
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
 
         if(fragid == 1) {

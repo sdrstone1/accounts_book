@@ -1,19 +1,12 @@
 package com.example.kollhong.accounts3;
 
-        import android.content.Intent;
-        import android.content.res.AssetManager;
-        import android.database.sqlite.SQLiteDatabase;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
-        import java.io.File;
-        import java.io.FileOutputStream;
-        import java.io.IOException;
-        import java.io.InputStream;
-        import static com.example.kollhong.accounts3.zDBScheme.DB_NAME;
+import static com.example.kollhong.accounts3.DB_Scheme.DB_NAME;
 
-public class S_Splash extends AppCompatActivity {
+public class Splash extends AppCompatActivity {
 
     //TODO ㄷㅣ비 버전 관리. card와ㅡ reciplists 테이블 업그레이드 / 복사 기능.
     //TODO 커서로 읽어와서 insert
@@ -27,18 +20,18 @@ public class S_Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent;
-        zPrefMan mPrefMan = new zPrefMan(getApplicationContext());
+        Preferences_Controll mPrefMan = new Preferences_Controll(getApplicationContext());
         if (!mPrefMan.init) {
             /*
             첫 실행이면 웰컴 액티비티 실행
              */
-            intent = new Intent(this, S_FirstLaunch.class);
+            intent = new Intent(this, Splash_OneTimeInit.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
             createDatabase();
         }
         else {
-            intent = new Intent(this, T_Main.class);
+            intent = new Intent(this, Main.class);
         }
         try {
             Thread.sleep(200);      //스플래시 보여주기
@@ -173,7 +166,7 @@ public class S_Splash extends AppCompatActivity {
                 "                left join asset as a on ( t.asset_id = a._id ) \n" +
                 "                left join category as parent on ( c.parent = parent._id);\n";
 
-        zDBMan dbMan = new zDBMan(this,true);
+        DB_Controll dbMan = new DB_Controll(this,true);
         dbMan.rawQuery(query);
 
     }

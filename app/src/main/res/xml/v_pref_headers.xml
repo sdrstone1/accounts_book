@@ -3,17 +3,17 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.example.kollhong.accounts3.v_PreferenceActivityTmp$GeneralPreferenceFragment"
+        android:fragment="com.example.kollhong.accounts3.Settings_View$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.example.kollhong.accounts3.v_PreferenceActivityTmp$NotificationPreferenceFragment"
+        android:fragment="com.example.kollhong.accounts3.Settings_View$NotificationPreferenceFragment"
         android:icon="@drawable/ic_category"
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="com.example.kollhong.accounts3.v_PreferenceActivityTmp$DataSyncPreferenceFragment"
+        android:fragment="com.example.kollhong.accounts3.Settings_View$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_accounts"
         android:title="@string/pref_header_data_sync" />
 

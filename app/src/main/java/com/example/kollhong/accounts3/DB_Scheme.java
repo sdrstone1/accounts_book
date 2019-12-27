@@ -7,12 +7,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.database.Cursor.*;
-
-public final class zDBScheme {
+public final class DB_Scheme {
     public static final String DB_NAME = "account_book";
     public static final String TABLE_ASSET = "asset";
     public static final String TABLE_CARD_INFO = "cardinfo";
@@ -122,12 +117,12 @@ public final class zDBScheme {
             return true;
         }
 
-        static long putRecord(SQLiteDatabase db, String table, ContentValues values) {
+        static int putRecord(SQLiteDatabase db, String table, ContentValues values) {
             try {
-                return db.insertOrThrow(table, null, values);
+                return (int) db.insertOrThrow(table, null, values);
             } catch (SQLiteConstraintException e) {
                 Log.e("PUT record error", e.getMessage());
-                return -1L;
+                return -1;
             }
         }
 
@@ -193,7 +188,7 @@ public final class zDBScheme {
         }
 
         static void rawQuery(SQLiteDatabase db, String query){
-            db.rawQuery(query, null);
+            db.rawQuery(query, null).close();
         }
     }
 }

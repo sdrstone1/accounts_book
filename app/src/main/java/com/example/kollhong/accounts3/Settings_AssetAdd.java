@@ -13,19 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.NumberPicker;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +24,7 @@ import java.util.ListIterator;
  * Created by KollHong on 06/06/2018.
  */
 
-public class v_Settings2_acc_add extends AppCompatActivity {
+public class Settings_AssetAdd extends AppCompatActivity {
     //View Holder
     EditText name_txt;
     EditText nick_txt;
@@ -49,7 +38,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     TextView with_date_txt ;
 
 
-    zDBMan mDB;
+    DB_Controll mDB;
     DBItem.AssetItem assetItem = new DBItem.AssetItem();
 
     boolean isUpdate;
@@ -58,7 +47,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Slide slide = new Slide();
-        slide.setSlideEdge(Gravity.RIGHT);
+        slide.setSlideEdge(Gravity.END);
         getWindow().setEnterTransition(slide);
         super.onCreate(savedInstanceState);
 
@@ -66,7 +55,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
         getViews();
 
-        mDB = new zDBMan(getApplicationContext(),true);
+        mDB = new DB_Controll(getApplicationContext(),true);
         Intent intent = getIntent();
         isUpdate = intent.getBooleanExtra("isUpdate", false);
 
@@ -75,7 +64,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
 
         if(isUpdate){
-            long id = intent.getLongExtra("id",0l);
+            int id = intent.getIntExtra("id",0);
             updateDisplay(id);
         }
 
@@ -170,9 +159,9 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.menu_save_but)
         {
-            assetItem.name = name_txt.getText()+"";
-            assetItem.nickname = nick_txt.getText()+"";
-            assetItem.balance = Float.valueOf(bal_text.getText()+"") ;
+            assetItem.name = name_txt.getText().toString();
+            assetItem.nickname = nick_txt.getText().toString();
+            assetItem.balance = Float.valueOf(bal_text.getText().toString()) ;
             mDB.addAsset(isUpdate, assetItem);
             finish();
             return true;
@@ -194,7 +183,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
     public void onWithDayDialog(View v) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings2_acc_add.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Settings_AssetAdd.this);
         builder.setTitle(R.string.withdrawal_date);
         builder.setCancelable(true);
 
@@ -203,7 +192,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         final NumberPicker datePicker = view.findViewById(R.id.date_picker);
         datePicker.setMaxValue(30);
         datePicker.setMinValue(1);
-        datePicker.setValue((int) assetItem.withdrawalDay);
+        datePicker.setValue( assetItem.withdrawalDay);
 
         builder.setView(view);
 
@@ -216,7 +205,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
                     public void SaveinDialog() {
                         assetItem.withdrawalDay =datePicker.getValue();
-                        with_date_txt.setText(assetItem.withdrawalDay+"");
+                        with_date_txt.setText(String.valueOf(assetItem.withdrawalDay));
                     }
                 });
 
@@ -231,7 +220,7 @@ public class v_Settings2_acc_add extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void updateDisplay(long id){
+    private void updateDisplay(int id){
 
         DBItem.AssetItem values = mDB.getAssetInfo(id);
         if(values!= null){
@@ -302,11 +291,9 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
     private List<ItemSpinner> makeSpinAdapter_Asset(List<DBItem.AssetItem> assetItemList){
         List<ItemSpinner> items = new ArrayList<>();
-        ListIterator listIterator = assetItemList.listIterator();
-        DBItem.AssetItem assetItem;
-        while (listIterator.hasNext()) {
-            assetItem = (DBItem.AssetItem) listIterator.next();
+       // ListIterator listIterator = assetItemList.listIterator();
 
+        for(DBItem.AssetItem assetItem : assetItemList){
             ItemSpinner item =  new ItemSpinner();
             item.id = assetItem.tableId;
             item.name = assetItem.name;
@@ -319,14 +306,11 @@ public class v_Settings2_acc_add extends AppCompatActivity {
 
     private List<ItemSpinner> makeSpinAdapter_Card(List<DBItem.CardInfoItem> cardItemList){
         List<ItemSpinner> items = new ArrayList<>();
-        ListIterator listIterator = cardItemList.listIterator();
-        DBItem.CardInfoItem assetItem;
-        while (listIterator.hasNext()) {
-            assetItem = (DBItem.CardInfoItem) listIterator.next();
 
+        for(DBItem.CardInfoItem cardItem : cardItemList){
             ItemSpinner item =  new ItemSpinner();
-            item.id = assetItem.tableId;
-            item.name = assetItem.cardName;
+            item.id = cardItem.tableId;
+            item.name = cardItem.cardName;
             items.add(item);
         }
 

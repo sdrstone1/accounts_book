@@ -4,7 +4,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,10 +20,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.example.kollhong.accounts3.zDBScheme.LEARN_TABLE.*;
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
-
-public class zMessageReciever extends BroadcastReceiver {
+public class Message_Reciever extends BroadcastReceiver {
 
     String type1;
     String type2;
@@ -33,10 +33,10 @@ public class zMessageReciever extends BroadcastReceiver {
     boolean is_CardSMS = false;
     boolean is_BankSMS = false;
     boolean is_Income = false;
-    zPrefMan mPrefMan;
-    zDBMan mDB;
+    Preferences_Controll mPrefMan;
+    DB_Controll mDB;
 
-    zDBScheme.ItemTransactions itemTransactions;
+    DBItem.ItemTransactions itemTransactions;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -57,9 +57,9 @@ public class zMessageReciever extends BroadcastReceiver {
                 if(action.equals("android.provider.Telephony.SMS_RECEIVED")) {
                     // DO YOUR STUFF
                 } else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
-                    mPrefMan = new zPrefMan(context);
+                    mPrefMan = new Preferences_Controll(context);
                     if(!mPrefMan.getSMSEnabled()) {
-                        unregisterReceiverFromManifest(zMessageReciever.class, context);
+                        unregisterReceiverFromManifest(Message_Reciever.class, context);
                         return;
                     }
                 }
@@ -69,8 +69,8 @@ public class zMessageReciever extends BroadcastReceiver {
             else return;
         }
         else return;
-        mDB = new zDBMan(context,true);
-        itemTransactions = new zDBScheme.ItemTransactions();
+        mDB = new DB_Controll(context,true);
+        itemTransactions = new DBItem.ItemTransactions();
         Bundle bundle = intent.getExtras();//인텐트의 부가 데이터 수신
 
         //PDU : Protocol Description Unit : SMS메시지 포맷
@@ -90,7 +90,7 @@ public class zMessageReciever extends BroadcastReceiver {
 
         long time =  smsMessage[0].getTimestampMillis();
         String smsNumber = smsMessage[0].getOriginatingAddress();
-        String message = smsMessage[0].getDisplayMessageBody().toString();
+        String message = smsMessage[0].getDisplayMessageBody();
 
         message = message.replace("[Web발신]","")
                 .replaceAll("\n\r", " ")
@@ -118,21 +118,21 @@ public class zMessageReciever extends BroadcastReceiver {
 
     }
 
-    public long addTrans(){
+    public int addTrans(){
         //학습에서 기록 확인
         itemTransactions.transactionId = 0;
-        ContentValues values = mDB.getLearnData(itemTransactions.recipname);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
+        DBItem.LearnItem values = mDB.getLearnData(itemTransactions.recipientName);   //_id, categoryid, accid, recipientid, budgetexception, perfexceoption, rewardtype, rewardamount
         if(values != null){
             //values.moveToNext();
             //data.trans_id = cursor.getLong(0);
-            itemTransactions.categoryId =  values.getAsLong(TABLE_ID);
-            itemTransactions.assetId = values.getAsLong(ASSET_ID);
+            itemTransactions.categoryId =  values.tableId;
+            itemTransactions.assetId = values.assetId;
 
-            itemTransactions.franchiseeId = values.getAsLong(FRANCHISEE_ID);
-            itemTransactions.budgetException = values.getAsLong(BUDGET_EXCEPTION);
-            itemTransactions.rewardException = values.getAsLong(REWARD_EXCEPTION);
-            itemTransactions.rewardType = values.getAsLong(REWARD_TYPE);
-            itemTransactions.rewardAmount = values.getAsFloat(REWARD_PERCENT);
+            itemTransactions.franchiseeId = values.franchiseeId;
+            itemTransactions.budgetException = values.budgetException;
+            itemTransactions.rewardException = values.rewardException;
+            itemTransactions.rewardType = values.rewardType;
+            itemTransactions.rewardAmount = values.rewardPercent;
             itemTransactions.rewardAmountCalculated = itemTransactions.rewardAmount * itemTransactions.amount;
         }else {
             itemTransactions.categoryId = 3;       //이체 항목으로 지정
@@ -161,7 +161,7 @@ public class zMessageReciever extends BroadcastReceiver {
 
     public void sendNoti(Context context){
         if(is_BankSMS || is_CardSMS) {
-            Intent intent = new Intent(context, w_Add_Tran.class);
+            Intent intent = new Intent(context, TransactionAdd_Activity.class);
             //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
             intent.putExtra("Notification", itemTransactions.transactionId);
@@ -196,7 +196,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 String recip = (String) context.getResources().getText(R.string.recipient);
                 charSequence = learn_data +
                         time + " : " + dateSTR + "\n" +
-                        recip + " : " + itemTransactions.recipname;
+                        recip + " : " + itemTransactions.recipientName;
             }else
             {
 
@@ -204,7 +204,7 @@ public class zMessageReciever extends BroadcastReceiver {
                 String time = (String) context.getResources().getText(R.string.time_text);
                 String cat = (String) context.getResources().getText(R.string.category);
                 String recip = (String) context.getResources().getText(R.string.recipient);
-                String acc = (String) context.getResources().getText(R.string.account);
+                String asst = (String) context.getResources().getText(R.string.account);
                 String re = (String) context.getResources().getText(R.string.reward);
 
                 charSequence = learn_data +
@@ -218,14 +218,14 @@ public class zMessageReciever extends BroadcastReceiver {
                 }
 
 
-                ContentValues values = mDB.getAssetInfo(itemTransactions.assetId);
+                DBItem.AssetItem values = mDB.getAssetInfo(itemTransactions.assetId);
                 if( values != null){
                     //values.moveToNext();
-                    charSequence = charSequence + "\n" + acc + " : " + values.getAsString(RECIPIENT);       //accname
+                    charSequence = charSequence + "\n" + asst + " : " + values.name;       //accname
                 }
 //                values.close();
 
-                charSequence = charSequence + "\n" + recip + " : "+ itemTransactions.recipname ;//recipient
+                charSequence = charSequence + "\n" + recip + " : "+ itemTransactions.recipientName ;//recipient
                 String recip_name = mDB.getFranchiseeName(itemTransactions.franchiseeId);
                 if(!recip_name.equals("")){
                     charSequence = charSequence + "\n" + re + " : " + recip_name;
@@ -301,10 +301,10 @@ public class zMessageReciever extends BroadcastReceiver {
             itemTransactions.amount = Float.parseFloat(split[6].replace(",",""));
             currency = split[7];
             for (int i = 8; i < len; i++ )
-                itemTransactions.recipname= itemTransactions.recipname + split[i];
+                itemTransactions.recipientName= itemTransactions.recipientName + split[i];
 
             if(BuildConfig.isTEST)
-                Log.e("Payed Message",  ""+ itemTransactions.recipname);
+                Log.e("Payed Message",  ""+ itemTransactions.recipientName);
 
             is_CardSMS = true;
             return;
@@ -328,10 +328,10 @@ public class zMessageReciever extends BroadcastReceiver {
             itemTransactions.amount = Float.parseFloat(split[5].replace(",","").replace("(금액)",""));
             currency = split[6];
             for (int i = 7; i < len; i++ )
-                itemTransactions.recipname= itemTransactions.recipname + split[i];
+                itemTransactions.recipientName= itemTransactions.recipientName + split[i];
 
             if(BuildConfig.isTEST)
-                Log.e("Payed Message",  ""+ itemTransactions.recipname);
+                Log.e("Payed Message",  ""+ itemTransactions.recipientName);
             is_CardSMS = true;
             return ;
         }
@@ -372,7 +372,7 @@ public class zMessageReciever extends BroadcastReceiver {
         currency = split[11];
 
         if(BuildConfig.isTEST)
-            Log.e("Payed Message",  ""+ itemTransactions.recipname);
+            Log.e("Payed Message",  ""+ itemTransactions.recipientName);
         is_BankSMS = true;
         return;
 

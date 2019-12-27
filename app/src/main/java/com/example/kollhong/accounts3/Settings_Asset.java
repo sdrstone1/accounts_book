@@ -1,6 +1,5 @@
 package com.example.kollhong.accounts3;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,15 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.example.kollhong.accounts3.zDBScheme.ASSET_TABLE.*;
-import static com.example.kollhong.accounts3.zDBScheme.TABLE_ID;
-
 /**
  * Created by KollHong on 31/05/2018.
  */
 
-public class v_Settings2_acc extends AppCompatActivity {
-    zDBMan mDB;
+public class Settings_Asset extends AppCompatActivity {
+    DB_Controll mDB;
 
     //List<zDBMan.ItemAcc> itemAccs = new ArrayList<>();
 
@@ -35,22 +32,27 @@ public class v_Settings2_acc extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         // set an exit transition
         Slide slide = new Slide();
-        slide.setSlideEdge(Gravity.RIGHT);
+        slide.setSlideEdge(Gravity.END);
         getWindow().setEnterTransition(slide);
 
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }catch(NullPointerException e){
+            Log.e("SettingAsset OnCreate","setDisplayHomeAsUpEnabled Error");
+            e.printStackTrace();
+        }
         setContentView(R.layout.v_pref2_accounts);
 
-        mDB = new zDBMan(getApplicationContext(),true);
+        mDB = new DB_Controll(getApplicationContext(),true);
 
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.acc_add);
+        FloatingActionButton fab =  findViewById(R.id.acc_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), v_Settings2_acc_add.class);
+                Intent intent = new Intent(getApplicationContext(), Settings_AssetAdd.class);
                 startActivity(intent);
             }
         });
@@ -73,32 +75,24 @@ public class v_Settings2_acc extends AppCompatActivity {
         Account_recycler(mDB.getAssetList());
     }
 
-    private void Account_recycler(List<ContentValues> valuesList) {
+    private void Account_recycler(List<DBItem.AssetItem> valuesList) {
 
         RecyclerView recyclerView = findViewById(R.id.pref_accounts_recycler);
 
         //itemAccs = new ArrayList<>();
         ListIterator valuesListIter = valuesList.listIterator();
 
-        List<zRecyclerAdapt_Gen.recyclerItem> assetItemList = new ArrayList<>();
+        List<RecyclerItem> assetItemList = new ArrayList<>();
 
-
-        while (valuesListIter.hasNext()) {
-            ContentValues values = (ContentValues) valuesListIter.next();
-            zRecyclerAdapt_Gen.assetItem item =  new zRecyclerAdapt_Gen.assetItem();
-            item.id = values.getAsLong(TABLE_ID);
-            item.assetType = values.getAsLong(ASSET_TYPE);
-            item.name = values.getAsString(NAME);
-            item.balance = values.getAsFloat(BALANCE);
-            item.withdrawalAccount = values.getAsLong(WITHDRAWALACCOUNT);
-            item.withdrawalDay = values.getAsLong(WITHDRAWALDAY);
-            item.cardId = values.getAsLong(CARD_ID);
+        for(DBItem.AssetItem values : valuesList){
+            RecyclerItem.AssetSettingsItem item =  new RecyclerItem.AssetSettingsItem();
+            item.item= values;
             assetItemList.add(item);
         }
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        zRecyclerAdapt_Gen.RecyclerAdapter assetAdapter = new zRecyclerAdapt_Gen.RecyclerAdapter(this, assetItemList,new assetOnClickListener());
+        Recycler_Adapter.RecyclerAdapter assetAdapter = new Recycler_Adapter.RecyclerAdapter(this, assetItemList,new assetOnClickListener());
         recyclerView.setAdapter(assetAdapter);
         assetAdapter.notifyDataSetChanged();
 
@@ -109,11 +103,11 @@ public class v_Settings2_acc extends AppCompatActivity {
 
     private void updateAccount(View v){
         //TextView view = (TextView) v;
-        zRecyclerAdapt_Gen.assetItem itemAcc = (zRecyclerAdapt_Gen.assetItem) v.getTag();
+        RecyclerItem.AssetSettingsItem itemAsset = (RecyclerItem.AssetSettingsItem) v.getTag();
 
-        Intent intent = new Intent(getApplicationContext(),v_Settings2_acc_add.class);
+        Intent intent = new Intent(getApplicationContext(), Settings_AssetAdd.class);
         intent.putExtra("isUpdate", true);
-        intent.putExtra("id",itemAcc.id);
+        intent.putExtra("id",itemAsset.item.tableId);
         startActivity(intent);
 
     }   //TODO 데이터 무결성 확인

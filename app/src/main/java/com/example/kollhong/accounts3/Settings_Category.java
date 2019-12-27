@@ -28,22 +28,22 @@ import java.util.ListIterator;
  * Created by KollHong on 31/05/2018.
  */
 
-public class v_Settings0_cat extends AppCompatActivity {
+public class Settings_Category extends AppCompatActivity {
     Context context;
 
-    zDBMan mDB;
+    DB_Controll mDB;
 
-    Long cat_id;
+    int cat_id;
     int cat_level;
 
     String tab_name;
-    long tab_num;
+    int tab_num;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Slide slide = new Slide();
-        slide.setSlideEdge(Gravity.RIGHT);
+        slide.setSlideEdge(Gravity.END);
         getWindow().setEnterTransition(slide);
 
         super.onCreate(savedInstanceState);
@@ -53,13 +53,13 @@ public class v_Settings0_cat extends AppCompatActivity {
         setContentView(R.layout.v_pref0_categories);
         context=getApplicationContext();
 
-        mDB = new zDBMan(context,true);
+        mDB = new DB_Controll(context,true);
         TabLayout tabLayout = findViewById(R.id.cat_tab);
         tabLayout.addOnTabSelectedListener(new tabListener());
         TabLayout.Tab tab = tabLayout.getTabAt(1);
         tab.select();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.cat_add);
+        FloatingActionButton fab = findViewById(R.id.cat_add);
         fab.setOnClickListener(new fabListener());
     }
 
@@ -85,25 +85,25 @@ public class v_Settings0_cat extends AppCompatActivity {
 
             switch (tab.getPosition()) {
                 case 0: {
-                    tab_num = 1l;
+                    tab_num = 1;
                     Category_Recycler(mDB.getChildCategoryList(tab_num));
-                    cat_id = 1l;
+                    cat_id = 1;
                     cat_level = 0;
                     break;
                 }
                 case 1: {
-                    tab_num = 2l;
+                    tab_num = 2;
                     Category_Recycler(mDB.getChildCategoryList(tab_num));
-                    cat_id = 2l;
+                    cat_id = 2;
                     cat_level = 3;
 
                     break;
 
                 }
                 case 2: {
-                    tab_num = 3l;
+                    tab_num = 3;
                     Category_Recycler(mDB.getChildCategoryList(tab_num));
-                    cat_id = 3l;
+                    cat_id = 3;
                     cat_level = 6;
 
                     break;
@@ -127,21 +127,21 @@ public class v_Settings0_cat extends AppCompatActivity {
 
             long id = (long)view.getTag();
             //TODO 아이디로 설정 편집 이동.
-            Intent intent = new Intent(context, v_Settings0_subcat.class);
+            Intent intent = new Intent(context, Settings_CategoryLEVEL2.class);
             intent.putExtra("id", id);
 
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(v_Settings0_cat.this).toBundle());
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(Settings_Category.this).toBundle());
         }
     }
 
     private void Category_Recycler(List<DBItem.CategoryItem> contentList) {
         List<RecyclerItem> recyclerItemList = new ArrayList<>();
         ListIterator<DBItem.CategoryItem> contentListIterator = contentList.listIterator();
-        DBItem.CategoryItem content;
+
 
         RecyclerView recyclerView = findViewById(R.id.pref_categories_recycler);
 
-        while (contentListIterator.hasNext()) {
+        for (DBItem.CategoryItem content : contentList) {
             content = contentListIterator.next();
             RecyclerItem.CategorySettingsItem item = new RecyclerItem.CategorySettingsItem();
             item.nameOnlyItem.tableId = content.tableId;
@@ -150,8 +150,8 @@ public class v_Settings0_cat extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        zRecyclerAdapt_Gen.RecyclerAdapter categoryadapter
-                = new zRecyclerAdapt_Gen.RecyclerAdapter(this,recyclerItemList, new categoryClickListener());
+        Recycler_Adapter.RecyclerAdapter categoryadapter
+                = new Recycler_Adapter.RecyclerAdapter(this,recyclerItemList, new categoryClickListener());
 
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();
@@ -165,7 +165,7 @@ public class v_Settings0_cat extends AppCompatActivity {
             final EditText editText = editView.findViewById(R.id.diag_text);
             editText.setHint(R.string.title_frag_settings_name_add_hint);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(v_Settings0_cat.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(Settings_Category.this);
             builder.setTitle(R.string.title_frag_settings_name_add);
             //builder.setMessage(R.string.title_frag_settings_name_add);
             builder.setCancelable(true);

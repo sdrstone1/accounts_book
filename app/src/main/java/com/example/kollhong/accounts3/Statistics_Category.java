@@ -3,6 +3,7 @@ package com.example.kollhong.accounts3;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -13,7 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
+import com.example.kollhong.accounts3.DBItem.TransactionsViewItem;
+import com.example.kollhong.accounts3.RecyclerItem.CategorySummaryItem;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -23,20 +25,16 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.ListIterator;
-
-import com.example.kollhong.accounts3.DBItem.*;
-import com.example.kollhong.accounts3.RecyclerItem.*;
 
 /**
  * Created by KollHong on 25/03/2018.
  */
 
 
-public class B_Manage1_stat extends Fragment {
+public class Statistics_Category extends Fragment {
     Calendar calendar1 = Calendar.getInstance();
 
-    zDBMan mDB;
+    DB_Controll mDB;
 
     List<RecyclerItem> catSummaryItemList = new ArrayList<>();
 
@@ -50,10 +48,10 @@ public class B_Manage1_stat extends Fragment {
 
 
     //  @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull  View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mDB = new zDBMan(getContext(),false);
+        mDB = new DB_Controll(getContext(),false);
 
 //리사이클러뷰 구현
         RecyclerView recyclerView;
@@ -97,9 +95,9 @@ public class B_Manage1_stat extends Fragment {
 //리스트로 차트 만들기
     public void makePieChart(){
         List<PieEntry> entries = new ArrayList<>();
-        for(int i = 0; i < catSummaryItemList.size() ; i++ ) {
-            CategorySummaryItem categorySummaryItem = (CategorySummaryItem) catSummaryItemList.get(i);
-            entries.add( new PieEntry(categorySummaryItem.amount, categorySummaryItem.assetName));
+        for (RecyclerItem recyclerItem : catSummaryItemList) {
+            CategorySummaryItem categorySummaryItem = (CategorySummaryItem) recyclerItem;
+            entries.add(new PieEntry(categorySummaryItem.amount, categorySummaryItem.assetName));
 
         }
         Context context = getContext();
@@ -118,7 +116,7 @@ public class B_Manage1_stat extends Fragment {
         pieChart.invalidate();
     }
 
-    public static final int getColor(Context context, int id) {
+    public static int getColor(Context context, int id) {
         final int version = Build.VERSION.SDK_INT;
         if (version >= 23) {
             return ContextCompat.getColor(context, id);
@@ -149,18 +147,17 @@ public class B_Manage1_stat extends Fragment {
         long thisMonth = calendar1.getTimeInMillis();
         calendar2.setTimeInMillis(thisMonth);
         calendar2.add(Calendar.MONTH, 1);
-        long nextMonth = calendar2.getTimeInMillis() - 1l;
+        long nextMonth = calendar2.getTimeInMillis() - 1L;
 
 
         catSummaryItemList.clear();
         List<TransactionsViewItem> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
-        ListIterator valuesListIter = valuesList.listIterator();
+        //ListIterator valuesListIter = valuesList.listIterator();
 
-        long list[] = {0l};
+        long list[] = {0L};
         int catId = -1;
         float amount = 0;
-        while (valuesListIter.hasNext()) {
-            TransactionsViewItem values = (TransactionsViewItem) valuesListIter.next();
+        for (TransactionsViewItem values : valuesList) {
             if (values.categoryId != catId) {
                 CategorySummaryItem summaryItem = new CategorySummaryItem();
 
@@ -180,9 +177,9 @@ public class B_Manage1_stat extends Fragment {
 
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        zRecyclerAdapt_Gen.RecyclerAdapter myadapter = new zRecyclerAdapt_Gen.RecyclerAdapter(getActivity(),catSummaryItemList,null);
+        Recycler_Adapter.RecyclerAdapter myadapter = new Recycler_Adapter.RecyclerAdapter(getActivity(),catSummaryItemList,null);
         recyclerView.setAdapter(myadapter);
-        zRecyclerAdapt_Gen.DividerItemDecoration divider = new zRecyclerAdapt_Gen.DividerItemDecoration(getContext());
+        Recycler_Adapter.DividerItemDecoration divider = new Recycler_Adapter.DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
         myadapter.notifyDataSetChanged();
 

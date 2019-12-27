@@ -35,7 +35,7 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.example.kollhong.accounts3.w_Add_Tran">
+            tools:context="com.example.kollhong.accounts3.TransactionAdd_Activity">
 
             <TextView
                 android:id="@+id/add_acc_name"
