@@ -10,16 +10,16 @@ import java.util.Date;
 import static java.text.DateFormat.getDateInstance;
 
 public abstract class RecyclerItem {
-    static final int Settings_AssetItem = 201;
-    static final int v_Settings0_cat = 203;
-    static final int A_Trans0_History_Header = 206;
-    static final int A_Trans0_History_Content = 207;
-    static final int B_Manage0_Asset_Header = 208;
+    static final int Settings_Asset_Item = 201;
+    static final int Settings_Category_Item = 203;
+    static final int Transaction_History_HEADER = 206;
+    static final int Transaction_History_CONTENT = 207;
+    static final int Statistics_Asset_HEADER = 208;
     static final int B_Manage0_Asset_Content = 209;
-    static final int B_Manage1_stat_Category_Header = 211;
+    static final int Statistics_Category_HEADER = 211;
     static final int B_Manage1_stat_Transaction_Content = 212;
-    static final int addTransactionsCategoryItem = 213;
-    static final int addTransactionsAssetItem = 214;
+    static final int TransactionAdd_Activity_CATEGORY_ITEM = 213;
+    static final int TransactionAdd_Activity_ASSET_ITEM = 214;
 
 
     abstract int getType();
@@ -31,7 +31,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return v_Settings0_cat;
+            return Settings_Category_Item;
         }
     }
 
@@ -39,7 +39,7 @@ public abstract class RecyclerItem {
         AssetItem item = new AssetItem();
         @Override
         int getType() {
-            return Settings_AssetItem;
+            return Settings_Asset_Item;
         }
     }
 
@@ -53,7 +53,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return A_Trans0_History_Header;
+            return Transaction_History_HEADER;
         }
 
     }
@@ -64,7 +64,7 @@ public abstract class RecyclerItem {
         //amount, recipient, account, category
         @Override
         int getType() {
-            return A_Trans0_History_Content;
+            return Transaction_History_CONTENT;
         }
     }
 
@@ -79,7 +79,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return B_Manage0_Asset_Header;
+            return Statistics_Asset_HEADER;
         }
     }
 
@@ -101,7 +101,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return B_Manage1_stat_Category_Header;
+            return Statistics_Category_HEADER;
         }
 
     }
@@ -120,7 +120,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return addTransactionsCategoryItem;
+            return TransactionAdd_Activity_CATEGORY_ITEM;
         }
     }
     static class TransactionAddAssetItem extends RecyclerItem {
@@ -128,7 +128,7 @@ public abstract class RecyclerItem {
 
         @Override
         int getType() {
-            return addTransactionsAssetItem;
+            return TransactionAdd_Activity_ASSET_ITEM;
         }
     }
 }

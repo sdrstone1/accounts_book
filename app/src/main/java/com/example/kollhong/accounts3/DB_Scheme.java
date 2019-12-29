@@ -455,16 +455,6 @@ public final class DB_Scheme extends SQLiteOpenHelper {
     }
 
     static class zDbIO {
-        static boolean creTable(SQLiteDatabase db, String table, String tablearg) {
-            try {
-                db.execSQL("CREATE TABLE IF NOT EXISTS " + table + " ( " + tablearg + " ); ");
-            } catch (SQLException e) {
-                e.getLocalizedMessage();
-                return false;
-            }
-            return true;
-        }
-
         static int putRecord(SQLiteDatabase db, String table, ContentValues values) {
             try {
                 return (int) db.insertOrThrow(table, null, values);
@@ -485,55 +475,11 @@ public final class DB_Scheme extends SQLiteOpenHelper {
         }
 
         static Cursor getRecordList(SQLiteDatabase db, String table, String[] columns, String where, String orderBy) {
-
             return db.query(table, columns, where, null, null, null, orderBy);
-            /*
-            List<ContentValues> contentValuesList = new ArrayList<>();
-
-            if (cursor.getCount() != 0) {
-                while (cursor.moveToNext()) {
-                    ContentValues contentValues = new ContentValues();   //거래 기록 표시
-                    for (int i = 0; i < cursor.getColumnCount(); i++) {
-                        switch( cursor.getType(i)) {
-
-                            case FIELD_TYPE_INTEGER:
-                                if( BuildConfig.isTEST){
-                                    Log.i("Get DB Record : ", "Long");
-                                }
-                                contentValues.put(cursor.getColumnName(i), cursor.getLong(i));
-                                break;
-                            case FIELD_TYPE_STRING:
-                                if( BuildConfig.isTEST){
-                                    Log.i("Get DB Record : ", "String");
-                                }
-                                contentValues.put(cursor.getColumnName(i), cursor.getString(i));
-                                break;
-                            case FIELD_TYPE_FLOAT:
-                                if( BuildConfig.isTEST){
-                                    Log.i("Get DB Record : ", "Float");
-                                }
-                                contentValues.put(cursor.getColumnName(i), cursor.getFloat(i));
-                                break;
-                            case FIELD_TYPE_BLOB:
-                                Log.e("Get DB Record Error : ", "Column Type Blob");
-                                break;
-                            case FIELD_TYPE_NULL:
-                                Log.e("Get DB Record Error : ", "Column NULL");
-                                break;
-                        }
-                    }
-                    contentValuesList.add(contentValues);
-                }
-            }
-            cursor.close();
-            return contentValuesList;
-
-             */
         }
 
         static void delRecord(SQLiteDatabase db, String table, long id) {
-            db.delete(table, "? = '?'", new String[]{TABLE_ID, Long.toString(id)});
-           // return true;
+            db.delete(table, TABLE_ID + " = " + id,null );
         }
 
         static void rawQuery(SQLiteDatabase db, String query){
@@ -545,8 +491,5 @@ public final class DB_Scheme extends SQLiteOpenHelper {
                 Log.e("rawQuery Error : ",e.getLocalizedMessage());
             }
         }
-
-
     }
-
 }

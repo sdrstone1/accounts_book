@@ -41,21 +41,21 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == Settings_AssetItem  || viewType == v_Settings0_cat || viewType == addTransactionsAssetItem || viewType == addTransactionsCategoryItem) {
+        if (viewType == Settings_Asset_Item || viewType == Settings_Category_Item || viewType == TransactionAdd_Activity_ASSET_ITEM || viewType == TransactionAdd_Activity_CATEGORY_ITEM) {
             View view = activity.getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
             return new settingsViewholder(view);
         }
-        else if (viewType == A_Trans0_History_Header) {      //헤더
+        else if (viewType == Transaction_History_HEADER) {      //헤더
             View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_header, parent, false);
             return new assetSummaryHeaderHolder(view);
-        } else if (viewType == A_Trans0_History_Content) {
+        } else if (viewType == Transaction_History_CONTENT) {
             View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_content, parent, false);
 
             return new ContentViewHolder(view);
-        } else if (viewType == B_Manage0_Asset_Header) {
+        } else if (viewType == Statistics_Asset_HEADER) {
             View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
             return new assetSummaryHolder(view);
-        } else if (viewType == B_Manage1_stat_Category_Header) {
+        } else if (viewType == Statistics_Category_HEADER) {
             View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
             return new categorySummaryHolder(view);
         } else {
@@ -73,7 +73,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         RecyclerItem item = items.get(position);
-        if (item.getType() == Settings_AssetItem) {
+        if (item.getType() == Settings_Asset_Item) {
             AssetSettingsItem assetitem = (AssetSettingsItem) item;
 
             settingsViewholder viewholder = (settingsViewholder) holder;
@@ -82,7 +82,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             v.setTag(item);
             viewholder.textView.setOnClickListener(listener);
         }
-        else if ( item.getType() == v_Settings0_cat) {
+        else if ( item.getType() == Settings_Category_Item) {
             CategorySettingsItem categoryitem = (CategorySettingsItem) item;
 
             settingsViewholder viewholder = (settingsViewholder) holder;
@@ -91,7 +91,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             v.setTag(item);
             viewholder.textView.setOnClickListener(listener);
         }
-        else if (item.getType() == A_Trans0_History_Header) {
+        else if (item.getType() == Transaction_History_HEADER) {
 
             assetSummaryHeaderHolder viewHolder = (assetSummaryHeaderHolder) holder;
             dateHeaderItem dateHeaderItem = (dateHeaderItem) item;
@@ -102,7 +102,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             viewHolder.time.setText(dateHeaderItem.format);
         }
-        else if (item.getType() == A_Trans0_History_Content) {
+        else if (item.getType() == Transaction_History_CONTENT) {
             ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
 
             HistoryContentItem historyContentItem = (HistoryContentItem) item;
@@ -146,7 +146,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             contentViewHolder.list_accounts.setText(historyContentItem.item.assetName);
             contentViewHolder.list_reci.setText(historyContentItem.item.recipientName);
 
-        } else if (item.getType() == B_Manage0_Asset_Header) {
+        } else if (item.getType() == Statistics_Asset_HEADER) {
             AssetSummaryItem assetItem = (AssetSummaryItem) item;
             assetSummaryHolder assetSummaryHolder = (assetSummaryHolder) holder;
 
@@ -160,7 +160,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         else if
-        (item.getType() == B_Manage1_stat_Category_Header){
+        (item.getType() == Statistics_Category_HEADER){
 
             categorySummaryHolder catSummaryHolder =  (categorySummaryHolder) holder;
             CategorySummaryItem catSummaryItem = (CategorySummaryItem) item;
@@ -171,7 +171,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             //accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
         }
         else if
-        (item.getType() == addTransactionsAssetItem){
+        (item.getType() == TransactionAdd_Activity_ASSET_ITEM){
             TransactionAddAssetItem transactionAddAssetItem = (TransactionAddAssetItem)item;
 
             settingsViewholder newholder = (settingsViewholder) holder;
@@ -183,7 +183,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         else if
-        (item.getType() == addTransactionsCategoryItem){
+        (item.getType() == TransactionAdd_Activity_CATEGORY_ITEM){
             TransactionAddCategoryItem transactionAddCategoryItem = (TransactionAddCategoryItem) item;
 
             settingsViewholder newholder = (settingsViewholder) holder;
@@ -208,9 +208,9 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             items.addAll(itemsSearched);
         }
         for (RecyclerItem wp : itemsSearched) {
-            if (wp.getType() == A_Trans0_History_Header) {
+            if (wp.getType() == Transaction_History_HEADER) {
                 items.add(wp);
-            } else if (wp.getType() == A_Trans0_History_Content) {
+            } else if (wp.getType() == Transaction_History_CONTENT) {
                 //wp = (ContentItem) wp;
                 if (((HistoryContentItem) wp).item.recipientName.toLowerCase(Locale.getDefault())
                         .contains(query)) {
