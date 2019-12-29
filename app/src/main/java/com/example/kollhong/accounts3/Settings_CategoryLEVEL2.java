@@ -24,8 +24,8 @@ import java.util.List;
 public class Settings_CategoryLEVEL2 extends AppCompatActivity {
     DB_Controll mDB;
 
-    int cat_id;
-    int cat_level;
+    long parent_cat_id;
+    int parent_cat_level;
     TextView namefield;
 
 
@@ -35,18 +35,18 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.v_pref0_categories_edit);
-        cat_id = getIntent().getIntExtra("id", 0);
+        parent_cat_id = getIntent().getLongExtra("id", 0);
 
         mDB = new DB_Controll(getApplicationContext(),true);
-        cat_level =mDB.getCatLevel(cat_id);
+        parent_cat_level =mDB.getCatLevel(parent_cat_id);
 
-        String name = mDB.getCategoryName(cat_id);
+        String name = mDB.getCategoryName(parent_cat_id);
         namefield= findViewById(R.id.cat_edit_name);
         namefield.setText(name);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Category_Recycler(mDB.getChildCategoryList(name));
+        Category_Recycler(mDB.getChildCategoryList(parent_cat_id));
 
 
         final FloatingActionButton fab =  findViewById(R.id.cat_fab);
@@ -72,9 +72,9 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
 
                             public void SaveinDialog() {
                                 String name = String.valueOf(editText.getText());
-                                mDB.addCat(cat_level, cat_id, name);       //부모 카테고리의 id
-                                String name2 = mDB.getCategoryName(cat_id);
-                                Category_Recycler(mDB.getChildCategoryList(name2));
+                                mDB.addCat(parent_cat_level, parent_cat_id, name);       //부모 카테고리의 id
+                                //String name2 = mDB.getCategoryName(cat_id);
+                                Category_Recycler(mDB.getChildCategoryList(parent_cat_id));
                             }
                         });
 
@@ -123,7 +123,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
             builder2.setPositiveButton(R.string.delete,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mDB.deleteAcc(cat_id);
+                            mDB.deleteAcc(parent_cat_id);
                             dialog.dismiss();
                             finish();
                         }
@@ -148,7 +148,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
 
     public void onSave(){
         String name = namefield.getText() + "";
-        mDB.updateCat(cat_id, name);
+        mDB.updateCat(parent_cat_id, name);
         finish();
     }
 
@@ -167,7 +167,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Recycler_Adapter.RecyclerAdapter categoryadapter = new Recycler_Adapter.RecyclerAdapter(this,recyclerItemList,new categoryClickListener());
+        Recycler_Adapter categoryadapter = new Recycler_Adapter(this,recyclerItemList,new categoryClickListener());
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();
     }
@@ -176,8 +176,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
 
     private class categoryClickListener implements View.OnClickListener{
 
-        String name;
-        int tableId;
+        DBItem.NameOnlyItem nameOnlyItem;
         EditText editText;
 
 
@@ -186,8 +185,9 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
             //텍스트의 이름과 번호 받아서 다이얼로그 생성
             TextView view = (TextView) v;
 
-            tableId = Integer.parseInt((view.getTag().toString()));
-            name = String.valueOf(view.getText());
+            RecyclerItem.CategorySettingsItem categoryitem = (RecyclerItem.CategorySettingsItem) v.getTag();
+
+            nameOnlyItem = categoryitem.nameOnlyItem;
             //TODO 이름 변경 팝업 띄우기
 
             buildDialog();
@@ -196,7 +196,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
         private void buildDialog() {
             View view = getLayoutInflater().inflate(R.layout.v_pref0_categories_edit_diag, null);
             editText = view.findViewById(R.id.diag_text);
-            editText.setText(name);
+            editText.setText(nameOnlyItem.name);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(Settings_CategoryLEVEL2.this);
             builder.setTitle(R.string.title_frag_settings_name_update);
@@ -212,10 +212,10 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
                         }
 
                         private void SaveinDialog() {
-                            name = String.valueOf(editText.getText());
-                            mDB.updateCat(tableId, name);
-                            String name = mDB.getCategoryName(cat_id);
-                            Category_Recycler(mDB.getChildCategoryList(name));
+                            nameOnlyItem.name = String.valueOf(editText.getText());
+                            mDB.updateCat(nameOnlyItem.tableId, nameOnlyItem.name);
+                            //String name = mDB.getCategoryName(cat_id);
+                            Category_Recycler(mDB.getChildCategoryList(parent_cat_id));
 
                         }
                     });
@@ -230,7 +230,7 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mDB.deleteCat(tableId);
+                            mDB.deleteCat(nameOnlyItem.tableId);
                             dialog.dismiss();
                         }
                     });

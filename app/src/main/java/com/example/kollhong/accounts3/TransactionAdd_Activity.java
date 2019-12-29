@@ -40,7 +40,7 @@ public class TransactionAdd_Activity extends AppCompatActivity {
     EditText amount_view;
     EditText recip_view;
     EditText note_view;
-    int tab_num;
+    long tab_num;
 
     VisibleControlView VCV;
     DB_Controll mDB;
@@ -161,13 +161,18 @@ public class TransactionAdd_Activity extends AppCompatActivity {
                 //Log.e("Recieved SMS Intent, id : ", String.valueOf(bundle.getLong("Notification")));
             }
         }
-        else if (intent.hasExtra("UpdateTrans")){
-            if(intent.getLongExtra("UpdateTrans", 0L) != 0) {
-                TransactionsItem transactionsValues = mDB.getTransbyID(intent.getLongExtra("UpdateTrans", 0));
-                UpdateDisplay(transactionsValues);        //trans 레코드 가져와서 띄우기
-            } else {
-                itemTransactions.transactionTime = calendar.getTimeInMillis();
+        else if (intent.hasExtra("UpdateTrans")) {
+            long id = intent.getLongExtra("UpdateTrans",0L);
+            if (BuildConfig.isTEST) {
+                Log.i("Update Transaction", String.valueOf(id));
             }
+
+            TransactionsItem transactionsValues = mDB.getTransbyID(id);
+            UpdateDisplay(transactionsValues);        //trans 레코드 가져와서 띄우기
+        }
+        else {
+            itemTransactions.transactionTime = calendar.getTimeInMillis();
+
         }
     }
 
@@ -314,8 +319,8 @@ public class TransactionAdd_Activity extends AppCompatActivity {
         RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
 
-        Recycler_Adapter.RecyclerAdapter bottomsheetAdapter
-                = new Recycler_Adapter.RecyclerAdapter(this,contentValuesList, clickListener);
+        Recycler_Adapter bottomsheetAdapter
+                = new Recycler_Adapter(this,contentValuesList, clickListener);
 
         recyclerView.setAdapter(bottomsheetAdapter);
 
@@ -434,14 +439,14 @@ public class TransactionAdd_Activity extends AppCompatActivity {
         //VCV.perf_spin.setVisibility(View.INVISIBLE);
     }
 
-    private void setCategory(String name, int id) {
+    private void setCategory(String name, long id) {
 
         itemTransactions.categoryName = name;
         cat_view.setText(name);
         itemTransactions.categoryId = id;
     }
 
-    private void setCategoryOnTab(int cat_id) {
+    private void setCategoryOnTab(long cat_id) {
         setCategory( mDB.getCategoryName(cat_id + 1), cat_id +1);
         tab_num = cat_id+1;
         if (BuildConfig.isTEST) {
@@ -583,12 +588,12 @@ public class TransactionAdd_Activity extends AppCompatActivity {
             mBottomSheetDialog.dismiss();
             //zDBMan mDB = new zDBMan(getApplicationContext(), false);
             TextView view = (TextView) v;
-
-            List<CategoryItem> childCategoryList = mDB.getChildCategoryList(String.valueOf(view.getText()));
+            RecyclerItem.TransactionAddCategoryItem item = (RecyclerItem.TransactionAddCategoryItem)view.getTag();
+            List<CategoryItem> childCategoryList = mDB.getChildCategoryList(item.nameOnlyItem.tableId);
 
             if (childCategoryList.isEmpty()) {        //자녀 카테고리 표시
                 TextView vt = (TextView) v;
-                setCategory(vt.getText().toString(), Integer.parseInt(v.getTag().toString()));
+                setCategory(vt.getText().toString(), item.nameOnlyItem.tableId);
             } else {
 
                 //ListIterator<CategoryItem> listIterater = childCategoryList.listIterator();

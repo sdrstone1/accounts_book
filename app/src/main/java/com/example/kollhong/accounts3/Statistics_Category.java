@@ -155,7 +155,7 @@ public class Statistics_Category extends Fragment {
         //ListIterator valuesListIter = valuesList.listIterator();
 
         long list[] = {0L};
-        int catId = -1;
+        long catId = -1;
         float amount = 0;
         for (TransactionsViewItem values : valuesList) {
             if (values.categoryId != catId) {
@@ -177,7 +177,7 @@ public class Statistics_Category extends Fragment {
 
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        Recycler_Adapter.RecyclerAdapter myadapter = new Recycler_Adapter.RecyclerAdapter(getActivity(),catSummaryItemList,null);
+        Recycler_Adapter myadapter = new Recycler_Adapter(getActivity(),catSummaryItemList,null);
         recyclerView.setAdapter(myadapter);
         Recycler_Adapter.DividerItemDecoration divider = new Recycler_Adapter.DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);

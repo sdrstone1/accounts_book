@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +42,9 @@ public class Settings_Category extends AppCompatActivity {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        if(BuildConfig.isTEST){
+            Log.i("Launch Activity : ","Settings_Category");
+        }
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         Slide slide = new Slide();
         slide.setSlideEdge(Gravity.END);
@@ -125,10 +129,10 @@ public class Settings_Category extends AppCompatActivity {
 
             TextView view = (TextView) v;
 
-            long id = (long)view.getTag();
+            RecyclerItem.CategorySettingsItem recyclerItem = (RecyclerItem.CategorySettingsItem)view.getTag();
             //TODO 아이디로 설정 편집 이동.
             Intent intent = new Intent(context, Settings_CategoryLEVEL2.class);
-            intent.putExtra("id", id);
+            intent.putExtra("id", recyclerItem.nameOnlyItem.tableId);
 
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(Settings_Category.this).toBundle());
         }
@@ -150,8 +154,8 @@ public class Settings_Category extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        Recycler_Adapter.RecyclerAdapter categoryadapter
-                = new Recycler_Adapter.RecyclerAdapter(this,recyclerItemList, new categoryClickListener());
+        Recycler_Adapter categoryadapter
+                = new Recycler_Adapter(this,recyclerItemList, new categoryClickListener());
 
         recyclerView.setAdapter(categoryadapter);
         categoryadapter.notifyDataSetChanged();

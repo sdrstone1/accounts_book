@@ -2,6 +2,7 @@ package com.example.kollhong.accounts3;
 
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public abstract class DBItem {
 
 
     //int context;
-    int tableId;
+    long tableId;
 
     /*
     DBItem(int context) {
@@ -41,7 +42,7 @@ public abstract class DBItem {
         String notes;
         int withdrawalAccount;
         int withdrawalDay;
-        int cardId;
+        long cardId;
 
         @Override
         int getType() {
@@ -59,8 +60,8 @@ public abstract class DBItem {
         int assetType;
         String rewardExceptions;//10003:10050
         String rewardSections;//b10:c90
-        String[] franchisee = {};//10050:50000
-        String[] amount = {};//0.8p
+        String[] franchisee = new String[4];//10050:50000
+        String[] amount = new String[4];//0.8p
         /*
                 String franchisee_1;//10050:50000
                 String amount_1;//0.8p
@@ -86,7 +87,7 @@ public abstract class DBItem {
             for (String s : split) {     //10101, 20100
                 ItemRecipient recipient = new ItemRecipient();
 
-                recipient.tableId = Integer.parseInt(s);
+                recipient.tableId = Long.parseLong(s);
                 recipient.recipientName = mDB.getFranchiseeName(recipient.tableId);
                 recipient.rewardExceptions = 1;
                 recipientList.add(recipient);
@@ -107,7 +108,7 @@ public abstract class DBItem {
                 } else if (condtype.equals("c")) {
                     conditiontype = 1;
                 } else {
-                    Log.w("카드 정보 오류", "실적 조건 유형(전월 현월 파싱 오류.", null);
+                    Log.w("카드 정보 오류", "실적 조건 유형(전월 당월 파싱 오류.", null);
                 }
                 int conditionAmount = Integer.parseInt(split[i].substring(1));
 
@@ -120,7 +121,7 @@ public abstract class DBItem {
 
                 for (int j = 0; j < franchiseeLength; j++) {
 
-                    int recipientId;
+                    long recipientId;
                     String rew = amount[j].substring(0, 1);
                     int rewtype = 0;
                     if (rew.equals("p")) {
@@ -155,7 +156,7 @@ public abstract class DBItem {
 
     static class CategoryItem extends DBItem{
         int catLevel;
-        int parentId;
+        long parentId;
         String name;
         String rewardExceptions;
         float budget;
@@ -171,9 +172,9 @@ public abstract class DBItem {
     }
     static class LearnItem extends DBItem{
         String recipientName;
-        int categoryId;
-        int assetId;
-        int franchiseeId;
+        long categoryId;
+        long assetId;
+        long franchiseeId;
         int budgetException;
         int rewardException;
         int rewardType;
@@ -190,12 +191,12 @@ public abstract class DBItem {
     }
     static class TransactionsItem extends DBItem{
         long transactionTime;
-        int categoryId;
+        long categoryId;
         float amount;
-        int assetId;
+        long assetId;
         String recipientName;
-        String notes;
-        int franchiseeId;
+        String notes = "";
+        long franchiseeId;
         int budgetException;
         int rewardException;
         int rewardType; //'P'oint 'D'iscount
@@ -214,9 +215,9 @@ public abstract class DBItem {
     static class TransactionsViewItem extends DBItem{
         long transactionTime;
         float amount;
-        int assetId;
+        long assetId;
         String assetName;
-        int categoryId;
+        long categoryId;
         int categoryLevel;
         String categoryName;
         String parentCategoryName;
@@ -264,19 +265,19 @@ public abstract class DBItem {
         boolean isUpdate = false;
         boolean learn;
 
-        int transactionId;
-        int categoryId = 0;
+        long transactionId;
+        long categoryId = 0;
         String categoryName = null;
         long transactionTime = 0L;
         float amount;
-        int assetId = 0;
+        long assetId = 0;
         int assetType;
         String assetName = null;
         int withdrawlDay = 0;
         int withdrawlAccount = 0;
-        int cardId = 0;
+        long cardId = 0;
         float balance;
-        int franchiseeId = 0;
+        long franchiseeId = 0;
         String recipientName = " ";
         float rewardAmount;
         float rewardAmountCalculated;

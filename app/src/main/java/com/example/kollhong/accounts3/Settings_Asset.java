@@ -42,7 +42,7 @@ public class Settings_Asset extends AppCompatActivity {
             Log.e("SettingAsset OnCreate","setDisplayHomeAsUpEnabled Error");
             e.printStackTrace();
         }
-        setContentView(R.layout.v_pref2_accounts);
+        setContentView(R.layout.v_pref2_assets);
 
         mDB = new DB_Controll(getApplicationContext(),true);
 
@@ -92,7 +92,7 @@ public class Settings_Asset extends AppCompatActivity {
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Recycler_Adapter.RecyclerAdapter assetAdapter = new Recycler_Adapter.RecyclerAdapter(this, assetItemList,new assetOnClickListener());
+        Recycler_Adapter assetAdapter = new Recycler_Adapter(this, assetItemList,new assetOnClickListener());
         recyclerView.setAdapter(assetAdapter);
         assetAdapter.notifyDataSetChanged();
 

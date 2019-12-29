@@ -10,16 +10,12 @@ import java.util.Date;
 import static java.text.DateFormat.getDateInstance;
 
 public abstract class RecyclerItem {
-    static final int ASSET = 201;
-    static final int CATEGORY = 202;
+    static final int Settings_AssetItem = 201;
     static final int v_Settings0_cat = 203;
-    static final int v_Settings2_ass = 204;
-    static final int dateHeader = 205;
     static final int A_Trans0_History_Header = 206;
     static final int A_Trans0_History_Content = 207;
     static final int B_Manage0_Asset_Header = 208;
     static final int B_Manage0_Asset_Content = 209;
-    static final int B_Manage1_stat_Asset = 210;
     static final int B_Manage1_stat_Category_Header = 211;
     static final int B_Manage1_stat_Transaction_Content = 212;
     static final int addTransactionsCategoryItem = 213;
@@ -29,24 +25,6 @@ public abstract class RecyclerItem {
     abstract int getType();
     //_id, type, name, balance, withdrawalaccount, withdrawalday, cardid
 
-
-    static class assetItem extends RecyclerItem{
-        AssetItem item = new AssetItem();
-
-        @Override
-        int getType() {
-            return ASSET;
-        }
-    }
-
-    static class categoryItem extends RecyclerItem {
-        NameOnlyItem nameOnlyItem = new NameOnlyItem();
-
-        @Override
-        int getType() {
-            return CATEGORY;
-        }
-    }
 
     static class CategorySettingsItem extends RecyclerItem{
         NameOnlyItem nameOnlyItem = new NameOnlyItem();
@@ -61,7 +39,7 @@ public abstract class RecyclerItem {
         AssetItem item = new AssetItem();
         @Override
         int getType() {
-            return 0;
+            return Settings_AssetItem;
         }
     }
 

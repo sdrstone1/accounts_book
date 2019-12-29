@@ -1,6 +1,8 @@
 package com.example.kollhong.accounts3;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.preference.*;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -154,8 +157,8 @@ public class Settings_View extends Settings_Module {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || AssetSettingsActivity.class.getName().equals(fragmentName)
+                || CategorySettingsActivity.class.getName().equals(fragmentName);
     }
 
     /**
@@ -199,19 +202,20 @@ public class Settings_View extends Settings_Module {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
+    public static class CategorySettingsActivity extends PreferenceFragment {
 
-        @Override
-        public void onAttach(Context context) {
-            Intent intent = new Intent(context, Settings_Category.class);
-            startActivity(intent);
-
-            super.onAttach(context);
-        }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+            if(BuildConfig.isTEST){
+                Log.i("Launch Activity : ","Settings_Category");
+            }
+
+            Intent intent = new Intent(getActivity(), Settings_Category.class);
+            startActivity(intent);
+
             //addPreferencesFromResource(R.xml.v_pref_notification);
             //setHasOptionsMenu(true);
 
@@ -223,7 +227,6 @@ public class Settings_View extends Settings_Module {
             //bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
 
         }
-
 
 
         @Override
@@ -248,26 +251,19 @@ public class Settings_View extends Settings_Module {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+    public static class AssetSettingsActivity extends PreferenceFragment {
         @Override
         public void onAttach(Context context) {
-            Intent intent = new Intent(context, Settings_Asset.class);
-            startActivity(intent);
-
             super.onAttach(context);
         }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            //addPreferencesFromResource(R.xml.v_pref_data_sync);
-            //setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            Intent intent = new Intent(getActivity(), Settings_Asset.class);
+            startActivity(intent);
+
         }
 
         @Override

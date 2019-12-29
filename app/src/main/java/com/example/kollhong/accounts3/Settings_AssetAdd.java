@@ -62,17 +62,18 @@ public class Settings_AssetAdd extends AppCompatActivity {
         set_with_acc_spinner();
 
 
-
+        int TAB_INDEX = 0;
         if(isUpdate){
-            int id = intent.getIntExtra("id",0);
+            long id = intent.getLongExtra("id",0);
             updateDisplay(id);
+            TAB_INDEX = assetItem.assetType;
         }
 
-        long TAB_INDEX = assetItem.assetType - 1;
+
 
         TabLayout tabLayout = findViewById(R.id.add_acc_tablayout);
         tabLayout.addOnTabSelectedListener(new tabListener());
-        TabLayout.Tab tab = tabLayout.getTabAt((int)TAB_INDEX);
+        TabLayout.Tab tab = tabLayout.getTabAt(TAB_INDEX);
         tab.select();
 
 
@@ -220,7 +221,7 @@ public class Settings_AssetAdd extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void updateDisplay(int id){
+    private void updateDisplay(long id){
 
         DBItem.AssetItem values = mDB.getAssetInfo(id);
         if(values!= null){

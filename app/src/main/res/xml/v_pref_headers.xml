@@ -8,12 +8,12 @@
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.example.kollhong.accounts3.Settings_View$NotificationPreferenceFragment"
+        android:fragment="com.example.kollhong.accounts3.Settings_View$CategorySettingsActivity"
         android:icon="@drawable/ic_category"
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="com.example.kollhong.accounts3.Settings_View$DataSyncPreferenceFragment"
+        android:fragment="com.example.kollhong.accounts3.Settings_View$AssetSettingsActivity"
         android:icon="@drawable/ic_accounts"
         android:title="@string/pref_header_data_sync" />
 

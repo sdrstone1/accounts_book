@@ -113,10 +113,10 @@ public class Statistics_Asset extends Fragment {
         List<TransactionsViewItem> transByAcc = mDB.getTransByAcc(thisMonth, nextMonth);
         //ListIterator listIterator = transByAcc.listIterator();
 
-        int assetId = -1;
+        long assetId = -1;
         float amountIncome = 0, amountExpend = 0, amountTransfer=0, reward = 0;
         for (TransactionsViewItem transactionItem : transByAcc) {
-            AssetContentItem contentItem = new AssetContentItem();
+            //AssetContentItem contentItem = new AssetContentItem();
 
            // transactionItem = (TransactionsViewItem) listIterator.next();
 
@@ -136,16 +136,6 @@ public class Statistics_Asset extends Fragment {
                 assetId = transactionItem.assetId;
             }
 
-            contentItem.item.tableId = transactionItem.tableId;
-            contentItem.item.assetName = transactionItem.assetName;
-            contentItem.item.amount = transactionItem.amount;
-            contentItem.item.assetId = transactionItem.assetId;
-            if(transactionItem.rewardCalculated != 1.175494e-38F) {
-                contentItem.item.rewardCalculated = transactionItem.rewardCalculated;
-                Log.i("데이터 가져오기","실적 : " +contentItem.item.rewardCalculated);
-            }
-            contentItem.item.categoryLevel = transactionItem.categoryLevel;
-
             //사용금액 합산
             if (transactionItem.categoryLevel == 0 || transactionItem.categoryLevel == 1 || transactionItem.categoryLevel == 2) {
                 amountIncome += transactionItem.amount;
@@ -158,11 +148,11 @@ public class Statistics_Asset extends Fragment {
             }
             reward += transactionItem.rewardCalculated;
 
-            recyclerItemList.add(contentItem);
+            //recyclerItemList.add(contentItem);
         }
 
         RecyclerView recyclerView = getView().findViewById(R.id.acc_recycler);
-        Recycler_Adapter.RecyclerAdapter accAdapter = new Recycler_Adapter.RecyclerAdapter(getActivity(),recyclerItemList,null);
+        Recycler_Adapter accAdapter = new Recycler_Adapter(getActivity(),recyclerItemList,null);
         recyclerView.setAdapter(accAdapter);
         Recycler_Adapter.DividerItemDecoration divider = new Recycler_Adapter.DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);

@@ -1,6 +1,7 @@
 package com.example.kollhong.accounts3;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,10 +15,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import static com.example.kollhong.accounts3.DB_Scheme.DB_NAME;
 
 public class Splash_OneTimeInit extends AppCompatActivity {
     int radio_checked = 0;
@@ -54,6 +58,9 @@ public class Splash_OneTimeInit extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(mViewPager, true);
 
+
+        openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
+        createDatabase();
     }
 
     public void onFinish(View view) {
@@ -68,6 +75,8 @@ public class Splash_OneTimeInit extends AppCompatActivity {
             Preferences_Controll mPref = new Preferences_Controll(getApplicationContext());
             mPref.setInit();
             mPref.setSMSRegistered(false);
+            Intent intent = new Intent(this, Main.class);
+            startActivity(intent);
             finish();
         }
         else
@@ -145,6 +154,8 @@ public class Splash_OneTimeInit extends AppCompatActivity {
     private void getSMSPerm(){
         int SMS = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
         if(SMS == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(this, Main.class);
+            startActivity(intent);
             finish();
         }
         else{
@@ -175,10 +186,21 @@ public class Splash_OneTimeInit extends AppCompatActivity {
             else
                 Toast.makeText(this, R.string.toast_fl_sms_not_granted, Toast.LENGTH_LONG).show();
 
+            Intent intent = new Intent(this, Main.class);
+            startActivity(intent);
             finish();
             return;
         }
-
+        Intent intent = new Intent(this, Main.class);
+        startActivity(intent);
         finish();
+    }
+
+    private void createDatabase(){
+
+
+        DB_Controll dbMan = new DB_Controll(getApplicationContext(),true);
+
+
     }
 }

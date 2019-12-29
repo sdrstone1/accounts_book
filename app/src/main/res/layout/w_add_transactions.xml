@@ -250,18 +250,18 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <CheckBox
-                android:id="@+id/Learn_Checker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="80dp"
-                android:checked="true"
-                android:text="@string/text_learn_checker"
-                android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/acc_acc_note_txt" />
+                    android:id="@+id/Learn_Checker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="80dp"
+                    android:checked="true"
+                    android:text="@string/text_learn_checker"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/acc_acc_note_txt"/>
 
         </android.support.constraint.ConstraintLayout>
 

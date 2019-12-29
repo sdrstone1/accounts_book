@@ -3,7 +3,6 @@
 
     <item android:drawable="@color/colorPrimary"/>
     <item
-
             android:width="240dp"
             android:height="240dp">
             <bitmap
@@ -11,5 +10,4 @@
                     android:drawable="@mipmap/ic_launcher_round"
                     android:src="@mipmap/ic_launcher_round"/>
     </item>
-
 </layer-list>

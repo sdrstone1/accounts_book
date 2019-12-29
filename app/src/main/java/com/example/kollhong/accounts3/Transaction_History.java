@@ -38,7 +38,7 @@ public class Transaction_History extends Fragment {
     int month;
 
 //    List<ItemVO> list;
-    Recycler_Adapter.RecyclerAdapter transAdapter;
+    Recycler_Adapter transAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -146,8 +146,8 @@ public class Transaction_History extends Fragment {
         calendar.set(Calendar.MILLISECOND, 0);
 
 
-        long today00;
-        long today2359;
+        long today;
+        long tomorrow;
         //날짜를 안다 하루씩 빼가면서 찾기
         //하루가 지날 때마다 날짜 헤더 표시하기
         //list = new ArrayList<>();
@@ -156,23 +156,23 @@ public class Transaction_History extends Fragment {
         for (int day2 = max_day; day2 >= min_day; day2--) {
             calendar.set(Calendar.DAY_OF_MONTH, day2);
 
-            today00 = calendar.getTimeInMillis();
-            calendar2.setTimeInMillis(today00);
+            today = calendar.getTimeInMillis();
+            calendar2.setTimeInMillis(today);
             calendar2.add(Calendar.DAY_OF_MONTH, 1);
-            today2359 = calendar2.getTimeInMillis() - 1L;
-            calendar2.setTimeInMillis(today2359);
+            tomorrow = calendar2.getTimeInMillis() - 1L;
+            calendar2.setTimeInMillis(tomorrow);
 
-            transactionHistoryList = mDB.getTransHistory(today00, today2359);
-            ListIterator iterator = transactionHistoryList.listIterator();
-            DBItem.TransactionsViewItem transactionsViewItem;
+            transactionHistoryList = mDB.getTransHistory(today, tomorrow);
 
-            if(iterator.hasNext()) {
+
+            if(!transactionHistoryList.isEmpty()) {
                 dateHeaderItem HeaderItem = new dateHeaderItem();
-                HeaderItem.transactionTime = today00;
+                HeaderItem.transactionTime = today;
                 recyclerItemList.add(HeaderItem);       //거래 날짜 표시
 
-                while (iterator.hasNext()) {
-                    transactionsViewItem = (DBItem.TransactionsViewItem) iterator.next();
+                for (DBItem.TransactionsViewItem transactionsViewItem : transactionHistoryList) {
+                    //transactionsViewItem = (DBItem.TransactionsViewItem) iterator.next();
+
                     HistoryContentItem item = new HistoryContentItem();
                     item.item = transactionsViewItem;
                     recyclerItemList.add(item);
@@ -180,7 +180,7 @@ public class Transaction_History extends Fragment {
             }
         }
 
-        transAdapter = new Recycler_Adapter.RecyclerAdapter(getActivity(), recyclerItemList,new TransactionClickListener());
+        transAdapter = new Recycler_Adapter(getActivity(), recyclerItemList,new TransactionClickListener());
         recyclerView.setAdapter(transAdapter);
         DividerItemDecoration divider = new DividerItemDecoration(getContext());
         recyclerView.addItemDecoration(divider);
