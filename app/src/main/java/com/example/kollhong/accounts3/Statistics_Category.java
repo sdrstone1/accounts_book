@@ -104,11 +104,11 @@ public class Statistics_Category extends Fragment {
         PieChart pieChart = getView().findViewById(R.id.pieChart);
         PieDataSet pieDataSet = new PieDataSet(entries, "카테고리별 지출");
         List<Integer> colorList = new ArrayList<>();
-        colorList.add(getColor(context,android.R.color.holo_blue_dark ));
-        colorList.add(getColor(context,android.R.color.holo_green_dark));
-        colorList.add(getColor(context,android.R.color.holo_orange_dark));
-        colorList.add(getColor(context,android.R.color.holo_red_dark));
-        colorList.add(getColor(context, R.color.colorAccent));
+        colorList.add(GlobalFunction.Color.getColor(context,android.R.color.holo_blue_dark ));
+        colorList.add(GlobalFunction.Color.getColor(context,android.R.color.holo_green_dark));
+        colorList.add(GlobalFunction.Color.getColor(context,android.R.color.holo_orange_dark));
+        colorList.add(GlobalFunction.Color.getColor(context, android.R.color.holo_red_dark));
+        colorList.add(GlobalFunction.Color.getColor(context, R.color.colorAccent));
 
         pieDataSet.setColors(colorList);
         PieData pieData = new PieData(pieDataSet);
@@ -116,14 +116,6 @@ public class Statistics_Category extends Fragment {
         pieChart.invalidate();
     }
 
-    public static int getColor(Context context, int id) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 23) {
-            return ContextCompat.getColor(context, id);
-        } else {
-            return context.getResources().getColor(id);
-        }
-    }
 
     public void makeRecyclerView() {
         List<RecyclerItem> recyclerItemList = new ArrayList<>();

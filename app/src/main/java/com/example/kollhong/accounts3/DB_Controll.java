@@ -29,7 +29,7 @@ public class DB_Controll {
     private SQLiteDatabase db;
     //여기서 읽기 쓰기 작업 모두 진행
     //여기서 디비 객체 선언
-    //TODO 모델 영역
+
 
     private DB_Scheme dbHelper;
 
@@ -52,13 +52,8 @@ public class DB_Controll {
         }
     }
 
-    //TODO 뷰 영역
-    //TODO 컨트롤러 영역은 UI부분임
-    //TODO 커서 리턴하지 말기!
-    //TODO 쿼리 대신 ContentValues 사용하면 함수 전부 다 합칠 수 잇을 듯
 
 
-    //TODO return list of objects
     List<TransactionsViewItem> getTransHistory(long today, long tomorrow){
         String[] columns = {TABLE_ID, TRANSACTION_TIME,AMOUNT,RECIPIENT,CATEGORY_LEVEL,CATEGORY_NAME,PARENT_CATEGORY_NAME,ASSET_NAME};
         Cursor cursor = zDbIO.getRecordList(db, TABLE_TRANSACTIONS_VIEW, columns,
@@ -69,6 +64,8 @@ public class DB_Controll {
         List<TransactionsViewItem> DBtransactionsItemList = new ArrayList<>();
         TransactionsViewItem DBtransactionsItem;
         //1577617134698
+
+        Log.i("Transaction_History",today + "    " + tomorrow);
         if(cursor.getCount() != 0){
             if(BuildConfig.isTEST){
                 Log.i("Transaction_History", "발견 됨 : "+ cursor.getCount());
@@ -441,7 +438,6 @@ public class DB_Controll {
 
 
 
-//TODO ItemTransaction를 모두 ContentValues로 바꾸기
     private void updateTransaction(ItemTransactions inputData){
         ContentValues values = new ContentValues();
         values.put(TRANSACTIONS_TABLE.TRANSACTION_TIME, inputData.transactionTime);

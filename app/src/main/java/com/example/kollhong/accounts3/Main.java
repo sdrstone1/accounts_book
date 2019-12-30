@@ -28,8 +28,6 @@ public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-
-    //TODO Cursor close();
     //TODO id좀 간단하게..
     //TODO Function call 순서 재정렬.
 

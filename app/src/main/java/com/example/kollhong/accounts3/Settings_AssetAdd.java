@@ -173,10 +173,9 @@ public class Settings_AssetAdd extends AppCompatActivity {
         }
         else if(id == R.id.itemDelete){
             if (isUpdate){
-
                 mDB.deleteAcc(assetItem.tableId);
-                this.finish();
             }
+            this.finish();
 
         }
         return super.onOptionsItemSelected(item);

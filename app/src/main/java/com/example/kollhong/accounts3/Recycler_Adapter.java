@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -39,8 +40,9 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         //this.context = context;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == Settings_Asset_Item || viewType == Settings_Category_Item || viewType == TransactionAdd_Activity_ASSET_ITEM || viewType == TransactionAdd_Activity_CATEGORY_ITEM) {
             View view = activity.getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
             return new settingsViewholder(view);
@@ -71,7 +73,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         RecyclerItem item = items.get(position);
         if (item.getType() == Settings_Asset_Item) {
             AssetSettingsItem assetitem = (AssetSettingsItem) item;
@@ -110,39 +112,22 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             holder.itemView.setTag(historyContentItem);
             holder.itemView.setOnClickListener(listener);
 
+
             if (historyContentItem.item.categoryLevel == 0 || historyContentItem.item.categoryLevel == 1) { //0,1,2        3,4,5           6,7,8
-                contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_blue);
-                contentViewHolder.list_cat2nd.setText("");
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
+                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_blue);
             } else if (historyContentItem.item.categoryLevel == 2) {
-                contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_blue);
-                contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_blue);
+                setTextLevel2(contentViewHolder,historyContentItem, contentViewHolder.color_blue);
             } else if (historyContentItem.item.categoryLevel == 3 || historyContentItem.item.categoryLevel == 4) {
-                contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_cat2nd.setText("");
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_red);
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
+                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_red);
             } else if (historyContentItem.item.categoryLevel == 5) {
-                contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_red);
-                contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_red);
+                setTextLevel2(contentViewHolder,historyContentItem, contentViewHolder.color_red);
             } else if (historyContentItem.item.categoryLevel == 6 || historyContentItem.item.categoryLevel == 7) {
-                contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_cat2nd.setText("");
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_gray);
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
+                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_gray);
             } else if (historyContentItem.item.categoryLevel == 8) {
-                contentViewHolder.list_cat.setTextColor(contentViewHolder.color_gray);
-                contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
-                contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
-                contentViewHolder.list_amount.setTextColor(contentViewHolder.color_gray);
+                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_gray);
             }
 
-            contentViewHolder.list_amount.setText(historyContentItem.item.amount + "");
+            contentViewHolder.list_amount.setText(String.valueOf(historyContentItem.item.amount));
             contentViewHolder.list_accounts.setText(historyContentItem.item.assetName);
             contentViewHolder.list_reci.setText(historyContentItem.item.recipientName);
 
@@ -222,6 +207,20 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyDataSetChanged();
     }
 
+
+    private void setTextLevel1(ContentViewHolder contentViewHolder, HistoryContentItem historyContentItem, int color){
+        contentViewHolder.list_cat.setText(historyContentItem.item.categoryName);
+        contentViewHolder.list_cat.setTextColor(color);
+        contentViewHolder.list_cat2nd.setText("");
+        contentViewHolder.list_amount.setTextColor(color);
+    }
+
+    private void setTextLevel2(ContentViewHolder contentViewHolder, HistoryContentItem historyContentItem, int color){
+        contentViewHolder.list_cat.setText(historyContentItem.item.parentCategoryName);
+        contentViewHolder.list_cat.setTextColor(color);
+        contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
+        contentViewHolder.list_amount.setTextColor(color);
+    }
     public class settingsViewholder extends RecyclerView.ViewHolder {
         TextView textView;
 
@@ -244,7 +243,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
 
             if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-                params.width = point.x;
+                params.width = point.x ;
 
             else params.width = point.y;
             v.setLayoutParams(params);
@@ -269,22 +268,16 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             list_reci = v.findViewById(R.id.list_reci);
             list_accounts = v.findViewById(R.id.list_accounts);
             list_amount = v.findViewById(R.id.list_amount);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                color_blue = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.holo_blue_light);
-                color_red = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.holo_red_light);
-                color_gray = ContextCompat.getColor(activity.getApplicationContext(), android.R.color.darker_gray);
-            } else {
-                color_blue = v.getResources().getColor(android.R.color.holo_blue_light);
-                color_red = v.getResources().getColor(android.R.color.holo_red_light);
-                color_gray = v.getResources().getColor(android.R.color.darker_gray);
-            }
+            color_blue = GlobalFunction.Color.getColor(activity, android.R.color.holo_blue_light);
+            color_red = GlobalFunction.Color.getColor(activity, android.R.color.holo_red_light);
+            color_gray = GlobalFunction.Color.getColor(activity, android.R.color.darker_gray);
 
         }
 
     }
 
 
-    private class assetSummaryHeaderHolder extends RecyclerView.ViewHolder {
+    private static class assetSummaryHeaderHolder extends RecyclerView.ViewHolder {
         public TextView time;
 
         public assetSummaryHeaderHolder(View v) {
@@ -294,7 +287,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public class assetSummaryHolder extends RecyclerView.ViewHolder {
+    public static class assetSummaryHolder extends RecyclerView.ViewHolder {
         TextView name;
         TextView income;
         TextView expense;
@@ -312,7 +305,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-    public class categorySummaryHolder extends RecyclerView.ViewHolder {
+    public static class categorySummaryHolder extends RecyclerView.ViewHolder {
         TextView name;
         //TextView income;
         TextView expense;
@@ -334,14 +327,13 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     static public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
-        private  final int[] ATTRS = new int[]{android.R.attr.listDivider};
-
         private Drawable divider;
 
         /**
          * Default divider will be used
          */
         public DividerItemDecoration(Context context) {
+            int[] ATTRS = new int[]{android.R.attr.listDivider};
             final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
             divider = styledAttributes.getDrawable(0);
             styledAttributes.recycle();

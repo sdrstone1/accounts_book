@@ -33,6 +33,7 @@ public abstract class RecyclerItem {
         int getType() {
             return Settings_Category_Item;
         }
+        
     }
 
     static class AssetSettingsItem extends  RecyclerItem{

@@ -9,7 +9,6 @@ import static com.example.kollhong.accounts3.DB_Scheme.DB_NAME;
 public class Splash extends AppCompatActivity {
 
     //TODO ㄷㅣ비 버전 관리. card와ㅡ reciplists 테이블 업그레이드 / 복사 기능.
-    //TODO 커서로 읽어와서 insert
 
 
     /*

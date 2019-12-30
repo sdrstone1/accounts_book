@@ -25,9 +25,9 @@ public final class DB_Scheme extends SQLiteOpenHelper {
     public static final String TABLE_TRANSACTIONS = "transactions";
     public static final String TABLE_TRANSACTIONS_VIEW = "transactions_view";
 
-    public static final int ASSET_TYPE_BANK_BOOK = 1;
-    public static final int ASSET_TYPE_DEBIT_CARD = 2;
-    public static final int ASSET_TYPE_CREDIT_CARD = 3;
+    public static final int ASSET_TYPE_BANK_BOOK = 0;
+    public static final int ASSET_TYPE_DEBIT_CARD = 1;
+    public static final int ASSET_TYPE_CREDIT_CARD = 2;
 
     public static final String TABLE_ID = "_id";
 
@@ -444,7 +444,7 @@ public final class DB_Scheme extends SQLiteOpenHelper {
         zDbIO.rawQuery(db, query);
 
         query = "INSERT INTO transactions (transaction_time,category_id,amount,asset_id,recipient,note,franchisee_id,budget_exception) VALUES (\n" +
-                (time+ 10000L) + ",1,50000000,1,'월급','',NULL,1);\n" ;
+                (time+ 100000L) + ",1,50000000,1,'월급','',NULL,1);\n" ;
         Log.i("Create Tables",query);
         zDbIO.rawQuery(db, query);
     }

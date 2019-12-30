@@ -188,7 +188,6 @@ public class Settings_CategoryLEVEL2 extends AppCompatActivity {
             RecyclerItem.CategorySettingsItem categoryitem = (RecyclerItem.CategorySettingsItem) v.getTag();
 
             nameOnlyItem = categoryitem.nameOnlyItem;
-            //TODO 이름 변경 팝업 띄우기
 
             buildDialog();
         }

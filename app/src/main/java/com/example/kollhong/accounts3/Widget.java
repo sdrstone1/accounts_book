@@ -53,16 +53,11 @@ public class Widget extends AppWidgetProvider {
         int color_gray;
         int color_blue;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            color_red = context.getColor(android.R.color.holo_red_light);
-            color_gray = context.getColor(android.R.color.darker_gray);
-            color_blue = context.getColor(android.R.color.holo_blue_light);
-        }
-        else {
-            color_red = context.getResources().getColor(android.R.color.holo_red_light);
-            color_gray = context.getResources().getColor(android.R.color.darker_gray);
-            color_blue = context.getResources().getColor(android.R.color.holo_blue_light);
-        }
+
+        color_red = GlobalFunction.Color.getColor(context,android.R.color.holo_red_light);
+        color_gray = GlobalFunction.Color.getColor(context,android.R.color.darker_gray);
+        color_blue = GlobalFunction.Color.getColor(context,android.R.color.holo_blue_light);
+
 
         List<DBItem.TransactionsViewItem> valuesList = mDB.getTransbyCat(thisMonth, nextMonth);
 

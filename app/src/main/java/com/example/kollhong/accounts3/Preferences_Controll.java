@@ -21,7 +21,6 @@ public class Preferences_Controll {
         mPref = PreferenceManager.getDefaultSharedPreferences(context);
         //mPref = context.getSharedPreferences(Pref_name,Context.MODE_PRIVATE);
 
-        //TODO MVC화... edit 호출도 나중에 commit할 때...
 
         if (mPref.contains("initialized")) {
             init = mPref.getBoolean("initialized", false);

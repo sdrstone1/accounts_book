@@ -40,14 +40,14 @@ public class Message_Reciever extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
+        // This method is called when the BroadcastReceiver is receiving
 
-        //TODO 발신인 확인하고
-        //TODO 은행 전화번호이면
+        // 발신인 확인하고
+        // 은행 전화번호이면
         //
-        //TODO 국민은행 1588-9999
-        //TODO 신한카드 1544-7200
-        //TODO 날짜 mm/dd 시간 hh:mm 거래 금액 거래처 해외 여부까지 나옴
+        // 국민은행 1588-9999
+        // 신한카드 1544-7200
+        // 날짜 mm/dd 시간 hh:mm 거래 금액 거래처 해외 여부까지 나옴
         // an Intent broadcast.
 
         //SMS를 수신받으면 발신자에 따라(은행에 따라) 메시지 폼을 분석하고 날짜, 거래처, add_transactions에 전달

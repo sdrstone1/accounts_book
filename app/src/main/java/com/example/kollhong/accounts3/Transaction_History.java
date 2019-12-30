@@ -137,13 +137,10 @@ public class Transaction_History extends Fragment {
 
         dateView.setText(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
 
-        int max_day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int min_day = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int firstDayOfMonth = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
 
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+        calendar = GlobalFunction.Calendar.getFirstDayOfCalendar(calendar);
 
 
         long today;
@@ -153,14 +150,14 @@ public class Transaction_History extends Fragment {
         //list = new ArrayList<>();
         List<DBItem.TransactionsViewItem> transactionHistoryList;
         List<RecyclerItem> recyclerItemList = new ArrayList<>();
-        for (int day2 = max_day; day2 >= min_day; day2--) {
+        for (int day2 = lastDayOfMonth; day2 >= firstDayOfMonth; day2--) {
             calendar.set(Calendar.DAY_OF_MONTH, day2);
 
             today = calendar.getTimeInMillis();
             calendar2.setTimeInMillis(today);
             calendar2.add(Calendar.DAY_OF_MONTH, 1);
             tomorrow = calendar2.getTimeInMillis() - 1L;
-            calendar2.setTimeInMillis(tomorrow);
+            //calendar2.setTimeInMillis(tomorrow);
 
             transactionHistoryList = mDB.getTransHistory(today, tomorrow);
 

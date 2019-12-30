@@ -265,7 +265,7 @@ public class TransactionAdd_Activity extends AppCompatActivity {
         Bundle args = new Bundle();
 
         args.putLong("timeinmillis", itemTransactions.transactionTime);
-        //TODO 년월일시분 전달
+        // 년월일시분 전달
 
         dialogFragment.setArguments(args);
         dialogFragment.show(getSupportFragmentManager().beginTransaction(), "tag");
@@ -325,7 +325,7 @@ public class TransactionAdd_Activity extends AppCompatActivity {
         recyclerView.setAdapter(bottomsheetAdapter);
 
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
 
         mBottomSheetDialog.setContentView(sheetView);
         mBottomSheetDialog.show();
