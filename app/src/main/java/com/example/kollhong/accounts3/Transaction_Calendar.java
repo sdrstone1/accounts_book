@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.prolificinteractive.materialcalendarview.*;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
-
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -29,6 +28,7 @@ public class Transaction_Calendar extends Fragment {
     TextView dateView;
     //Calendar calendar;
     MaterialCalendarView calendarView;
+    List<Long> calendarGenerated= new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +47,7 @@ public class Transaction_Calendar extends Fragment {
         new ApiSimulator(Calendar.getInstance()).executeOnExecutor(Executors.newSingleThreadExecutor());
 
 
-        //\\calendarView.setOnMonthChangedListener(new onMonthChangedListener());
+        calendarView.setOnMonthChangedListener(new onMonthChangedListener());
     }
 
     public class onDateSelectedListener implements OnDateSelectedListener {
@@ -63,6 +63,7 @@ public class Transaction_Calendar extends Fragment {
         @Override
         public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
             // localdate = date.getDate();
+            new ApiSimulator(date.getCalendar()).executeOnExecutor(Executors.newSingleThreadExecutor());
 
         }
     }
@@ -88,6 +89,9 @@ public class Transaction_Calendar extends Fragment {
             }
 
             calendar = GlobalFunction.Calendar.getFirstDayOfCalendar(calendar);
+            if(calendarGenerated.contains(calendar.getTimeInMillis())){
+                return null;
+            }
 
             ArrayList<CalendarDay> dates = new ArrayList<>();
 
@@ -140,7 +144,7 @@ public class Transaction_Calendar extends Fragment {
         @Override
         protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
             super.onPostExecute(calendarDays);
-
+            if(calendarDays == null) return;
             int color = 0;
             if (transferOnly) {
                 color = GlobalFunction.Color.getColor(getContext(), android.R.color.darker_gray);
