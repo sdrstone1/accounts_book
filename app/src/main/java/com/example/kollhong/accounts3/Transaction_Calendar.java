@@ -1,11 +1,15 @@
 package com.example.kollhong.accounts3;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +20,8 @@ import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import java.util.*;
 import java.util.concurrent.Executors;
+
+import static com.example.kollhong.accounts3.GlobalFunction.Calendar.ONEDAY_IN_MILLIS;
 
 /**
  * Created by KollHong on 25/03/2018.
@@ -30,6 +36,7 @@ public class Transaction_Calendar extends Fragment {
     MaterialCalendarView calendarView;
     List<Long> calendarGenerated= new ArrayList<>();
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,19 +50,76 @@ public class Transaction_Calendar extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         calendarView = view.findViewById(R.id.calendarView);
         new ApiSimulator(Calendar.getInstance()).executeOnExecutor(Executors.newSingleThreadExecutor());
 
 
         calendarView.setOnMonthChangedListener(new onMonthChangedListener());
+        calendarView.setOnDateChangedListener(new onDateSelectedListener());
     }
 
     public class onDateSelectedListener implements OnDateSelectedListener {
         @Override
         public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+            if (selected) {
+                BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(getContext());
+                View sheetView = getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker, null);
+                RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
-            //TODO make bottomsheet
-            //TODO bottomsheet
+                if (mBottomSheetDialog.isShowing()) mBottomSheetDialog.dismiss();
+
+                //Make a new instance of Calendar.
+                // 새로운 인스턴스를 만들지 않으면
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(date.getCalendar().getTimeInMillis());
+
+                List<RecyclerItem> recyclerItemList = makeTransactionHistoryList(calendar);
+                Recycler_Adapter bottomsheetAdapter = new Recycler_Adapter(getActivity(), recyclerItemList, new TransactionClickListener());
+                recyclerView.setAdapter(bottomsheetAdapter);
+                recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+
+
+                mBottomSheetDialog.setContentView(sheetView);
+                mBottomSheetDialog.show();
+            }
+
+        }
+
+        List<RecyclerItem> makeTransactionHistoryList(Calendar date) {
+            Calendar selectedDate = GlobalFunction.Calendar.getMidnightOfDay(date);
+
+            long today = selectedDate.getTimeInMillis();
+            long tomorrow = today + ONEDAY_IN_MILLIS;
+
+            List<DBItem.TransactionsViewItem> transactionHistoryList = mDB.getTransHistory(today, tomorrow);
+            List<RecyclerItem> recyclerItemList = new ArrayList<>();
+
+            RecyclerItem.dateHeaderItem HeaderItem = new RecyclerItem.dateHeaderItem();
+            HeaderItem.transactionTime = today;
+            recyclerItemList.add(HeaderItem);       //거래 날짜 표시
+
+            for (DBItem.TransactionsViewItem transactionsViewItem : transactionHistoryList) {
+                //transactionsViewItem = (DBItem.TransactionsViewItem) iterator.next();
+
+                RecyclerItem.HistoryContentItem item = new RecyclerItem.HistoryContentItem();
+                item.item = transactionsViewItem;
+                recyclerItemList.add(item);
+            }
+
+            return recyclerItemList;
+        }
+
+        public class TransactionClickListener implements View.OnClickListener {
+            @Override
+            public void onClick(View v) {
+
+                RecyclerItem.HistoryContentItem contentItem = (RecyclerItem.HistoryContentItem) v.getTag();
+                Log.e("Updating Trans, ", "trans_id : " + contentItem.item.tableId);
+                Intent intent = new Intent(getContext(), TransactionAdd_Activity.class);
+                intent.putExtra("UpdateTrans", contentItem.item.tableId);
+                startActivity(intent);
+            }
         }
     }
 
@@ -96,7 +160,7 @@ public class Transaction_Calendar extends Fragment {
             ArrayList<CalendarDay> dates = new ArrayList<>();
 
 
-            Calendar calendar2 = Calendar.getInstance();
+            //Calendar calendar2 = Calendar.getInstance();
             //month = calendar.get(Calendar.MONTH);
 
 
@@ -110,10 +174,11 @@ public class Transaction_Calendar extends Fragment {
             for (int day2 = lastDayOfMonth; day2 >= firstDayOfMonth; day2--) {
                 calendar.set(Calendar.DAY_OF_MONTH, day2);
 
+
                 today = calendar.getTimeInMillis();
-                calendar2.setTimeInMillis(today);
-                calendar2.add(Calendar.DAY_OF_MONTH, 1);
-                tomorrow = calendar2.getTimeInMillis() - 1L;
+                tomorrow = today + ONEDAY_IN_MILLIS;
+                //calendar2.add(Calendar.DAY_OF_MONTH, 1);
+                //tomorrow = calendar2.getTimeInMillis() - 1L;
                 //calendar2.setTimeInMillis(tomorrow);
 
                 List<DBItem.TransactionsViewItem> transactionHistoryList = mDB.getTransHistory(today, tomorrow);

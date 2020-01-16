@@ -65,7 +65,7 @@ public class DB_Controll {
         TransactionsViewItem DBtransactionsItem;
         //1577617134698
 
-        Log.i("Transaction_History",today + "    " + tomorrow);
+        //Log.i("Transaction_History",today + "    " + tomorrow);
         if(cursor.getCount() != 0){
             if(BuildConfig.isTEST){
                 Log.i("Transaction_History", "발견 됨 : "+ cursor.getCount());

@@ -21,7 +21,12 @@ import android.widget.TextView;
 import com.example.kollhong.accounts3.RecyclerItem.HistoryContentItem;
 import com.example.kollhong.accounts3.RecyclerItem.dateHeaderItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import static com.example.kollhong.accounts3.GlobalFunction.Calendar.ONEDAY_IN_MILLIS;
 
 //import com.example.kollhong.accounts3.DBItem.*;
 
@@ -132,7 +137,19 @@ public class Transaction_History extends Fragment {
     private void makeRecyclerView() {
         RecyclerView recyclerView = getView().findViewById(R.id.tran_hist_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        Calendar calendar2 = Calendar.getInstance();
+
+        List<RecyclerItem> recyclerItemList = makeTransactionHistoryList();
+
+        transAdapter = new Recycler_Adapter(getActivity(), recyclerItemList, new TransactionClickListener());
+        recyclerView.setAdapter(transAdapter);
+        DividerItemDecoration divider = new DividerItemDecoration(getContext());
+        recyclerView.addItemDecoration(divider);
+        transAdapter.notifyDataSetChanged();
+
+    }
+
+    private List<RecyclerItem> makeTransactionHistoryList() {
+        //Calendar calendar2 = Calendar.getInstance();
         month = calendar.get(Calendar.MONTH);
 
         dateView.setText(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
@@ -154,9 +171,7 @@ public class Transaction_History extends Fragment {
             calendar.set(Calendar.DAY_OF_MONTH, day2);
 
             today = calendar.getTimeInMillis();
-            calendar2.setTimeInMillis(today);
-            calendar2.add(Calendar.DAY_OF_MONTH, 1);
-            tomorrow = calendar2.getTimeInMillis() - 1L;
+            tomorrow = today + ONEDAY_IN_MILLIS;
             //calendar2.setTimeInMillis(tomorrow);
 
             transactionHistoryList = mDB.getTransHistory(today, tomorrow);
@@ -176,13 +191,7 @@ public class Transaction_History extends Fragment {
                 }
             }
         }
-
-        transAdapter = new Recycler_Adapter(getActivity(), recyclerItemList,new TransactionClickListener());
-        recyclerView.setAdapter(transAdapter);
-        DividerItemDecoration divider = new DividerItemDecoration(getContext());
-        recyclerView.addItemDecoration(divider);
-        transAdapter.notifyDataSetChanged();
-
+        return recyclerItemList;
     }
     public class TransactionClickListener implements View.OnClickListener {
         @Override

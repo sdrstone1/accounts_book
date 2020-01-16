@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +30,7 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     //int context;
 
     Recycler_Adapter(Activity ac, List<RecyclerItem> item, View.OnClickListener clickListener) {
-
+        super();
         activity = ac;
         items = item;
         listener = clickListener;
@@ -43,28 +42,36 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == Settings_Asset_Item || viewType == Settings_Category_Item || viewType == TransactionAdd_Activity_ASSET_ITEM || viewType == TransactionAdd_Activity_CATEGORY_ITEM) {
-            View view = activity.getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
-            return new settingsViewholder(view);
-        }
-        else if (viewType == Transaction_History_HEADER) {      //헤더
-            View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_header, parent, false);
-            return new assetSummaryHeaderHolder(view);
-        } else if (viewType == Transaction_History_CONTENT) {
-            View view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_content, parent, false);
+        View view;
+        switch (viewType) {
+            case Settings_Asset_Item:
+            case Settings_Category_Item:
+            case TransactionAdd_Activity_ASSET_ITEM:
+            case TransactionAdd_Activity_CATEGORY_ITEM:
+                view = activity.getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker_holder, parent, false);
+                return new settingsViewholder(view);
+            case Transaction_History_HEADER:
+                view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_header, parent, false);
+                return new assetSummaryHeaderHolder(view);
 
-            return new ContentViewHolder(view);
-        } else if (viewType == Statistics_Asset_HEADER) {
-            View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
-            return new assetSummaryHolder(view);
-        } else if (viewType == Statistics_Category_HEADER) {
-            View view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
-            return new categorySummaryHolder(view);
-        } else {
-            Log.w("리사이클러뷰", "에러");
-            return null;
-        }
+            case Transaction_History_CONTENT:
+                view = LayoutInflater.from(activity).inflate(R.layout.a_trans_frag0_content, parent, false);
+                return new ContentViewHolder(view);
 
+            case Statistics_Asset_HEADER:
+                view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
+                return new assetSummaryHolder(view);
+
+            case Statistics_Category_HEADER:
+                view = LayoutInflater.from(activity).inflate(R.layout.b_manage_frag0_recycler, parent, false);
+                return new categorySummaryHolder(view);
+
+            default:
+
+                Log.w("리사이클러뷰", "에러");
+                return null;
+
+        }
     }
 
     @Override
@@ -75,107 +82,113 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         RecyclerItem item = items.get(position);
-        if (item.getType() == Settings_Asset_Item) {
-            AssetSettingsItem assetitem = (AssetSettingsItem) item;
+        switch (item.getType()) {
+            case Settings_Asset_Item: {
+                AssetSettingsItem assetitem = (AssetSettingsItem) item;
 
-            settingsViewholder viewholder = (settingsViewholder) holder;
-            viewholder.textView.setText(assetitem.item.name);
-            View v = viewholder.textView;
-            v.setTag(item);
-            viewholder.textView.setOnClickListener(listener);
-        }
-        else if ( item.getType() == Settings_Category_Item) {
-            CategorySettingsItem categoryitem = (CategorySettingsItem) item;
-
-            settingsViewholder viewholder = (settingsViewholder) holder;
-            viewholder.textView.setText(categoryitem.nameOnlyItem.name);
-            View v = viewholder.textView;
-            v.setTag(item);
-            viewholder.textView.setOnClickListener(listener);
-        }
-        else if (item.getType() == Transaction_History_HEADER) {
-
-            assetSummaryHeaderHolder viewHolder = (assetSummaryHeaderHolder) holder;
-            dateHeaderItem dateHeaderItem = (dateHeaderItem) item;
-
-
-            dateHeaderItem.date.setTime(dateHeaderItem.transactionTime);
-            dateHeaderItem.format = dateHeaderItem.df.format(dateHeaderItem.date);
-
-            viewHolder.time.setText(dateHeaderItem.format);
-        }
-        else if (item.getType() == Transaction_History_CONTENT) {
-            ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
-
-            HistoryContentItem historyContentItem = (HistoryContentItem) item;
-
-            holder.itemView.setTag(historyContentItem);
-            holder.itemView.setOnClickListener(listener);
-
-
-            if (historyContentItem.item.categoryLevel == 0 || historyContentItem.item.categoryLevel == 1) { //0,1,2        3,4,5           6,7,8
-                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_blue);
-            } else if (historyContentItem.item.categoryLevel == 2) {
-                setTextLevel2(contentViewHolder,historyContentItem, contentViewHolder.color_blue);
-            } else if (historyContentItem.item.categoryLevel == 3 || historyContentItem.item.categoryLevel == 4) {
-                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_red);
-            } else if (historyContentItem.item.categoryLevel == 5) {
-                setTextLevel2(contentViewHolder,historyContentItem, contentViewHolder.color_red);
-            } else if (historyContentItem.item.categoryLevel == 6 || historyContentItem.item.categoryLevel == 7) {
-                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_gray);
-            } else if (historyContentItem.item.categoryLevel == 8) {
-                setTextLevel1(contentViewHolder,historyContentItem, contentViewHolder.color_gray);
+                settingsViewholder viewholder = (settingsViewholder) holder;
+                viewholder.textView.setText(assetitem.item.name);
+                View v = viewholder.textView;
+                v.setTag(item);
+                viewholder.textView.setOnClickListener(listener);
+                break;
             }
 
-            contentViewHolder.list_amount.setText(String.valueOf(historyContentItem.item.amount));
-            contentViewHolder.list_accounts.setText(historyContentItem.item.assetName);
-            contentViewHolder.list_reci.setText(historyContentItem.item.recipientName);
+            case Settings_Category_Item: {
+                CategorySettingsItem categoryitem = (CategorySettingsItem) item;
+                settingsViewholder viewholder = (settingsViewholder) holder;
+                viewholder.textView.setText(categoryitem.nameOnlyItem.name);
+                View v = viewholder.textView;
+                v.setTag(item);
+                viewholder.textView.setOnClickListener(listener);
+                break;
+            }
+            case Transaction_History_HEADER: {
+                assetSummaryHeaderHolder viewHolder = (assetSummaryHeaderHolder) holder;
+                dateHeaderItem dateHeaderItem = (dateHeaderItem) item;
 
-        } else if (item.getType() == Statistics_Asset_HEADER) {
-            AssetSummaryItem assetItem = (AssetSummaryItem) item;
-            assetSummaryHolder assetSummaryHolder = (assetSummaryHolder) holder;
+                dateHeaderItem.date.setTime(dateHeaderItem.transactionTime);
+                dateHeaderItem.format = dateHeaderItem.df.format(dateHeaderItem.date);
 
-            assetSummaryHolder.name.setText(assetItem.assetName);
-            assetSummaryHolder.income.setText(String.valueOf(assetItem.IncomeSummary));
-            assetSummaryHolder.expense.setText(String.valueOf(assetItem.ExpenseSummary));
-            assetSummaryHolder.remittance.setText(String.valueOf(assetItem.TransferSummary));
-            CharSequence string = activity.getApplicationContext().getResources().getText(R.string.reward);
-            String reward = String.valueOf(Float.valueOf(assetItem.RewardSummary).intValue());
-            assetSummaryHolder.reward.setText(string + "   " + reward);
-        }
+                viewHolder.time.setText(dateHeaderItem.format);
+                break;
+            }
+            case Transaction_History_CONTENT: {
 
-        else if
-        (item.getType() == Statistics_Category_HEADER){
+                ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
 
-            categorySummaryHolder catSummaryHolder =  (categorySummaryHolder) holder;
-            CategorySummaryItem catSummaryItem = (CategorySummaryItem) item;
+                HistoryContentItem historyContentItem = (HistoryContentItem) item;
 
-            catSummaryHolder.name.setText(catSummaryItem.assetName);
-            //accHolder.income.setText(String.valueOf(itemVO.amount_in));
-            catSummaryHolder.expense.setText(String.valueOf(catSummaryItem.amount));
-            //accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
-        }
-        else if
-        (item.getType() == TransactionAdd_Activity_ASSET_ITEM){
-            TransactionAddAssetItem transactionAddAssetItem = (TransactionAddAssetItem)item;
+                holder.itemView.setTag(historyContentItem);
+                holder.itemView.setOnClickListener(listener);
 
-            settingsViewholder newholder = (settingsViewholder) holder;
-            newholder.textView.setText(transactionAddAssetItem.item.name);
-            View v = newholder.textView;
-            v.setTag(transactionAddAssetItem);
 
-            newholder.textView.setOnClickListener(listener);
-        }
+                if (historyContentItem.item.categoryLevel == 0 || historyContentItem.item.categoryLevel == 1) { //0,1,2        3,4,5           6,7,8
+                    setTextLevel1(contentViewHolder, historyContentItem, contentViewHolder.color_blue);
+                } else if (historyContentItem.item.categoryLevel == 2) {
+                    setTextLevel2(contentViewHolder, historyContentItem, contentViewHolder.color_blue);
+                } else if (historyContentItem.item.categoryLevel == 3 || historyContentItem.item.categoryLevel == 4) {
+                    setTextLevel1(contentViewHolder, historyContentItem, contentViewHolder.color_red);
+                } else if (historyContentItem.item.categoryLevel == 5) {
+                    setTextLevel2(contentViewHolder, historyContentItem, contentViewHolder.color_red);
+                } else if (historyContentItem.item.categoryLevel == 6 || historyContentItem.item.categoryLevel == 7) {
+                    setTextLevel1(contentViewHolder, historyContentItem, contentViewHolder.color_gray);
+                } else if (historyContentItem.item.categoryLevel == 8) {
+                    setTextLevel1(contentViewHolder, historyContentItem, contentViewHolder.color_gray);
+                }
 
-        else if
-        (item.getType() == TransactionAdd_Activity_CATEGORY_ITEM){
-            TransactionAddCategoryItem transactionAddCategoryItem = (TransactionAddCategoryItem) item;
+                contentViewHolder.list_amount.setText(String.valueOf(historyContentItem.item.amount));
+                contentViewHolder.list_accounts.setText(historyContentItem.item.assetName);
+                contentViewHolder.list_reci.setText(historyContentItem.item.recipientName);
+                break;
+            }
+            case Statistics_Asset_HEADER: {
 
-            settingsViewholder newholder = (settingsViewholder) holder;
-            newholder.textView.setText(transactionAddCategoryItem.nameOnlyItem.name);
-            View v = newholder.textView;
-            v.setTag(transactionAddCategoryItem);
-            newholder.textView.setOnClickListener(listener);
+                AssetSummaryItem assetItem = (AssetSummaryItem) item;
+                assetSummaryHolder assetSummaryHolder = (assetSummaryHolder) holder;
+
+                assetSummaryHolder.name.setText(assetItem.assetName);
+                assetSummaryHolder.income.setText(String.valueOf(assetItem.IncomeSummary));
+                assetSummaryHolder.expense.setText(String.valueOf(assetItem.ExpenseSummary));
+                assetSummaryHolder.remittance.setText(String.valueOf(assetItem.TransferSummary));
+                CharSequence string = activity.getApplicationContext().getResources().getText(R.string.reward);
+                String reward = String.valueOf(Float.valueOf(assetItem.RewardSummary).intValue());
+                assetSummaryHolder.reward.setText(string + "   " + reward);
+
+                break;
+            }
+            case Statistics_Category_HEADER: {
+
+                categorySummaryHolder catSummaryHolder = (categorySummaryHolder) holder;
+                CategorySummaryItem catSummaryItem = (CategorySummaryItem) item;
+
+                catSummaryHolder.name.setText(catSummaryItem.assetName);
+                //accHolder.income.setText(String.valueOf(itemVO.amount_in));
+                catSummaryHolder.expense.setText(String.valueOf(catSummaryItem.amount));
+                //accHolder.remittance.setText(String.valueOf(itemVO.amount_rem));
+
+                break;
+            }
+            case TransactionAdd_Activity_ASSET_ITEM: {
+                TransactionAddAssetItem transactionAddAssetItem = (TransactionAddAssetItem) item;
+
+                settingsViewholder newholder = (settingsViewholder) holder;
+                newholder.textView.setText(transactionAddAssetItem.item.name);
+                View v = newholder.textView;
+                v.setTag(transactionAddAssetItem);
+                newholder.textView.setOnClickListener(listener);
+                break;
+            }
+            case TransactionAdd_Activity_CATEGORY_ITEM: {
+                TransactionAddCategoryItem transactionAddCategoryItem = (TransactionAddCategoryItem) item;
+
+                settingsViewholder newholder = (settingsViewholder) holder;
+                newholder.textView.setText(transactionAddCategoryItem.nameOnlyItem.name);
+                View v = newholder.textView;
+                v.setTag(transactionAddCategoryItem);
+                newholder.textView.setOnClickListener(listener);
+                break;
+            }
         }
     }
 
@@ -221,6 +234,8 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         contentViewHolder.list_cat2nd.setText(historyContentItem.item.categoryName);
         contentViewHolder.list_amount.setTextColor(color);
     }
+
+
     public class settingsViewholder extends RecyclerView.ViewHolder {
         TextView textView;
 
@@ -249,7 +264,6 @@ public class Recycler_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             v.setLayoutParams(params);
         }
     }
-
 
     public class ContentViewHolder extends RecyclerView.ViewHolder {
         public TextView list_cat;

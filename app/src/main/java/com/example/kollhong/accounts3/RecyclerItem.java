@@ -15,9 +15,9 @@ public abstract class RecyclerItem {
     static final int Transaction_History_HEADER = 206;
     static final int Transaction_History_CONTENT = 207;
     static final int Statistics_Asset_HEADER = 208;
-    static final int B_Manage0_Asset_Content = 209;
+//    static final int B_Manage0_Asset_Content = 209;
     static final int Statistics_Category_HEADER = 211;
-    static final int B_Manage1_stat_Transaction_Content = 212;
+    //    static final int B_Manage1_stat_Transaction_Content = 212;
     static final int TransactionAdd_Activity_CATEGORY_ITEM = 213;
     static final int TransactionAdd_Activity_ASSET_ITEM = 214;
 
@@ -84,16 +84,6 @@ public abstract class RecyclerItem {
         }
     }
 
-
-    public static class AssetContentItem extends RecyclerItem{
-        TransactionsViewItem item = new TransactionsViewItem();
-
-        @Override
-        int getType() {
-            return B_Manage0_Asset_Content;
-        }
-    }
-
     public static class CategorySummaryItem extends RecyclerItem {
         String assetName;
         float amount;
@@ -105,14 +95,6 @@ public abstract class RecyclerItem {
             return Statistics_Category_HEADER;
         }
 
-    }
-    public static class CategoryContentItem extends RecyclerItem{
-        TransactionsViewItem item = new TransactionsViewItem();
-
-        @Override
-        int getType() {
-            return B_Manage1_stat_Transaction_Content;
-        }
     }
 
 

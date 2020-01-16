@@ -315,12 +315,9 @@ public class TransactionAdd_Activity extends AppCompatActivity {
     private void make_bottomSheet(List<RecyclerItem> contentValuesList, View.OnClickListener clickListener){
         mBottomSheetDialog = new BottomSheetDialog(this);
         View sheetView = getLayoutInflater().inflate(R.layout.w_add_transactions_category_picker, null);
-
         RecyclerView recyclerView = sheetView.findViewById(R.id.add_tran_recategory_recycler);
 
-
-        Recycler_Adapter bottomsheetAdapter
-                = new Recycler_Adapter(this,contentValuesList, clickListener);
+        Recycler_Adapter bottomsheetAdapter = new Recycler_Adapter(this, contentValuesList, clickListener);
 
         recyclerView.setAdapter(bottomsheetAdapter);
 
